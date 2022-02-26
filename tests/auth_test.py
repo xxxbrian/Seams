@@ -22,7 +22,7 @@ def create_users():
 def test_login_return_type(user_list):
     for login in user_list:
         assert type(login) == dict
-        assert type(login["auth_user_id"]) == int
+        assert type(login["u_id"]) == int
 
 def test_login_user_id(user_list):
     assert auth_login_v1("z5374603@ad.unsw.edu.au", "Ymc123") == user_list[0]
@@ -66,8 +66,8 @@ def test_register_type_and_return_unique_id(user_list):
     user_id = list()
     for user in user_list:
         assert type(user) == dict    # Make sure the return type is dict
-        assert type(user["auth_user_id"]) == int # make sure the type of id is int
-        user_id.append(user["auth_user_id"])
+        assert type(user["u_id"]) == int # make sure the type of id is int
+        user_id.append(user["u_id"])
     # check each id is unique
     assert len(user_id) == len(set(user_id))
             
