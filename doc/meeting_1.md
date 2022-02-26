@@ -1,10 +1,10 @@
-# Meeting minutes
+# Meeting
 
 ## 02/26 Weekly meeting
 
 **Participation:** _Steve Yang_, _Bojin Li_, _Cicy Zhou_, _Weihou Zeng_
 
-**Minute taker:** _Steve Yang, Bojin Li_
+**Notekeepers:** _Steve Yang, Bojin Li_
 
 **Topic:**
 
