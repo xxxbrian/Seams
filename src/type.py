@@ -1,5 +1,3 @@
-from curses.ascii import US
-from plistlib import UID
 from src import data_store
 from data_store import data_store
 
