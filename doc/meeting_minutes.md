@@ -44,3 +44,5 @@ _Status:_
 **-** ![](https://img.shields.io/badge/label-in%20test-%239400d3) _Add this label for tasks that have already started_
 
 **-** ![](https://img.shields.io/badge/label-completed-%239400d3) _Add this label for tasks that have been approved_
+
+## 03/04 Weekly meeting (next meeting)
