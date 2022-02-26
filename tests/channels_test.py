@@ -16,6 +16,16 @@ def clear():
 @pytest.fixture
 def create_user():
     user_list = list()
+    user_list.append(
+        auth_register_v1('elon.mask@spacex.com', 'Password', 'Elon', 'Musk'))
+    user_list.append(
+        auth_register_v1('mark.zuckerberg@meta.com', 'Password', 'Mark',
+                         'Zuckerberg'))
+    user_list.append(
+        auth_register_v1('tim.cook@icloud.com', 'Password', 'Tim', 'Cook'))
+    user_list.append(
+        auth_register_v1('bill.gates@outlook.com', 'Password', 'Bill',
+                         'Gates'))
     return user_list
 
 
