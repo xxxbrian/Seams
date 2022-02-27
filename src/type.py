@@ -1,5 +1,5 @@
 from src import data_store
-from data_store import data_store
+from src.data_store import data_store
 
 store = data_store.get()
 
@@ -55,12 +55,31 @@ class User():
 
     @staticmethod
     def get_last_id() -> int:
-        users = store['users'].reverse()
+        users = list(reversed(store['users']))
         u_id = users[0].u_id if len(users) > 0 else 0
         return u_id
 
     def add_to_store(self):
         store['users'].append(self)
+
+    @staticmethod
+    def generat_20fullname(name_first, name_last):
+        fullname = (name_first + name_last).lower()
+        fullname = ''.join(list(filter(str.isalnum, fullname)))[:20]
+        return fullname
+
+    def generat_handle(self) -> str:
+        fullname = self.generat_20fullname(self.name_first, self.name_last)
+
+        lastend = ''
+        for user in list(reversed(store['users'])):
+            if self.generat_20fullname(user.name_first,
+                                       user.name_last) == fullname:
+                lastend = user.handle[(len(fullname)):]
+                break
+
+        lastend = str(int(lastend) + 1) if lastend != '' else lastend
+        return fullname + lastend
 
 
 class Channel():
@@ -89,13 +108,13 @@ class Channel():
     def __init__(self, u_id, name, is_public=True) -> None:
         self.name = name
         self.owners = [User.find_by_id(u_id)]
-        self.menbers = [self.owner]
+        self.menbers = [self.owners]
         self.channel_id = Channel.get_last_id()
         self.is_public = is_public
 
     @staticmethod
     def get_last_id() -> int:
-        users = store['channels'].reverse()
+        users = list(reversed(store['channels']))
         channel_id = users[0].channel_id if len(users) > 0 else 0
         return channel_id
 
