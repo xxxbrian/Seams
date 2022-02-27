@@ -169,21 +169,3 @@ def test_register_too_long_name():
     with pytest.raises(InputError):
         auth_register_v1("imyourgrangpa4@unsw.com","1234567", too_long_first_name_2, too_long_last_name_2)
         
-def test_register_handle_cut():
-    assert auth_register_v1("asdrty@unsw.com", "123456", "steeeeeeeeeeve", "yanggggggg")['handle'] == 'steeeeeeeeeeveyanggg'    
-
-def test_register_handle_upper_to_lower():
-    assert auth_register_v1("17890123@qq.com", "123456", "Minchuan", "Yang")['handle'] == 'minchuanyang'
-    assert auth_register_v1("z522009872@ad.unsw.edu.au", "1234567", "Brian", "Li")['handle'] == 'brianli'
-    
-def test_register_delete_digit():
-    assert auth_register_v1("ahahahahaha@xixi.com", "1234567", "ste3ve1", "2yang2")['handle'] == 'steveyang'
-    assert auth_register_v1("aswerdx@qq.com", "1234567", "123james3", "34har7den")['handle'] == 'jamesharden'
-    
-def test_register_the_same_name():
-    user_1 = auth_register_v1("123@123.com", "1234567", "bobo", "zhou")
-    user_2 = auth_register_v1("456@123.com", "1234567", "bobo", "zhou")
-    user_3 = auth_register_v1("789@123.com", "1234567", "bobo", "zhou")
-    assert user_1['handle'] == 'bobozhou'
-    assert user_2['handle'] == 'bobozhou0'
-    assert user_3['handle'] == 'bobozhou1'
