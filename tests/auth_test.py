@@ -1,4 +1,6 @@
+from asyncio import Handle
 import pytest
+from src import auth
 from src.auth import auth_login_v1, auth_register_v1
 from src.other import clear_v1
 from src.error import InputError
@@ -125,7 +127,7 @@ def test_register_empty_first_name():
     with pytest.raises(InputError):
         auth_register_v1("imyourmother@unsw.com", "12345dd", " ", "James")
         
-def test_too_long_first_name():
+def test_register_too_long_first_name():
     too_long_first_name_1 = ""
     while len(too_long_first_name_1) < 50:
         too_long_first_name_1 += 'a'
@@ -137,7 +139,7 @@ def test_too_long_first_name():
     with pytest.raises(InputError):
         auth_register_v1("imyourgrangpa2@unsw.com","1234567", too_long_first_name_2, "Xia")
         
-def test_too_long_first_name():
+def test_register_too_long_first_name():
     too_long_last_name_1 = ""
     while len(too_long_last_name_1) < 50:
         too_long_last_name_1 += 'c'
@@ -149,7 +151,7 @@ def test_too_long_first_name():
     with pytest.raises(InputError):
         auth_register_v1("imyourgrangpa4@unsw.com","1234567", "Xia", too_long_last_name_2)
         
-def test_too_long_name():
+def test_register_too_long_name():
     too_long_last_name_1 = ""
     while len(too_long_last_name_1) < 50:
         too_long_last_name_1 += 'c'
@@ -166,3 +168,22 @@ def test_too_long_name():
         auth_register_v1("imyourgrangpa3@unsw.com","1234567", too_long_first_name_1, too_long_last_name_1)
     with pytest.raises(InputError):
         auth_register_v1("imyourgrangpa4@unsw.com","1234567", too_long_first_name_2, too_long_last_name_2)
+        
+def test_register_handle_cut():
+    assert auth_register_v1("asdrty@unsw.com", "123456", "steeeeeeeeeeve", "yanggggggg")['handle'] == 'steeeeeeeeeeveyanggg'    
+
+def test_register_handle_upper_to_lower():
+    assert auth_register_v1("17890123@qq.com", "123456", "Minchuan", "Yang")['handle'] == 'minchuanyang'
+    assert auth_register_v1("z522009872@ad.unsw.edu.au", "1234567", "Brian", "Li")['handle'] == 'brianli'
+    
+def test_register_delete_digit():
+    assert auth_register_v1("ahahahahaha@xixi.com", "1234567", "ste3ve1", "2yang2")['handle'] == 'steveyang'
+    assert auth_register_v1("aswerdx@qq.com", "1234567", "123james3", "34har7den")['handle'] == 'jamesharden'
+    
+def test_register_the_same_name():
+    user_1 = auth_register_v1("123@123.com", "1234567", "bobo", "zhou")
+    user_2 = auth_register_v1("456@123.com", "1234567", "bobo", "zhou")
+    user_3 = auth_register_v1("789@123.com", "1234567", "bobo", "zhou")
+    assert user_1['handle'] == 'bobozhou'
+    assert user_2['handle'] == 'bobozhou0'
+    assert user_3['handle'] == 'bobozhou1'
