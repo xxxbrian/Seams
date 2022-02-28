@@ -1,7 +1,4 @@
-def channels_list_v1(auth_user_id):
-    for user in data_store:  #for users in uid 数据库
-        if user.u_id == auth_user_id
-            return 
+def channels_list_v1(auth_user_id):      
     return {
         'channels': [
         	{

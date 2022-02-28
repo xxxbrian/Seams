@@ -1,123 +1,67 @@
 import pytest
 
-from src import data_store
 from src.channel import channel_join_v1, channel_invite_v1
 from src.channels import channels_create_v1, channels_list_v1
 from src.auth import auth_register_v1, auth_login_v1
 from src.error import InputError, AccessError
 from src.other import clear_v1
 
-
-def test_channels_list_after_join():
-    clear_v1()  # Initialization
-
-    # create users
-    user_list = list()
-    user_list.append(
-        auth_register_v1('elon.mask@spacex.com', 'Password', 'Elon', 'Musk'))
-    user_list.append(
-        auth_register_v1('mark.zuckerberg@meta.com', 'Password', 'Mark',
-                         'Zuckerberg'))
-    user_list.append(
-        auth_register_v1('tim.cook@icloud.com', 'Password', 'Tim', 'Cook'))
-    user_list.append(
-        auth_register_v1('bill.gates@outlook.com', 'Password', 'Bill',
-                         'Gates'))
-
-    # create 8 channels
-    channels_create_v1(user_list[0]['auth_user_id'], 'channel1', True)
-    channels_create_v1(user_list[0]['auth_user_id'], 'channel2', True)
-    channels_create_v1(user_list[0]['auth_user_id'], 'channel3', True)
-    channels_create_v1(user_list[0]['auth_user_id'], 'channel4', True)
-
-    channels_create_v1(user_list[1]['auth_user_id'], 'channel5', True)
-    channels_create_v1(user_list[1]['auth_user_id'], 'channel6', True)
-    channels_create_v1(user_list[1]['auth_user_id'], 'channel7', True)
-    channels_create_v1(user_list[1]['auth_user_id'], 'channel8', True)
-
-    # get all channels
-    store = data_store.get()
-    channels = store['channels']
-
-    # connect to first user if the first 4 channels are not
-    channel_join_v1(user_list[0]['auth_user_id'], 5)
-    channel_join_v1(user_list[0]['auth_user_id'], 6)
-    channel_join_v1(user_list[0]['auth_user_id'], 7)
-    channel_join_v1(user_list[0]['auth_user_id'], 8)
-
-    # get first user's channel 
-    channels_dict1 = channels_list_v1(user_list[0]['auth_user_id'])
-    channels_list1 = channels_dict1['channels']
-
-    # test if 8 channels included 
-    assert len(channels_list1) == 8
-
-    for channel in channels_list1:
-        exist = False
-        for i in range(0, len(channels)):
-            if channel['channel_id'] == channels[i]['channel_id'] and channel['name'] == channels[i]['name']:
-                exist = True
-        assert exist == True
-
-def test_channel_join_v1():
-    clear_v1()  # 
-
-    # create users
-    user_list = list()
-    user_list.append(
-        auth_register_v1('elon.mask@spacex.com', 'Password', 'Elon', 'Musk'))
-    user_list.append(
-        auth_register_v1('mark.zuckerberg@meta.com', 'Password', 'Mark',
-                         'Zuckerberg'))
-    user_list.append(
-        auth_register_v1('tim.cook@icloud.com', 'Password', 'Tim', 'Cook'))
-    user_list.append(
-        auth_register_v1('bill.gates@outlook.com', 'Password', 'Bill',
-                         'Gates'))
-
-    # create channel 
-    channel1 = channels_create_v1(user_list[0]['auth_user_id'], "example_channel1", True)
-    # invite second user
-    channel_invite_v1(user_list[0]['auth_user_id'], channel1['channel_id'], user_list[1]['auth_user_id'])
-    # connect to third user
-    ret_val = channel_join_v1(user_list[2]['auth_user_id'], channel1['channel_id'])
-    # return {}
-    assert ret_val == {}
-
-def test_channel_join_v1_except():
-    clear_v1()  
-
+@pytest.fixture(name = "user_list")
+def create_users():
+    """
+    This function is to pre_register 4 users for tests
     
+    Return a list of user_id (type: dict)
+
+    """
+    clear_v1()
     user_list = list()
-    user_list.append(
-        auth_register_v1('elon.mask@spacex.com', 'Password', 'Elon', 'Musk'))
-    user_list.append(
-        auth_register_v1('mark.zuckerberg@meta.com', 'Password', 'Mark',
-                         'Zuckerberg'))
-    user_list.append(
-        auth_register_v1('tim.cook@icloud.com', 'Password', 'Tim', 'Cook'))
-    user_list.append(
-        auth_register_v1('bill.gates@outlook.com', 'Password', 'Bill',
-                         'Gates'))
+    user_list.append(auth_register_v1("z5374603@ad.unsw.edu.au", "Ymc123", "Steve", "Yang"))
+    user_list.append(auth_register_v1("z5201314@ad.unsw.edu.au", "Bojin123", "Bojin", "Li"))
+    user_list.append(auth_register_v1("12345678@qq.com", "Cicy123", "Cicy", "Zhou"))
+    user_list.append(auth_register_v1("13579@gmail.com", "Lebron123", "Lebron", "James"))
+    return user_list
 
-    # no exist 2 IDs
-    no_exist1 = 200000
-    no_exist2 = 200001
-    # create two channels
-    channel1 = channels_create_v1(user_list[0]['auth_user_id'], "example_channel1", True)
-    channel2 = channels_create_v1(user_list[0]['auth_user_id'], "example_channel2", False)
-    # invite the first channel 
-    channel_invite_v1(user_list[0]['auth_user_id'], channel1['channel_id'], user_list[1]['auth_user_id'])
+@pytest.fixture(name = "channel_id")
+def creat_channels():
+    """
+    This function is to pre_creat a public channel for tests
+    
+    Return channel_id (type: dict)
 
-    # connect to user if the user does not exist AccessError
-    with pytest.raises(AccessError):
-        channel_join_v1(no_exist1, channel1['channel_id'])
-    # connect to channel if the channel does not exist InputError
+    """
+    user_1 = auth_login_v1("z5374603@ad.unsw.edu.au", "Ymc123")['auth_user_id']
+    user_2 = auth_login_v1("z5201314@ad.unsw.edu.au", "Bojin123")['auth_user_id']
+    channel_id = channels_create_v1(user_1, "Channel_1", True)['channel_id'] 
+    channel_id2 = channels_create_v1(user_1, "Channel_2", False)['channel_id'] 
+    channel_join_v1(user_2, channel_id)
+    return channel_id, channel_id2
+
+def test_channel_join_invalid_channel_id():
+    user_1 = auth_login_v1("z5374603@ad.unsw.edu.au", "Ymc123")['auth_user_id']
     with pytest.raises(InputError):
-        assert channel_join_v1(user_list[2]['auth_user_id'], no_exist2)
-    # connect existed user InputError
+        channel_join_v1(user_1, -1)
     with pytest.raises(InputError):
-        assert channel_join_v1(user_list[0]['auth_user_id'], channel1['channel_id'])
-    # connect to private channel AccessError
+        channel_join_v1(user_1, -2)
+
+
+def test_channel_join_user_is_already_a_member(channel_id):
+    user_1 = auth_login_v1("z5374603@ad.unsw.edu.au", "Ymc123")['auth_user_id']
+    user_2 = auth_login_v1("z5201314@ad.unsw.edu.au", "Bojin123")['auth_user_id']
+    with pytest.raises(InputError):
+        channel_join_v1(user_1, channel_id)
+    with pytest.raises(InputError):
+        channel_join_v1(user_2, channel_id)
+    
+
+
+def test_channel_join_private_channel(channel_id2):
+    user_2 = auth_login_v1("z5201314@ad.unsw.edu.au", "Bojin123")['auth_user_id']
+    user_3 = auth_login_v1("12345678@qq.com", "Cicy123")['auth_user_id']
     with pytest.raises(AccessError):
-        assert channel_join_v1(user_list[2]['auth_user_id'], channel2['channel_id'])
+        channel_join_v1(user_2, channel_id2)
+    with pytest.raises(AccessError):
+        channel_join_v1(user_3, channel_id2)
+
+
+   
