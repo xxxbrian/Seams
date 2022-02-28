@@ -1,4 +1,3 @@
-from asyncio import Handle
 import pytest
 from src import auth
 from src.auth import auth_login_v1, auth_register_v1
