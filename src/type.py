@@ -42,6 +42,12 @@ class User():
         self.name_last = name_last
         self.handle_str = self.generat_handle()
 
+    def todict(self, show={'u_id', 'email', 'name_first', 'name_last'}):
+        return {
+            key: value
+            for key, value in self.__dict__.items() if key in show
+        }
+
     @staticmethod
     def find_by_id(u_id):
         '''
@@ -82,11 +88,11 @@ class User():
         u_id = users[0].u_id if len(users) > 0 else -1
         return u_id
 
-    def add_to_store(self):
+    def add_to_store(self) -> None:
         store['users'].append(self)
 
     @staticmethod
-    def generat_20fullname(name_first: str, name_last: str):
+    def generat_20fullname(name_first: str, name_last: str) -> str:
         fullname = (name_first + name_last).lower()
         fullname = ''.join(list(filter(str.isalnum, fullname)))[:20]
         return fullname
@@ -174,11 +180,39 @@ class Channel():
         self.channel_id = Channel.get_last_id()
         self.is_public = is_public
 
+    def todict(self, show={'channel_id', 'name', 'is_public'}):
+        return {
+            key: value
+            for key, value in self.__dict__.items() if key in show
+        }
+
     @staticmethod
     def get_last_id() -> int:
         users = list(reversed(store['channels']))
         channel_id = users[0].channel_id if len(users) > 0 else 0
         return channel_id
 
-    def add_to_store(self):
+    @staticmethod
+    def find_by_id(channel_id):
+        '''
+
+        Find channel by channel's channel_id
+
+        Args: 
+            channel_id
+
+        Return:
+            Channel
+        '''
+        for channel in store['channels']:
+            if channel.channel_id == channel_id:
+                return channel
+        return None
+
+    def add_to_store(self) -> None:
         store['channels'].append(self)
+
+    def join(self, u_id) -> None:
+        user = User.find_by_id(u_id)
+        if user not in self.menbers and user is not None:
+            self.menbers.append(user)
