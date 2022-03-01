@@ -212,7 +212,8 @@ class Channel():
     def add_to_store(self) -> None:
         store['channels'].append(self)
 
-    def join(self, u_id) -> None:
-        user = User.find_by_id(u_id)
-        if user not in self.menbers and user is not None:
-            self.menbers.append(user)
+    def has_user(self,user:User) -> bool:
+        return user in self.menbers
+        
+    def join(self, user:User) -> None:
+        self.menbers.append(user)
