@@ -22,7 +22,7 @@ def create_users():
     user_list.append(auth_register_v1("13579@gmail.com", "Lebron123", "Lebron", "James"))
     return user_list
 
-@pytest.fixture(name = "channel_id")
+@pytest.fixture()
 def creat_channels():
     """
     This function is to pre_creat a public channel for tests
