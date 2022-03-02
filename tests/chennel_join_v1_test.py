@@ -54,13 +54,13 @@ def test_channel_join_invalid_channel_id():
         channel_join_v1(user_1, -2)
 
 
-def test_channel_join_user_is_already_a_member_of_public_channel(channel_id_1):
+def test_channel_join_user_is_already_a_member_of_public_channel(user_list, channel_id_1):
     user_2 = auth_login_v1("z5201314@ad.unsw.edu.au", "Bojin123")['auth_user_id']
     channel_join_v1(user_2, channel_id_1)
     with pytest.raises(InputError):
         channel_join_v1(user_2, channel_id_1)
     
-def test_channel_join_user_is_already_a_member_of_private_channel(channel_id_2):
+def test_channel_join_user_is_already_a_member_of_private_channel(user_list, channel_id_2):
     user_1 = auth_login_v1("z5374603@ad.unsw.edu.au", "Ymc123")['auth_user_id']
     user_2 = auth_login_v1("z5201314@ad.unsw.edu.au", "Bojin123")['auth_user_id']
     channel_invite_v1(user_2, channel_id_2, user_1)
@@ -68,7 +68,7 @@ def test_channel_join_user_is_already_a_member_of_private_channel(channel_id_2):
         channel_join_v1(user_1, channel_id_2)
 
 
-def test_channel_join_private_channel(channel_id_2):
+def test_channel_join_private_channel(user_list, channel_id_2):
     user_3 = auth_login_v1("12345678@qq.com", "Cicy123")['auth_user_id']
     user_4 = auth_login_v1("13579@gmail.com", "Lebron123")['auth_user_id']
     with pytest.raises(AccessError):
