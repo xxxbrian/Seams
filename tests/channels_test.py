@@ -10,7 +10,7 @@ import random, string
 
 @pytest.fixture
 def clear():
-    clear_v1
+    clear_v1()
 
 
 @pytest.fixture
