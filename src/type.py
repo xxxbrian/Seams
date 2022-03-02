@@ -254,3 +254,53 @@ class Channel():
 
     def join(self, user: User) -> None:
         self.members.append(user)
+
+
+class Message():
+
+    def __init__(self, u_id: int, content: str, time_sent: int) -> None:
+        self.message_id = Message.get_last_id() + 1
+        self.u_id = u_id
+        self.content = content
+        self.time_sent = time_sent
+
+    def todict(self, show={'message_id', 'u_id', 'message', 'time_sent'}):
+        info_dict = {
+            key: value
+            for key, value in self.__dict__.items() if key in show
+        }
+        if 'message' in show:
+            info_dict['message'] = list(content.todict()
+                                        for content in self.content)
+
+    def get_last_id() -> int:
+        users = list(reversed(store['messages']))
+        channel_id = users[0].channel_id if len(users) > 0 else 0
+        return channel_id
+
+    @staticmethod
+    def find_by_id(channel_id):
+        '''
+
+        Find channel by channel's channel_id
+
+        Args: 
+            channel_id
+
+        Return:
+            Channel
+        '''
+        for channel in store['channels']:
+            if channel.channel_id == channel_id:
+                return channel
+        return None
+
+    @staticmethod
+    def clear() -> None:
+        store['messages'] = []
+
+    def add_to_store(self) -> None:
+        store['messages'].append(self)
+
+    def add_to_channel(self, channel: Channel) -> None:
+        channel.messages.append(self)
