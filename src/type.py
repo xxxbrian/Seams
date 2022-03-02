@@ -1,4 +1,3 @@
-from src import channel
 from src.data_store import data_store
 
 import re
