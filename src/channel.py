@@ -1,31 +1,24 @@
+from src.type import User, Channel
+
+
 def channel_invite_v1(auth_user_id, channel_id, u_id):
-    return {
-    }
+    # Example for add someone in channel
+    channel = Channel.find_by_id(channel_id)
+    user = User.find_by_id(u_id)
+    channel.join(user)
+    return {}
+
 
 def channel_details_v1(auth_user_id, channel_id):
-    return {
-        'name': 'Hayden',
-        'owner_members': [
-            {
-                'u_id': 1,
-                'email': 'example@gmail.com',
-                'name_first': 'Hayden',
-                'name_last': 'Jacobs',
-                'handle_str': 'haydenjacobs',
-            }
-        ],
-        'all_members': [
-            {
-                'u_id': 1,
-                'email': 'example@gmail.com',
-                'name_first': 'Hayden',
-                'name_last': 'Jacobs',
-                'handle_str': 'haydenjacobs',
-            }
-        ],
-    }
+    # Example for get channel details
+    channel = Channel.find_by_id(channel_id)
+    channel_info = channel.todict(
+        {'name', 'is_public', 'owner_members', 'all_members'})
+    return channel_info
+
 
 def channel_messages_v1(auth_user_id, channel_id, start):
+    # Wait for new methods provide in src.type
     return {
         'messages': [
             {
@@ -39,6 +32,7 @@ def channel_messages_v1(auth_user_id, channel_id, start):
         'end': 50,
     }
 
+
 def channel_join_v1(auth_user_id, channel_id):
-    return {
-    }
+    # Example is same in channel_intive_v1
+    return {}
