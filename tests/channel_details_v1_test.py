@@ -34,14 +34,14 @@ def creat_channels():
     
     return channel_id
 
-def test_channel_details_invalid_channel_id():
+def test_channel_details_invalid_channel_id(user_list):
     user_1 = auth_login_v1("z5374603@ad.unsw.edu.au", "Ymc123")['auth_user_id']
     with pytest.raises(InputError):
         channel_details_v1(user_1, -1)
     with pytest.raises(InputError):
         channel_details_v1(user_1, -2)
         
-def test_channel_details_user_not_in_channel(channel_id):
+def test_channel_details_user_not_in_channel(user_list, channel_id):
     user_2 = auth_login_v1("z5201314@ad.unsw.edu.au", "Bojin123")['auth_user_id']
     with pytest.raises(AccessError):
         channel_details_v1(user_2, channel_id)
@@ -72,7 +72,7 @@ def test_channel_details_one_owner(channel_id):
         }
     ])
     
-def test_channel_details_one_join_members(channel_id):
+def test_channel_details_one_join_members(user_list,channel_id):
     user_1 = auth_login_v1("z5374603@ad.unsw.edu.au", "Ymc123")['auth_user_id']
     user_2 = auth_login_v1("z5201314@ad.unsw.edu.au", "Bojin123")['auth_user_id']
     channel_join_v1(user_2, channel_id)
@@ -104,7 +104,7 @@ def test_channel_details_one_join_members(channel_id):
         }
     ])
  
-def test_channel_details_two_join_members(channel_id):  
+def test_channel_details_two_join_members(user_list, channel_id):  
     user_1 = auth_login_v1("z5374603@ad.unsw.edu.au", "Ymc123")['auth_user_id']
     user_2 = auth_login_v1("z5201314@ad.unsw.edu.au", "Bojin123")['auth_user_id']
     user_3 = auth_login_v1("12345678@qq.com", "Cicy123")['auth_user_id']
