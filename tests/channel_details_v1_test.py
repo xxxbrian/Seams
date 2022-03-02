@@ -1,7 +1,7 @@
 import pytest
 from src.other import clear_v1
 from src.error import InputError, AccessError
-from src.channel import channel_details_v1, channel_join_v1
+from src.channel import channel_details_v1, channel_join_v1, channel_invite_v1
 from src.channels import channels_create_v1
 from src.auth import auth_login_v1, auth_register_v1
 
@@ -22,7 +22,7 @@ def create_users():
     return user_list
 
 @pytest.fixture(name = "channel_id")
-def creat_channels():
+def creat_public_channel():
     """
     This function is to pre_creat a public channel for tests
     
@@ -32,7 +32,7 @@ def creat_channels():
     user_1 = auth_login_v1("z5374603@ad.unsw.edu.au", "Ymc123")['auth_user_id']
     channel_id = channels_create_v1(user_1, "Channel_1", True)['channel_id']
     
-    return channel_id
+    return channel_id                                                                   
 
 def test_channel_details_invalid_channel_id():
     user_1 = auth_login_v1("z5374603@ad.unsw.edu.au", "Ymc123")['auth_user_id']
@@ -110,6 +110,79 @@ def test_channel_details_two_join_members(channel_id):
     user_3 = auth_login_v1("12345678@qq.com", "Cicy123")['auth_user_id']
     channel_join_v1(user_2, channel_id)
     channel_join_v1(user_3, channel_id)
+    
+    assert channel_details_v1(user_1, channel_id)['name'] == 'Channel_1'
+    assert set(channel_details_v1(user_1, channel_id)['owner_members']) == set([ 
+        {
+            'u_id': user_1,
+            'name_first': 'Steve',
+            'name_last': 'Yang',
+            'email': 'z5374603@ad.unsw.edu.au',
+            'handle_str': "steveyang",
+        }                                                                    
+    ])
+    assert set(channel_details_v1(user_1, channel_id)['all_members']) == set([
+        {
+            'u_id': user_1,
+            'name_first': 'Steve',
+            'name_last': 'Yang',
+            'email': 'z5374603@ad.unsw.edu.au',                
+            'handle_str': "steveyang",
+        },
+        {
+            'u_id': user_2,
+            'name_first': 'Bojin',
+            'name_last': 'Li',
+            'email': 'z5201314@ad.unsw.edu.au',
+            'handle_str': "bojinli",
+        },
+        {
+            'u_id': user_3,
+            'name_first': 'Cicy',
+            'name_last': 'Zhou',
+            'email': '12345678@qq.com',
+            'handle_str': 'cicyzhou',
+        },
+    ])
+    
+def test_channel_details_invite_one_members(channel_id):
+    user_1 = auth_login_v1("z5374603@ad.unsw.edu.au", "Ymc123")['auth_user_id']
+    user_2 = auth_login_v1("z5201314@ad.unsw.edu.au", "Bojin123")['auth_user_id']
+    channel_invite_v1(user_1, channel_id, user_2)
+    
+    assert channel_details_v1(user_1, channel_id)['name'] == 'Channel_1'
+    assert set(channel_details_v1(user_1, channel_id)['owner_members']) == set([
+        {
+            'u_id': user_1,
+            'name_first': 'Steve',
+            'name_last': 'Yang',
+            'email': 'z5374603@ad.unsw.edu.au',
+            'handle_str': "steveyang",
+        }
+    ])
+    assert set(channel_details_v1(user_1, channel_id)['all_members']) == set([
+        {
+            'u_id': user_1,
+            'name_first': 'Steve',
+            'name_last': 'Yang',
+            'email': 'z5374603@ad.unsw.edu.au',
+            'handle_str': "steveyang",
+        },
+        {
+            'u_id': user_2,
+            'name_first': 'Bojin',
+            'name_last': 'Li',
+            'email': 'z5201314@ad.unsw.edu.au',
+            'handle_str': "bojinli",
+        }
+    ])
+    
+def test_channel_details_invite_two_members(channel_id):  
+    user_1 = auth_login_v1("z5374603@ad.unsw.edu.au", "Ymc123")['auth_user_id']
+    user_2 = auth_login_v1("z5201314@ad.unsw.edu.au", "Bojin123")['auth_user_id']
+    user_3 = auth_login_v1("12345678@qq.com", "Cicy123")['auth_user_id']
+    channel_invite_v1(user_1, channel_id, user_2)
+    channel_invite_v1(user_1, channel_id, user_3)
     
     assert channel_details_v1(user_1, channel_id)['name'] == 'Channel_1'
     assert set(channel_details_v1(user_1, channel_id)['owner_members']) == set([ 
