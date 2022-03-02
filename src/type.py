@@ -1,4 +1,4 @@
-from src import data_store
+from src import channel
 from src.data_store import data_store
 
 import re
@@ -42,14 +42,25 @@ class User():
         self.name_last = name_last
         self.handle_str = self.generat_handle()
 
-    def todict(self, show={'u_id', 'email', 'name_first', 'name_last'}):
+    def __str__(self):
+        info = 'User object:\n'+\
+            f' - u_id:     {self.u_id}\n'+\
+            f' - email:    {self.email}\n'+\
+            f' - password: {self.password}\n'+\
+            f' - name:     {self.name_first} {self.name_first}\n'+\
+            f' - handle:   {self.handle_str}'
+        return info
+
+    def todict(self,
+               show={'u_id', 'email', 'name_first', 'name_last',
+                     'handle_str'}):
         return {
             key: value
             for key, value in self.__dict__.items() if key in show
         }
 
     @staticmethod
-    def find_by_id(u_id):
+    def find_by_id(u_id: int):
         '''
 
         Find user by user's u_id
@@ -81,6 +92,10 @@ class User():
             if user.email == email:
                 return user
         return None
+
+    @staticmethod
+    def clear() -> None:
+        store['users'] = []
 
     @staticmethod
     def get_last_id() -> int:
@@ -157,7 +172,7 @@ class Channel():
     Attributes:
         name:         (str)   channel's name
         owners:       (list)  channel's owners
-        menbers:      (list)  channel's menbers
+        members:      (list)  channel's members
         channel_id:   (int)   channel's id
         is_public:    (bool)  channel is public or not
     
@@ -176,15 +191,33 @@ class Channel():
     def __init__(self, u_id: int, name: str, is_public: bool = True) -> None:
         self.name = name
         self.owners = [User.find_by_id(u_id)]
-        self.menbers = [self.owners]
+        self.members = [User.find_by_id(u_id)]
         self.channel_id = Channel.get_last_id()
         self.is_public = is_public
+        self.messages = []
+
+    def __str__(self):
+        channel_type = 'public' if self.is_public else 'privte'
+        info = 'Channel object:\n'+\
+            f' - name:        {self.name}\n'+\
+            f' - channel_id:  {self.channel_id}\n'+\
+            f' - type:        {channel_type}\n'+\
+            f' - members:     {len(self.members)} ({len(self.owners)}owners)'
+        return info
 
     def todict(self, show={'channel_id', 'name', 'is_public'}):
-        return {
+        info_dict = {
             key: value
             for key, value in self.__dict__.items() if key in show
         }
+        if 'owner_members' in show:
+            info_dict['owner_members'] = list(user.todict()
+                                              for user in self.owners)
+        if 'all_members' in show:
+            info_dict['all_members'] = list(user.todict()
+                                            for user in self.members)
+
+        return info_dict
 
     @staticmethod
     def get_last_id() -> int:
@@ -209,11 +242,15 @@ class Channel():
                 return channel
         return None
 
+    @staticmethod
+    def clear() -> None:
+        store['channels'] = []
+
     def add_to_store(self) -> None:
         store['channels'].append(self)
 
-    def has_user(self,user:User) -> bool:
-        return user in self.menbers
-        
-    def join(self, user:User) -> None:
-        self.menbers.append(user)
+    def has_user(self, user: User) -> bool:
+        return user in self.members
+
+    def join(self, user: User) -> None:
+        self.members.append(user)
