@@ -49,7 +49,7 @@ def test_channel_details_user_not_in_channel(user_list, channel_id):
     with pytest.raises(AccessError):
         channel_details_v1(user_3, channel_id)
         
-def test_channel_details_one_owner(channel_id):
+def test_channel_details_one_owner(user_list, channel_id):
     user_1 = auth_login_v1("z5374603@ad.unsw.edu.au", "Ymc123")['auth_user_id']
     
     assert channel_details_v1(user_1, channel_id)['name'] == 'Channel_1'
@@ -145,7 +145,7 @@ def test_channel_details_two_join_members(user_list, channel_id):
         },
     ])
     
-def test_channel_details_invite_one_members(channel_id):
+def test_channel_details_invite_one_members(user_list,channel_id):
     user_1 = auth_login_v1("z5374603@ad.unsw.edu.au", "Ymc123")['auth_user_id']
     user_2 = auth_login_v1("z5201314@ad.unsw.edu.au", "Bojin123")['auth_user_id']
     channel_invite_v1(user_1, channel_id, user_2)
@@ -177,7 +177,7 @@ def test_channel_details_invite_one_members(channel_id):
         }
     ])
     
-def test_channel_details_invite_two_members(channel_id):  
+def test_channel_details_invite_two_members(user_list, channel_id):  
     user_1 = auth_login_v1("z5374603@ad.unsw.edu.au", "Ymc123")['auth_user_id']
     user_2 = auth_login_v1("z5201314@ad.unsw.edu.au", "Bojin123")['auth_user_id']
     user_3 = auth_login_v1("12345678@qq.com", "Cicy123")['auth_user_id']
