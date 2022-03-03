@@ -25,7 +25,7 @@ Example usage:
 '''
 
 ## YOU SHOULD MODIFY THIS OBJECT BELOW
-initial_object = {'users': [], 'channels': []}
+initial_object = {'users': [], 'channels': [], 'messages': []}
 
 ## YOU SHOULD MODIFY THIS OBJECT ABOVE
 
