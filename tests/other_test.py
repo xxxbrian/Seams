@@ -3,7 +3,7 @@ import pytest
 from src.other import clear_v1
 from src.data_store import data_store
 
-def test_clear_v1():
+def clear_v1_test():
     store = data_store.get()
     users = store['users']
     chann = store['channels']
