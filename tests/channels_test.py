@@ -1,6 +1,6 @@
 import pytest
 
-from src.channels import channels_create_v1
+from src.channels import channels_create_v1, channels_list_v1, channels_listall_v1
 from src.auth import auth_register_v1
 from src.error import InputError
 from src.other import clear_v1
@@ -59,3 +59,58 @@ def test_channels_create_all_normal(clear, create_user):
     for channel in channel_list:
         assert type(channel) == dict
         assert type(channel['channel_id']) == int
+
+
+def test_channels_list(clear, create_user):
+    elon_group = {'id': [], 'list': []}  #elon's channel
+    zuck_group = {'id': [], 'list': []}  #zuck's channel
+    elon_group['id'].append(
+        channels_create_v1(create_user[0]['auth_user_id'], 'Tesla',
+                           True)['channel_id'])
+    elon_group['id'].append(
+        channels_create_v1(create_user[0]['auth_user_id'], 'SpaceX',
+                           True)['channel_id'])
+    elon_group['id'].append(
+        channels_create_v1(create_user[0]['auth_user_id'], 'Dogecoin',
+                           False)['channel_id'])
+    zuck_group['id'].append(
+        channels_create_v1(create_user[1]['auth_user_id'], 'Facebook',
+                           True)['channel_id'])
+    zuck_group['id'].append(
+        channels_create_v1(create_user[1]['auth_user_id'], 'Metaverse',
+                           False)['channel_id'])
+
+    elon_group['list'] = channels_list_v1(create_user[0])
+    zuck_group['list'] = channels_list_v1(create_user[1])
+
+    for channel in elon_group['list']:
+        assert channel['channel_id'] in elon_group['id']
+        assert channel['name'] == str
+    for channel in zuck_group['list']:
+        assert channel['channel_id'] in zuck_group['id']
+        assert channel['name'] == str
+
+
+def test_channels_listall_v1(clear, create_user):
+    channel_list = list()
+    for user in create_user:
+        channel_list.append(
+            channels_create_v1(user['auth_user_id'], 'Tesla', True))
+        # different channel name
+        channel_list.append(
+            channels_create_v1(user['auth_user_id'], 'SpaceX', True))
+        # different channel type
+        channel_list.append(
+            channels_create_v1(user['auth_user_id'], 'SpaceX', False))
+        # same channel name
+        channel_list.append(
+            channels_create_v1(user['auth_user_id'], 'SpaceX', False))
+
+    assert len(channel_list) == len(
+        channels_listall_v1(create_user[0]['auth_user_id']))
+    assert len(channel_list) == len(
+        channels_listall_v1(create_user[1]['auth_user_id']))
+
+    for detial in channels_listall_v1(create_user[0]['auth_user_id']):
+        assert detial['channel_id'] == int
+        assert detial['name'] == str
