@@ -34,7 +34,7 @@ def creat_public_channel():
     
     return channel_id                                                                   
 
-def test_channel_details_invalid_channel_id(user_list):
+def test_channel_details_invalid_channel_id(user_list, channel_id):
     user_1 = auth_login_v1("z5374603@ad.unsw.edu.au", "Ymc123")['auth_user_id']
     with pytest.raises(InputError):
         channel_details_v1(user_1, -1)
