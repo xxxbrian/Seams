@@ -9,9 +9,9 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
         raise InputError
     if user is None:
         raise InputError
-    if channel.has_user(u_id) is True:
+    if channel.has_user(u_id):
         raise InputError
-    if Channel.find_by_id(channel_id) is not None and channel.has_user(auth_user_id) is False:
+    if not channel.has_user(auth_user_id):
         raise AccessError
 
     channel.join(user)
@@ -22,7 +22,7 @@ def channel_details_v1(auth_user_id, channel_id):
     channel = Channel.find_by_id(channel_id)
     if channel is None:
         raise InputError
-    if channel.has_user(auth_user_id) == False:
+    if not channel.has_user(auth_user_id):
         raise AccessError
     
     channel_info = channel.todict(
@@ -34,6 +34,8 @@ def channel_messages_v1(auth_user_id, channel_id, start):
     channel = Channel.find_by_id(channel_id)
     if channel is None:
         raise InputError
+    
+    # Wait for new methods provide in src.type
 
     return {
         'messages': [
@@ -53,9 +55,9 @@ def channel_join_v1(auth_user_id, channel_id):
     channel = Channel.find_by_id(channel_id)
     if channel is None:
         raise InputError
-    if Channel.has_user(channel, auth_user_id) is True:
+    if channel.has_user(auth_user_id):
         raise InputError
-    if channel.is_public is False and channel.has_user(auth_user_id) is False:
+    if not channel.is_public:
         raise AccessError
     
     user = User.find_by_id(auth_user_id)
