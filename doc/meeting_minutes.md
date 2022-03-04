@@ -4,7 +4,7 @@
 
 **Participation:** _Steve Yang_, _Bojin Li_, _Cicy Zhou_, _Weihou Zeng_
 
-**Minute taker:** _Steve Yang, Bojin Li_
+**Minute taker:** _Steve Yang_, _Bojin Li_
 
 **Topic:**
 
@@ -45,4 +45,18 @@ _Status:_
 
 **-** ![](https://img.shields.io/badge/label-completed-%239400d3) _Add this label for tasks that have been approved_
 
-## 03/04 Weekly meeting (next meeting)
+## 03/01 Weekly meeting
+
+**Participation:** _Steve Yang_, _Bojin Li_, _Cicy Zhou_, _Weihou Zeng_, _Quan Gu_
+
+**Minute taker:** _Steve Yang_, _Bojin Li_
+
+**Topic:**
+
+- Discussing which situations, we should test in `auth_test`. We should follow the **black-box** rule, which means we can’t use any functions or variables not define in interface.
+- When finished `auth_register` and `auth_login`, we found some bugs in our test program. According to ED forum, we know the meaning of `auth_user_id` and `u_id`, hence we change the variable name in our test program, which used `u_id` before. But we should use `auth_user_id` because it is the return value.
+- Change the way to test `channel_details`. Because list is ordered, we can’t just use `==` straitly. Hence, we use the `set()` function to compare `all_members` and `owner_members`.
+- Discussing a method named `to_dict`, which is really helpful when we need to return a dictionary in a function.
+- Discusses the methods we need to provide in our `Class`.
+
+## 03/05 Weekly meeting (next meeting)
