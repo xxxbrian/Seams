@@ -24,7 +24,7 @@ def create_users():
 def test_login_return_type(user_list):
     for login in user_list:
         assert type(login) == dict
-        assert type(login["u_id"]) == int
+        assert type(login["auth_user_id"]) == int
 
 def test_login_user_id(user_list):
     assert auth_login_v1("z5374603@ad.unsw.edu.au", "Ymc123") == user_list[0]
@@ -32,31 +32,31 @@ def test_login_user_id(user_list):
     assert auth_login_v1("12345678@qq.com", "Cicy123") == user_list[2]
     assert auth_login_v1("13579@gmail.com", "Lebron123") == user_list[3]
      
-def test_login_empty_email():
+def test_login_empty_email(user_list):
     with pytest.raises(InputError):
         auth_login_v1("", "asdfg")   # test empty email
         
-def test_login_string_email():        
+def test_login_string_email(user_list):        
     with pytest.raises(InputError):
         auth_login_v1("email", "123456") # test string
         
-def test_login_without_at_email():        
+def test_login_without_at_email(user_list):        
     with pytest.raises(InputError):
         auth_login_v1("email.com", "1234")   # test without '@'
 
-def test_login_without_com_email():
+def test_login_without_com_email(user_list):
     with pytest.raises(InputError):
         auth_login_v1("email@qq", "1234")    # test without '.com'
 
-def test_login_inexistent_email():
+def test_login_inexistent_email(user_list):
     with pytest.raises(InputError):
         auth_login_v1("z5374604@ad.unsw.edu.au", "1234") # a valid email but inexistent
                    
-def test_login_empty_password():
+def test_login_empty_password(user_list):
     with pytest.raises(InputError):
         auth_login_v1("z5374603@ad.unsw.edu.au", "") # test empty password
         
-def test_login_correct_email_wrong_password():
+def test_login_correct_email_wrong_password(user_list):
     with pytest.raises(InputError):
         auth_login_v1("z5374603@ad.unsw.edu.au", "Ymc1234")   # correct email but wrong password
     with pytest. raises(InputError):
@@ -68,8 +68,8 @@ def test_register_type_and_return_unique_id(user_list):
     user_id = list()
     for user in user_list:
         assert type(user) == dict    # Make sure the return type is dict
-        assert type(user["u_id"]) == int # make sure the type of id is int
-        user_id.append(user["u_id"])
+        assert type(user["auth_user_id"]) == int # make sure the type of id is int
+        user_id.append(user["auth_user_id"])
     # check each id is unique
     assert len(user_id) == len(set(user_id))
             
@@ -125,11 +125,11 @@ def test_register_empty_first_name():
     with pytest.raises(InputError):
         auth_register_v1("imurfather@unsw.com", "123456KK", "", "Harden")
     with pytest.raises(InputError):
-        auth_register_v1("imyourmother@unsw.com", "12345dd", " ", "James")
+        auth_register_v1("imyourmother@unsw.com", "12345dd", "", "James")
         
 def test_register_too_long_first_name():
     too_long_first_name_1 = ""
-    while len(too_long_first_name_1) < 50:
+    while len(too_long_first_name_1) < 51:
         too_long_first_name_1 += 'a'
     too_long_first_name_2 = ""
     while len(too_long_first_name_2) < 100:
@@ -141,7 +141,7 @@ def test_register_too_long_first_name():
         
 def test_register_too_long_first_name():
     too_long_last_name_1 = ""
-    while len(too_long_last_name_1) < 50:
+    while len(too_long_last_name_1) < 51:
         too_long_last_name_1 += 'c'
     too_long_last_name_2 = ""
     while len(too_long_last_name_2) < 100:
@@ -153,13 +153,13 @@ def test_register_too_long_first_name():
         
 def test_register_too_long_name():
     too_long_last_name_1 = ""
-    while len(too_long_last_name_1) < 50:
+    while len(too_long_last_name_1) < 51:
         too_long_last_name_1 += 'c'
     too_long_last_name_2 = ""
     while len(too_long_last_name_2) < 100:
         too_long_last_name_2 += 'd'
         too_long_first_name_1 = ""
-    while len(too_long_first_name_1) < 50:
+    while len(too_long_first_name_1) < 51:
         too_long_first_name_1 += 'a'
     too_long_first_name_2 = ""
     while len(too_long_first_name_2) < 100:
