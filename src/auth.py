@@ -1,4 +1,3 @@
-from ast import In
 from src.data_store import data_store
 from src.error import InputError
 from src.type import User

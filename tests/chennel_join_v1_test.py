@@ -46,7 +46,7 @@ def creat_private_channel():
     channel_id_2 = channels_create_v1(user_2, "Channel_2", False)['channel_id']
     return channel_id_2                                                             # private channel_id
     
-def test_channel_join_invalid_channel_id():
+def test_channel_join_invalid_channel_id(user_list):
     user_1 = auth_login_v1("z5374603@ad.unsw.edu.au", "Ymc123")['auth_user_id']
     with pytest.raises(InputError):
         channel_join_v1(user_1, -1)

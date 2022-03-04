@@ -32,31 +32,31 @@ def test_login_user_id(user_list):
     assert auth_login_v1("12345678@qq.com", "Cicy123") == user_list[2]
     assert auth_login_v1("13579@gmail.com", "Lebron123") == user_list[3]
      
-def test_login_empty_email():
+def test_login_empty_email(user_list):
     with pytest.raises(InputError):
         auth_login_v1("", "asdfg")   # test empty email
         
-def test_login_string_email():        
+def test_login_string_email(user_list):        
     with pytest.raises(InputError):
         auth_login_v1("email", "123456") # test string
         
-def test_login_without_at_email():        
+def test_login_without_at_email(user_list):        
     with pytest.raises(InputError):
         auth_login_v1("email.com", "1234")   # test without '@'
 
-def test_login_without_com_email():
+def test_login_without_com_email(user_list):
     with pytest.raises(InputError):
         auth_login_v1("email@qq", "1234")    # test without '.com'
 
-def test_login_inexistent_email():
+def test_login_inexistent_email(user_list):
     with pytest.raises(InputError):
         auth_login_v1("z5374604@ad.unsw.edu.au", "1234") # a valid email but inexistent
                    
-def test_login_empty_password():
+def test_login_empty_password(user_list):
     with pytest.raises(InputError):
         auth_login_v1("z5374603@ad.unsw.edu.au", "") # test empty password
         
-def test_login_correct_email_wrong_password():
+def test_login_correct_email_wrong_password(user_list):
     with pytest.raises(InputError):
         auth_login_v1("z5374603@ad.unsw.edu.au", "Ymc1234")   # correct email but wrong password
     with pytest. raises(InputError):
