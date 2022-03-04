@@ -80,15 +80,17 @@ def test_channels_list(clear, create_user):
         channels_create_v1(create_user[1]['auth_user_id'], 'Metaverse',
                            False)['channel_id'])
 
-    elon_group['list'] = channels_list_v1(create_user[0])
-    zuck_group['list'] = channels_list_v1(create_user[1])
+    elon_group['list'] = channels_list_v1(
+        create_user[0]['auth_user_id'])['channels']
+    zuck_group['list'] = channels_list_v1(
+        create_user[1]['auth_user_id'])['channels']
 
     for channel in elon_group['list']:
         assert channel['channel_id'] in elon_group['id']
-        assert channel['name'] == str
+        assert type(channel['name']) is str
     for channel in zuck_group['list']:
         assert channel['channel_id'] in zuck_group['id']
-        assert channel['name'] == str
+        assert type(channel['name']) is str
 
 
 def test_channels_listall_v1(clear, create_user):
@@ -107,10 +109,11 @@ def test_channels_listall_v1(clear, create_user):
             channels_create_v1(user['auth_user_id'], 'SpaceX', False))
 
     assert len(channel_list) == len(
-        channels_listall_v1(create_user[0]['auth_user_id']))
+        channels_listall_v1(create_user[0]['auth_user_id'])['channels'])
     assert len(channel_list) == len(
-        channels_listall_v1(create_user[1]['auth_user_id']))
+        channels_listall_v1(create_user[1]['auth_user_id'])['channels'])
 
-    for detial in channels_listall_v1(create_user[0]['auth_user_id']):
-        assert detial['channel_id'] == int
-        assert detial['name'] == str
+    for detial in channels_listall_v1(
+            create_user[0]['auth_user_id'])['channels']:
+        assert type(detial['channel_id']) is int
+        assert type(detial['name']) is str
