@@ -26,30 +26,27 @@ def channel_details_v1(auth_user_id, channel_id):
         raise InputError
     if not channel.has_user(user):
         raise AccessError
-    
+
     channel_info = channel.todict(
         {'name', 'is_public', 'owner_members', 'all_members'})
     return channel_info
 
 
 def channel_messages_v1(auth_user_id, channel_id, start):
+    user = User.find_by_id(auth_user_id)
     channel = Channel.find_by_id(channel_id)
     if channel is None:
         raise InputError
-    
-    # Wait for new methods provide in src.type
-
+    if start > len(channel.messages):
+        raise InputError
+    if not channel.has_user(User):
+        raise AccessError
+    end = start + 50 if start + 50 <= len(channel.messages) else -1
+    msg_list = list(msg.todict() for msg in channel.get_message(start, end))
     return {
-        'messages': [
-            {
-                'message_id': 1,
-                'u_id': 1,
-                'message': 'Hello world',
-                'time_sent': 1582426789,
-            }
-        ],
-        'start': 0,
-        'end': 50,
+        'messages': msg_list,
+        'start': start,
+        'end': end,
     }
 
 
