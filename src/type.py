@@ -253,6 +253,13 @@ class Channel():
 
     def join(self, user: User) -> None:
         self.members.append(user)
+    
+    @staticmethod
+    def check_name_invalid(name: str) -> bool:
+        """
+        Check whether the length of user is satisfy length request
+        """
+        return len(name) < 1 or len(name) > 20
 
 
 class Message():
