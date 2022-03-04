@@ -268,6 +268,10 @@ class Channel():
         """
         return store['channels']
 
+    def get_messages(self, start: int, end: int) -> list:
+        end = len(self.messages) if end < 0 else end
+        return self.messages[start:end]
+
 
 class Message():
 
