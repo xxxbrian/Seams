@@ -1,6 +1,9 @@
-from src.data_store import data_store
+from src.type import User, Channel, Message
+
+# resets all data
+
 
 def clear_v1():
-    store = data_store.get()
-    store['users'] = []
-    data_store.set(store)
+    User.clear()
+    Channel.clear()
+    Message.clear()
