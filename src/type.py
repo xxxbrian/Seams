@@ -42,16 +42,17 @@ class User():
 
     def __str__(self):
         info = 'User object:\n'+\
-            f' - u_id:     {self.u_id}\n'+\
-            f' - email:    {self.email}\n'+\
-            f' - password: {self.password}\n'+\
-            f' - name:     {self.name_first} {self.name_first}\n'+\
+            f' - u_id:     {self.u_id}\n' + \
+            f' - email:    {self.email}\n' + \
+            f' - password: {self.password}\n' + \
+            f' - name:     {self.name_first} {self.name_first}\n' + \
             f' - handle:   {self.handle_str}'
         return info
 
     def todict(self,
                show = {'u_id', 'email', 'name_first', 'name_last',
                      'handle_str'}):
+
         return {
             key: value
             for key, value in self.__dict__.items() if key in show
@@ -66,8 +67,9 @@ class User():
             u_id
 
         Return:
-            User
+            user
         '''
+
         for user in store['users']:
             if user.u_id == u_id:
                 return user
@@ -92,19 +94,24 @@ class User():
 
     @staticmethod
     def clear() -> None:
+        """clear user"""
         store['users'] = []
 
     @staticmethod
     def get_last_id() -> int:
+        """return last user id"""
         users = list(reversed(store['users']))
         u_id = users[0].u_id if len(users) > 0 else -1
         return u_id
 
     def add_to_store(self) -> None:
+        """add user"""
         store['users'].append(self)
 
     @staticmethod
     def generat_20fullname(name_first: str, name_last: str) -> str:
+        """generate 20 lowercase full names"""
+
         fullname = (name_first + name_last).lower()
         fullname = ''.join(list(filter(str.isalnum, fullname)))[:20]
         return fullname
@@ -125,14 +132,12 @@ class User():
     @staticmethod
     def check_email_invalid(email: str) -> bool:
         """Check whether the email address is valid"""
-
         regx = r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$'
         return not re.fullmatch(regx, email)
 
     @staticmethod
     def check_email_been_used(email: str) -> bool:
         """Check whether the user's email is been used"""
-
         return User.find_by_email(email) is not None
 
     @staticmethod
@@ -277,7 +282,7 @@ class Message():
         if 'message' in show:
             info_dict['message'] = list(content.todict()
                                         for content in self.content)
-
+    @staticmethod
     def get_last_id() -> int:
         users = list(reversed(store['messages']))
         channel_id = users[0].channel_id if len(users) > 0 else 0
