@@ -1,8 +1,8 @@
-from src.data_store import data_store
 from src.error import InputError
 from src.type import User
 
 def auth_login_v1(email, password):
+    """if login details are correct, user id returned"""
     # email entered does not belong to a user
     if not User.check_email_been_used(email):
         raise InputError
@@ -15,6 +15,8 @@ def auth_login_v1(email, password):
     }
 
 def auth_register_v1(email, password, name_first, name_last):
+    """register new user if inputs are valid"""
+
     if User.check_email_invalid(email):
         raise InputError
     if User.check_email_been_used(email):
@@ -25,7 +27,7 @@ def auth_register_v1(email, password, name_first, name_last):
         raise InputError
     if User.check_name_invalid(name_last):
         raise InputError
-    
+
     new_user = User(email, password, name_first, name_last)
     new_user.add_to_store()
 
