@@ -22,7 +22,9 @@ def create_users():
     user_list.append(auth_register_v1("12345678@qq.com",
                                         "Cicy123", "Cicy", "Zhou"))
     user_list.append(auth_register_v1("13579@gmail.com", "Lebron123",
-                                        "Lebron", "James"))
+                                        "Steve", "Yang"))
+    user_list.append(auth_register_v1("135798@gmail.com", "James123",
+                                        "Steve", "Yang"))
     return user_list
 
 @pytest.fixture(name = "channel_id")
@@ -228,6 +230,61 @@ def test_channel_details_invite_two_members(user_list, channel_id):
                 'name_last': 'Zhou',
                 'email': '12345678@qq.com',
                 'handle_str': 'cicyzhou',
+            },
+        ],
+    }
+    
+############################## Test for handle ####################################
+def test_channel_details_three_members_cotain_the_same_name(user_list, channel_id):
+    user_1 = auth_login_v1("z5374603@ad.unsw.edu.au", "Ymc123")['auth_user_id']
+    user_2 = auth_login_v1("z5201314@ad.unsw.edu.au", "Bojin123")['auth_user_id']
+    user_3 = auth_login_v1("13579@gmail.com", "Lebron123")['auth_user_id']
+    user_4 = auth_login_v1("135798@gmail.com", "James123")['auth_user_id']
+    
+    channel_invite_v1(user_1, channel_id, user_2)
+    channel_invite_v1(user_1, channel_id, user_3)
+    channel_invite_v1(user_1, channel_id, user_4)
+
+    assert channel_details_v1(user_1, channel_id) == {
+        'name': 'Channel_1',
+        "is_public": True,
+        'owner_members': [
+            {
+                'u_id': user_1,
+                'name_first': 'Steve',
+                'name_last': 'Yang',
+                'email': 'z5374603@ad.unsw.edu.au',
+                'handle_str': "steveyang",
+            }
+        ],
+        'all_members': [
+            {
+                'u_id': user_1,
+                'name_first': 'Steve',
+                'name_last': 'Yang',
+                'email': 'z5374603@ad.unsw.edu.au',
+                'handle_str': "steveyang",
+            },
+            {
+                'u_id': user_2,
+                'name_first': 'Bojin',
+                'name_last': 'Li',
+                'email': 'z5201314@ad.unsw.edu.au',
+                'handle_str': "bojinli",
+            },
+            {
+                'u_id': user_3,
+                'name_first': 'Steve',
+                'name_last': 'Yang',
+                'email': '13579@gmail.com',
+                'handle_str': 'steveyang0',
+            },
+            {
+                'u_id': user_4,
+                'name_first': 'Steve',
+                'name_last': 'Yang',
+                'email': '135798@gmail.com',
+                'handle_str': 'steveyang1',
             },
         ],
     }
