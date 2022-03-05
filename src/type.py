@@ -32,7 +32,6 @@ class User():
 
     def __init__(self, email: str, password: str, name_first: str,
                  name_last: str) -> None:
-
         self.u_id = User.get_last_id() + 1
         self.email = email
         self.password = password
@@ -52,7 +51,6 @@ class User():
     def todict(self,
                show = {'u_id', 'email', 'name_first', 'name_last',
                      'handle_str'}):
-
         return {
             key: value
             for key, value in self.__dict__.items() if key in show
@@ -123,7 +121,7 @@ class User():
         for user in list(reversed(store['users'])):
             if self.generat_20fullname(user.name_first,
                                        user.name_last) == fullname:
-                lastend = user.handle[(len(fullname)):]
+                lastend = user.handle_str[(len(fullname)):]
                 break
 
         lastend = str(int(lastend) + 1) if lastend != '' else lastend
