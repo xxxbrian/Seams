@@ -2,7 +2,8 @@ from src.error import InputError
 from src.type import User
 
 def auth_login_v1(email, password):
-    """if login details are correct, user id returned"""
+    """Given a registered user's email and password,
+    returns their `auth_user_id` value."""
     # email entered does not belong to a user
     if not User.check_email_been_used(email):
         raise InputError
@@ -15,7 +16,7 @@ def auth_login_v1(email, password):
     }
 
 def auth_register_v1(email, password, name_first, name_last):
-    """register new user if inputs are valid"""
+    """register new user if all inputs are valid"""
 
     if User.check_email_invalid(email):
         raise InputError
