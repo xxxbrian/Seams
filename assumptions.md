@@ -15,3 +15,6 @@
     
 # 5. channels_test:
     We assume auth_register_v1 amd clear_v1 are both working well. Because we need to have some users at first. So that we can let these users creat channels.
+
+# 6. handle_test:
+    About handle test, because we can't return handle in any function, we decide to test it in channel_details_v1_test. We can check if handles are right when we check all informations in a channel. And we do test the situation that 2 users names are the same.
