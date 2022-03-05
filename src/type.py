@@ -121,10 +121,13 @@ class User():
         for user in list(reversed(store['users'])):
             if self.generat_20fullname(user.name_first,
                                        user.name_last) == fullname:
-                lastend = user.handle_str[(len(fullname)):]
+                if user.handle_str[(len(fullname)):] == '':
+                    lastend = '0'
+                else:
+                    lastend = user.handle_str[(len(fullname)):]
+                    lastend = str(int(lastend) + 1)
                 break
 
-        lastend = str(int(lastend) + 1) if lastend != '' else lastend
         return fullname + lastend
 
     @staticmethod
