@@ -138,8 +138,9 @@ def test_register_too_long_first_name():
         auth_register_v1("imyourgrangpa1@unsw.com","1234567", too_long_first_name_1, "Haa")
     with pytest.raises(InputError):
         auth_register_v1("imyourgrangpa2@unsw.com","1234567", too_long_first_name_2, "Xia")
-        
-def test_register_too_long_first_name():
+
+       
+def test_register_too_long_last_name():
     too_long_last_name_1 = ""
     while len(too_long_last_name_1) < 51:
         too_long_last_name_1 += 'c'
@@ -150,6 +151,7 @@ def test_register_too_long_first_name():
         auth_register_v1("imyourgrangpa3@unsw.com","1234567", "Haa", too_long_last_name_1)
     with pytest.raises(InputError):
         auth_register_v1("imyourgrangpa4@unsw.com","1234567", "Xia", too_long_last_name_2)
+
         
 def test_register_too_long_name():
     too_long_last_name_1 = ""
