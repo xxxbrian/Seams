@@ -4,6 +4,7 @@ from src.data_store import data_store
 
 store = data_store.get()
 
+
 class User():
     '''
     Every user will be store in data_store:[(object) Datastore] as an User object
@@ -49,7 +50,7 @@ class User():
         return info
 
     def todict(self,
-               show = {'u_id', 'email', 'name_first', 'name_last',
+               show={'u_id', 'email', 'name_first', 'name_last',
                      'handle_str'}):
         return {
             key: value
@@ -159,6 +160,7 @@ class User():
             return user.password == password
         return False
 
+
 class Channel():
     '''
     Every channel will be store in data_store:[(object) Datastore] as an Channel object
@@ -198,7 +200,7 @@ class Channel():
             f' - members:     {len(self.members)} ({len(self.owners)}owners)'
         return info
 
-    def todict(self, show = {'channel_id', 'name', 'is_public'}):
+    def todict(self, show={'channel_id', 'name', 'is_public'}):
         info_dict = {
             key: value
             for key, value in self.__dict__.items() if key in show
@@ -283,9 +285,10 @@ class Message():
         if 'message' in show:
             info_dict['message'] = list(content.todict()
                                         for content in self.content)
+
     @staticmethod
     def get_last_id() -> int:
-        users = list(reversed(store['messages']))
+        users = store['messages']
         channel_id = users[0].channel_id if len(users) > 0 else 0
         return channel_id
 
@@ -311,7 +314,7 @@ class Message():
         store['messages'] = []
 
     def add_to_store(self) -> None:
-        store['messages'].append(self)
+        store['messages'].insert(0, self)
 
     def add_to_channel(self, channel: Channel) -> None:
-        channel.messages.append(self)
+        channel.messages.insert(0, self)
