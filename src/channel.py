@@ -43,17 +43,18 @@ def channel_messages_v1(auth_user_id, channel_id, start):
         return up to 50 messages between index
         start" and "start + 50"""
 
+    user = User.find_by_id(auth_user_id)
     channel = Channel.find_by_id(channel_id)
     if channel is None:
         raise InputError
     if start > len(channel.messages):
         raise InputError
-    if not channel.has_user(User):
+    if not channel.has_user(user):
         raise AccessError
 
     # Message with index 0 is the most recent message in the channel.
     end = start + 50 if start + 50 <= len(channel.messages) else -1
-    msg_list = list(msg.todict() for msg in channel.get_message(start, end))
+    msg_list = list(msg.todict() for msg in channel.get_messages(start, end))
     return {
         'messages': msg_list,
         'start': start,
