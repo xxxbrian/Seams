@@ -47,10 +47,10 @@ def channel_messages_v1(auth_user_id, channel_id, start):
     channel = Channel.find_by_id(channel_id)
     if channel is None:
         raise InputError
-    if start >= len(channel.messages):
-        raise InputError
     if not channel.has_user(user):
         raise AccessError
+    if start >= len(channel.messages):
+        raise InputError
 
     # Message with index 0 is the most recent message in the channel.
     end = start + 50 if start + 50 <= len(channel.messages) else -1
