@@ -47,7 +47,7 @@ def channel_messages_v1(auth_user_id, channel_id, start):
     channel = Channel.find_by_id(channel_id)
     if channel is None:
         raise InputError
-    if start > len(channel.messages):
+    if start >= len(channel.messages):
         raise InputError
     if not channel.has_user(user):
         raise AccessError
