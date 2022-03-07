@@ -187,7 +187,7 @@ class Channel():
         self.name = name
         self.owners = [User.find_by_id(u_id)]
         self.members = [User.find_by_id(u_id)]
-        self.channel_id = Channel.get_last_id()
+        self.channel_id = Channel.get_last_id() + 1
         self.is_public = is_public
         self.messages = []
 
