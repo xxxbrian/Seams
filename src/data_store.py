@@ -25,13 +25,13 @@ Example usage:
 '''
 
 ## YOU SHOULD MODIFY THIS OBJECT BELOW
-initial_object = {
-    'users': [],
-}
+initial_object = {'users': [], 'channels': [], 'messages': []}
 ## YOU SHOULD MODIFY THIS OBJECT ABOVE
+
 
 ## YOU ARE ALLOWED TO CHANGE THE BELOW IF YOU WISH
 class Datastore:
+
     def __init__(self):
         self.__store = initial_object
 
@@ -42,6 +42,7 @@ class Datastore:
         if not isinstance(store, dict):
             raise TypeError('store must be of type dictionary')
         self.__store = store
+
 
 print('Loading Datastore...')
 

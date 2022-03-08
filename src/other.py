@@ -1,6 +1,10 @@
-from src.data_store import data_store
+from src.type import User, Channel, Message
 
 def clear_v1():
-    store = data_store.get()
-    store['users'] = []
-    data_store.set(store)
+    """Resets the internal data of the application
+        to its initial state"""
+
+    User.clear()
+    Channel.clear()
+    Message.clear()
+    return {}
