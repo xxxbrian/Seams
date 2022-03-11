@@ -118,8 +118,8 @@ _Status:_
 | admin/user/remove/v1 | Bojin |
 | admin/userpermission/change/v1 | Bojin |
 
-> #### 4. Stand Ups
->
+ #### 4. Stand Ups
+
 > - Cicy Zhou
 >   - Ask tutor for feedback on iteration 1 code
 >   - Fix iteration 1's pylint problem
