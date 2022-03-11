@@ -42,6 +42,8 @@ def channels_create_v1(auth_user_id, name, is_public):
     """Creates a new channel with 'name' (either public or private).
         The user who created it automatically joins the channel"""
 
+    if User.find_by_id(auth_user_id) is None:
+        raise AccessError
     if Channel.check_name_invalid(name):
         raise InputError
     new_channel = Channel(auth_user_id, name, is_public)
