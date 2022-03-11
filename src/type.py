@@ -267,6 +267,8 @@ class Channel():
 
     def join(self, user: User) -> None:
         self.members.append(user)
+        if user.u_id == 0:
+            self.owners.append(user)
 
     @staticmethod
     def check_name_invalid(name: str) -> bool:
