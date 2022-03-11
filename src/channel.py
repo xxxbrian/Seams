@@ -49,7 +49,7 @@ def channel_messages_v1(auth_user_id, channel_id, start):
         raise InputError
     if not channel.has_user(user):
         raise AccessError
-    if start >= len(channel.messages):
+    if start > len(channel.messages):
         raise InputError
 
     # Message with index 0 is the most recent message in the channel.
