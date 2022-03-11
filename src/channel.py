@@ -75,7 +75,7 @@ def channel_join_v1(auth_user_id, channel_id):
         raise InputError
     if channel.has_user(user):
         raise InputError
-    if not channel.is_public:
+    if not channel.is_public and auth_user_id != 0:
         raise AccessError
 
     channel.join(user)
