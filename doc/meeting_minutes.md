@@ -65,4 +65,77 @@ _Status:_
 
 **Minute taker:** _Cicy Zhou_
 
+**Topics to discuss:**
+-[x] Discuss changes iteration 1 needs before we can start iteration 2
+-[x] Discuss what iteration 2 expects us to do, make sure everyone is on the same page
+-[x] Testing task allocation for everyone
+-[x] Standups
 
+**Minutes**
+1. *Iteration 1 Problems*
+- pylint needs update
+- some bugs needs to be fixed (allocate in standups)
+- ask tutor for feedback to implement
+
+2. *Iteration 2*
+- Need to write all the test first
+- Learn http test
+- Set test due date as 18/03
+
+3. *Test Allocation : Due 18th March*
+| test name      | assigned to |
+| ----------- | ----------- |
+| auth/login/v2| Cicy       |
+| auth/register/v2 | Cicy   |
+| channels/create/v2 | Quan |
+| channels/list/v2 | Quan |
+| channels/listall/v2 | Quan |
+| channel/details/v2 | Quan |
+| channel/join/v2  | Quan |
+| channel/invite/v2 | Quan |
+| channel/messages/v2 | Bojin |
+| clear/v1 | Steve |
+| auth/logout/v1 | Cicy |
+| channel/leave/v1 | Weihou |
+| channel/addowner/v1 | Weihou |
+| channel/removeowner/v1 | Weihou |
+| message/send/v1 | Bojin |
+| message/edit/v1 | Bojin |
+| message/remove/v1 | Bojin |
+| dm/create/v1 | Cicy |
+| dm/list/v1 | Cicy |
+| dm/remove/v1 | Cicy |
+| dm/details/v1 | Weihou |
+| dm/leave/v1 | Weihou |
+| dm/messages/v1 | Weihou |
+| message/senddm/v1 | Bojin |
+| users/all/v1 | Steve |
+| user/profile/v1 | Steve |
+| user/profile/setname/v1 | Steve |
+| user/profile/setemail/v1 | Steve |
+| user/profile/sethandle/v1 | Steve |
+| admin/user/remove/v1 | Bojin |
+| admin/userpermission/change/v1 | Bojin |
+
+> #### 4. Stand Ups
+>
+> - Cicy Zhou
+>   - Ask tutor for feedback on iteration 1 code
+>   - Fix iteration 1's pylint problem
+>   - Fix style in interation 1 using PEP8 guidelines
+>   - Write up allocated tests for iteration 2
+>
+> - Bojin Li
+>   - Fix bug in iteration 1's result (bug of ending name with numbers causes conflicts)
+>   - Implement: channels list needs to return error
+>   - Fix style in `type.py` using PEP8 guidelines
+>   - Write up allocated tests for iteration 2
+> 
+> - Quan Gu
+>   - Write up allocated tests for iteration 2
+> 
+> - Weihou Zeng
+>   - Write up allocated tests for iteration 2
+> 
+
+## 18/03 Weekly Meeting (Next Meeting)
