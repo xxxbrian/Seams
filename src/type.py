@@ -1,4 +1,5 @@
 import re
+import string
 
 from src.data_store import data_store
 
@@ -45,7 +46,7 @@ class User():
             f' - u_id:     {self.u_id}\n' + \
             f' - email:    {self.email}\n' + \
             f' - password: {self.password}\n' + \
-            f' - name:     {self.name_first} {self.name_first}\n' + \
+            f' - name:     {self.name_first} {self.name_last}\n' + \
             f' - handle:   {self.handle_str}'
         return info
 
@@ -108,28 +109,45 @@ class User():
         store['users'].append(self)
 
     @staticmethod
-    def generat_20fullname(name_first: str, name_last: str) -> str:
+    def __generat_20fullname(name_first: str, name_last: str) -> str:
         """generate 20 lowercase full names"""
 
         fullname = (name_first + name_last).lower()
         fullname = ''.join(list(filter(str.isalnum, fullname)))[:20]
         return fullname
 
-    def generat_handle(self) -> str:
-        fullname = self.generat_20fullname(self.name_first, self.name_last)
-
-        lastend = ''
-        for user in list(reversed(store['users'])):
-            if self.generat_20fullname(user.name_first,
-                                       user.name_last) == fullname:
-                if user.handle_str[(len(fullname)):] == '':
-                    lastend = '0'
-                else:
-                    lastend = user.handle_str[(len(fullname)):]
-                    lastend = str(int(lastend) + 1)
+    @staticmethod
+    def __generat_fullname_text(fullname) -> str:
+        fullname_text = ''
+        for cha in fullname:
+            if cha.isdigit() and int(cha) != 0:
                 break
+            fullname_text += cha
+        if len(fullname_text) == len(fullname):
+            return fullname.rstrip(string.digits)
+        else:
+            return fullname_text
 
-        return fullname + lastend
+    def generat_handle(self) -> str:
+        fullname = self.__generat_20fullname(self.name_first, self.name_last)
+        fullname_text = self.__generat_fullname_text(fullname)
+        fullname_digits = -1
+        if len(fullname_text) != len(fullname):
+            fullname_digits = int(fullname[len(fullname_text):])
+
+        for user in list(reversed(store['users'])):
+            last_text = user.handle_str[:len(fullname_text)]
+            last_digit_str = user.handle_str[len(fullname_text):]
+            last_digit = int(
+                last_digit_str) if last_digit_str.isdigit() else -1
+            if fullname_text == last_text and (last_digit_str.isdigit()
+                                               or last_digit_str == ''):
+                fullname_digits = max(last_digit + 1, fullname_digits)
+
+        if fullname_digits >= 0:
+            fullname_text += str(fullname_digits)
+
+        return fullname_text
 
     @staticmethod
     def check_email_invalid(email: str) -> bool:
