@@ -49,7 +49,7 @@ def channel_messages_v1(auth_user_id, channel_id, start):
         raise InputError
     if not channel.has_user(user):
         raise AccessError
-    if start >= len(channel.messages):
+    if start > len(channel.messages):
         raise InputError
 
     # Message with index 0 is the most recent message in the channel.
@@ -69,11 +69,13 @@ def channel_join_v1(auth_user_id, channel_id):
     channel = Channel.find_by_id(channel_id)
     user = User.find_by_id(auth_user_id)
 
+    if user is None:
+        raise AccessError
     if channel is None:
         raise InputError
     if channel.has_user(user):
         raise InputError
-    if not channel.is_public:
+    if not channel.is_public and auth_user_id != 0:
         raise AccessError
 
     channel.join(user)

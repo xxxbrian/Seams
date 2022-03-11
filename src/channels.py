@@ -7,6 +7,9 @@ def channels_list_v1(auth_user_id):
         Once invited, the user is added to the channel immediately."""
 
     user = User.find_by_id(auth_user_id)
+    if user is None:
+        raise AccessError
+
     channels_list = Channel.get_allchannel()
     info = list()
 
@@ -23,6 +26,8 @@ def channels_listall_v1(auth_user_id):
     """Provide a list of all channels, including private channels,
         and their associated details"""
 
+    if User.find_by_id(auth_user_id) is None:
+        raise AccessError
     channels_list = Channel.get_allchannel()
     info = list()
     for channel in channels_list:
@@ -37,6 +42,8 @@ def channels_create_v1(auth_user_id, name, is_public):
     """Creates a new channel with 'name' (either public or private).
         The user who created it automatically joins the channel"""
 
+    if User.find_by_id(auth_user_id) is None:
+        raise AccessError
     if Channel.check_name_invalid(name):
         raise InputError
     new_channel = Channel(auth_user_id, name, is_public)
