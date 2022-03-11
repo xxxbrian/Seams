@@ -71,18 +71,18 @@ _Status:_
 - [x] Testing task allocation for everyone
 - [x] Standups
 
-**Minutes**
-1. *Iteration 1 Problems*
+### Minutes
+#### 1. Iteration 1 Problems
 - pylint needs update
 - some bugs needs to be fixed (allocate in standups)
 - ask tutor for feedback to implement
 
-2. *Iteration 2*
+#### 2. Iteration 2
 - Need to write all the test first
 - Learn http test
 - Set test due date as 18/03
 
-3. *Test Allocation : Due 18th March*
+#### 3. Test Allocation : Due 18th March
 
 | test name      | assigned to |
 | -----------    | ----------- |
