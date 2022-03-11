@@ -1,6 +1,6 @@
 # Meeting minutes
 
-## 02/26 Weekly meeting
+## 26/02 Weekly meeting
 
 **Participation:** _Steve Yang_, _Bojin Li_, _Cicy Zhou_, _Weihou Zeng_
 
@@ -45,7 +45,7 @@ _Status:_
 
 **-** ![](https://img.shields.io/badge/label-completed-%239400d3) _Add this label for tasks that have been approved_
 
-## 03/01 Weekly meeting
+## 01/03 Weekly meeting
 
 **Participation:** _Steve Yang_, _Bojin Li_, _Cicy Zhou_, _Weihou Zeng_, _Quan Gu_
 
@@ -59,4 +59,10 @@ _Status:_
 - Discussing a method named `to_dict`, which is really helpful when we need to return a dictionary in a function.
 - Discusses the methods we need to provide in our `Class`.
 
-## 03/05 Weekly meeting (next meeting)
+## 11/03 Weekly Meeting
+
+**Participation:** _Bojin Li_, _Cicy Zhou_, _Weihou Zeng_, _Quan Gu_
+
+**Minute taker:** _Cicy Zhou_
+
+
