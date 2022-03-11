@@ -69,6 +69,8 @@ def channel_join_v1(auth_user_id, channel_id):
     channel = Channel.find_by_id(channel_id)
     user = User.find_by_id(auth_user_id)
 
+    if user is None:
+        raise AccessError
     if channel is None:
         raise InputError
     if channel.has_user(user):
