@@ -83,12 +83,13 @@ _Status:_
 - Set test due date as 18/03
 
 3. *Test Allocation : Due 18th March*
+
 | test name      | assigned to |
-| ----------- | ----------- |
-| auth/login/v2| Cicy       |
-| auth/register/v2 | Cicy   |
-| channels/create/v2 | Quan |
-| channels/list/v2 | Quan |
+| -----------    | ----------- |
+| auth/login/v2  | Cicy        |
+| auth/register/v2 | Cicy      |
+| channels/create/v2 | Quan  |
+| channels/list/v2  | Quan |
 | channels/listall/v2 | Quan |
 | channel/details/v2 | Quan |
 | channel/join/v2  | Quan |
