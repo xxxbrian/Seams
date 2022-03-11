@@ -66,10 +66,10 @@ _Status:_
 **Minute taker:** _Cicy Zhou_
 
 **Topics to discuss:**
--[x] Discuss changes iteration 1 needs before we can start iteration 2
--[x] Discuss what iteration 2 expects us to do, make sure everyone is on the same page
--[x] Testing task allocation for everyone
--[x] Standups
+- [x] Discuss changes iteration 1 needs before we can start iteration 2
+- [x] Discuss what iteration 2 expects us to do, make sure everyone is on the same page
+- [x] Testing task allocation for everyone
+- [x] Standups
 
 **Minutes**
 1. *Iteration 1 Problems*
