@@ -14,7 +14,7 @@ def create_users():
     """
 
     clear_v1()
-    user_list = list()
+    user_list = []
     user_list.append(auth_register_v1("z5374603@ad.unsw.edu.au",
                                         "Ymc123",  "Steve", "Yang"))
     user_list.append(auth_register_v1("z5201314@ad.unsw.edu.au",

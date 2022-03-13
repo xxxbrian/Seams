@@ -10,7 +10,7 @@ def quit_gracefully(*args):
     '''For coverage'''
     exit(0)
 
-def defaultHandler(err):
+def default_handler(err):
     response = err.get_response()
     print('response', err, err.get_response())
     response.data = dumps({
@@ -25,7 +25,7 @@ APP = Flask(__name__)
 CORS(APP)
 
 APP.config['TRAP_HTTP_EXCEPTIONS'] = True
-APP.register_error_handler(Exception, defaultHandler)
+APP.register_error_handler(Exception, default_handler)
 
 #### NO NEED TO MODIFY ABOVE THIS POINT, EXCEPT IMPORTS
 

@@ -12,7 +12,7 @@ def create_users():
     """
 
     clear_v1()
-    user_list = list()
+    user_list = []
     user_list.append(auth_register_v1("z5374603@ad.unsw.edu.au",
                                     "Ymc123", "Steve", "Yang"))
     user_list.append(auth_register_v1("z5201314@ad.unsw.edu.au",
@@ -71,7 +71,7 @@ def test_login_correct_email_wrong_password():
         auth_login_v1("13579@gmail.com", "Lebron")
 
 def test_register_type_and_return_unique_id(user_list):
-    user_id = list()
+    user_id = []
     for user in user_list:
         # user type must be dictionary
         assert isinstance(user, dict)
