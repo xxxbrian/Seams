@@ -278,7 +278,7 @@ class Channel():
         return len(name) < 1 or len(name) > 20
 
     @staticmethod
-    def get_allchannel() -> list:
+    def get_all_channel() -> list:
         """
         Check whether the length of user is satisfy length request
         """

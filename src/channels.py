@@ -11,7 +11,7 @@ def channels_list_v1(auth_user_id):
         raise AccessError
 
     channels_list = Channel.get_allchannel()
-    info = list()
+    info = []
 
     for channel in channels_list:
         if user in channel.members:
@@ -22,14 +22,14 @@ def channels_list_v1(auth_user_id):
     }
 
 
-def channels_listall_v1(auth_user_id):
+def channels_list_all_v1(auth_user_id):
     """Provide a list of all channels, including private channels,
         and their associated details"""
 
     if User.find_by_id(auth_user_id) is None:
         raise AccessError
     channels_list = Channel.get_allchannel()
-    info = list()
+    info = []
     for channel in channels_list:
         info.append(channel.todict({'channel_id', 'name'}))
 
