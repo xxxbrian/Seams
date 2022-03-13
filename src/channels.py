@@ -22,7 +22,7 @@ def channels_list_v1(auth_user_id):
     }
 
 
-def channels_list_all_v1(auth_user_id):
+def channels_listall_v1(auth_user_id):
     """Provide a list of all channels, including private channels,
         and their associated details"""
 
