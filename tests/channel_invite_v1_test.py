@@ -13,7 +13,7 @@ def create_users():
     Return a list of user_id (type: dict)
     """
     clear_v1()
-    user_list = list()
+    user_list = []
     user_list.append(auth_register_v1("z5270202@ad.unsw.edu.au",
                                         "Pet123", "Weihou", "Zeng"))
     user_list.append(auth_register_v1("z5374603@ad.unsw.edu.au",

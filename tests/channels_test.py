@@ -13,7 +13,7 @@ def clear():
 
 @pytest.fixture
 def create_user():
-    user_list = list()
+    user_list = []
     user_list.append(
                     auth_register_v1(
                                     'elon.mask@spacex.com',
@@ -60,7 +60,7 @@ def test_channels_create_name_too_long(clear, create_user):
             channels_create_v1(user['auth_user_id'], name, True)
 
 def test_channels_create_all_normal(clear, create_user):
-    channel_list = list()
+    channel_list = []
     for user in create_user:
         channel_list.append(
                     channels_create_v1(user['auth_user_id'], 'Tesla', True))
@@ -110,7 +110,7 @@ def test_channels_list(clear, create_user):
 
 
 def test_channels_listall_v1(clear, create_user):
-    channel_list = list()
+    channel_list = []
     for user in create_user:
         channel_list.append(
             channels_create_v1(user['auth_user_id'], 'Tesla', True))
