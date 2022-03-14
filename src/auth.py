@@ -37,3 +37,10 @@ def auth_register_v2(email, password, name_first, name_last):
     new_user.add_to_store()
 
     return auth_login_v2(email, password)
+
+
+def auth_logout_v1(token):
+    if User.token_in_store(token):
+        User.remove_token(token)
+    else:
+        raise InputError
