@@ -156,7 +156,7 @@ def test_auth_register_no_at_email(user_list):
                                  'name_last': 'Lee'}))
     assert respon.status_code == InputError.code
     
-def test_auth_register_no_at_email(user_list):
+def test_auth_register_no_com_email(user_list):
     '''
     This test is testing no '.com' emails and raising InputError
     
