@@ -2,6 +2,10 @@ from src.error import InputError, AccessError
 from src.type import User, Channel
 
 
+def channel_invite_v2(token, channel_id, u_id):
+    pass
+
+
 def channel_invite_v1(auth_user_id, channel_id, u_id):
     """Invites a user with ID u_id to join a channel with ID channel_id.
     Once invited, the user is added to the channel immediately."""
@@ -22,6 +26,10 @@ def channel_invite_v1(auth_user_id, channel_id, u_id):
     return {}
 
 
+def channel_details_v2(token, channel_id):
+    pass
+
+
 def channel_details_v1(auth_user_id, channel_id):
     """Given channel_id that the authorised user is a member of,
     provide basic details about the channel."""
@@ -36,6 +44,10 @@ def channel_details_v1(auth_user_id, channel_id):
     channel_info = channel.todict(
         {'name', 'is_public', 'owner_members', 'all_members'})
     return channel_info
+
+
+def channel_messages_v2(token, channel_id, start):
+    pass
 
 
 def channel_messages_v1(auth_user_id, channel_id, start):
@@ -62,6 +74,10 @@ def channel_messages_v1(auth_user_id, channel_id, start):
     }
 
 
+def channel_join_v2(token, channel_id):
+    pass
+
+
 def channel_join_v1(auth_user_id, channel_id):
     """Given a channel that the authorised user can join,
     adds them to that channel."""
@@ -80,3 +96,15 @@ def channel_join_v1(auth_user_id, channel_id):
 
     channel.join(user)
     return {}
+
+
+def channel_leave_v1(token, channel_id):
+    pass
+
+
+def channel_addowner_v1(token, channel_id, u_id):
+    pass
+
+
+def channel_removeowner_v1(token, channel_id, u_id):
+    pass

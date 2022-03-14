@@ -2,6 +2,10 @@ from src.error import AccessError, InputError
 from src.type import User, Channel
 
 
+def channels_list_v2(token):
+    pass
+
+
 def channels_list_v1(auth_user_id):
     """Invites a user with u_id to join a channel with channel_id.
         Once invited, the user is added to the channel immediately."""
@@ -22,6 +26,10 @@ def channels_list_v1(auth_user_id):
     }
 
 
+def channels_listall_v2(token):
+    pass
+
+
 def channels_listall_v1(auth_user_id):
     """Provide a list of all channels, including private channels,
         and their associated details"""
@@ -36,6 +44,10 @@ def channels_listall_v1(auth_user_id):
     return {
         'channels': info,
     }
+
+
+def channels_create_v2(token, name, is_public):
+    pass
 
 
 def channels_create_v1(auth_user_id, name, is_public):
