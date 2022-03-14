@@ -1,6 +1,7 @@
 import re
 import string
 import jwt
+import hashlib
 
 from src.data_store import data_store
 
@@ -39,7 +40,7 @@ class User():
                  name_last: str) -> None:
         self.u_id = User.get_last_id() + 1
         self.email = email
-        self.password = password
+        self.password = User.encrypt(password)
         self.name_first = name_first
         self.name_last = name_last
         self.handle_str = self.generat_handle()
@@ -196,8 +197,12 @@ class User():
         """Check whether the input email and password are match"""
         user = User.find_by_email(email)
         if user:
-            return user.password == password
+            return user.password == User.encrypt(password)
         return False
+
+    @staticmethod
+    def encrypt(password: str):
+        return hashlib.sha256(password.encode()).hexdigest()
 
 
 class Channel():
