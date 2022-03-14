@@ -52,7 +52,7 @@ def echo():
     return dumps({'data': data})
 
 
-@APP.route("auth/login/v2", methods=['POST'])
+@APP.route("/auth/login/v2", methods=['POST'])
 def auth_login():
     data = request.get_json()
     resp = auth_login_v2(
@@ -62,7 +62,7 @@ def auth_login():
     return dumps(resp)
 
 
-@APP.route("auth/register/v2", methods=['POST'])
+@APP.route("/auth/register/v2", methods=['POST'])
 def auth_register():
     data = request.get_json()
     resp = auth_register_v2(
@@ -74,7 +74,7 @@ def auth_register():
     return dumps(resp)
 
 
-@APP.route("channels/create/v2", methods=['POST'])
+@APP.route("/channels/create/v2", methods=['POST'])
 def channels_create():
     data = request.get_json()
     resp = channels_create_v2(
@@ -85,21 +85,21 @@ def channels_create():
     return dumps(resp)
 
 
-@APP.route("channels/list/v2", methods=['GET'])
+@APP.route("/channels/list/v2", methods=['GET'])
 def channels_list():
     token = str(request.args.get('token'))
     resp = channels_list_v2(token)
     return dumps(resp)
 
 
-@APP.route("channels/listall/v2", methods=['GET'])
+@APP.route("/channels/listall/v2", methods=['GET'])
 def channels_listall():
     token = str(request.args.get('token'))
     resp = channels_listall_v2(token)
     return dumps(resp)
 
 
-@APP.route("channel/details/v2", methods=['GET'])
+@APP.route("/channel/details/v2", methods=['GET'])
 def channel_details():
     token = str(request.args.get('token'))
     channel_id = int(request.args.get('channel_id'))
@@ -107,7 +107,7 @@ def channel_details():
     return dumps(resp)
 
 
-@APP.route("channel/join/v2", methods=['POST'])
+@APP.route("/channel/join/v2", methods=['POST'])
 def channel_join():
     data = request.get_json()
     resp = channel_join_v2(
@@ -117,7 +117,7 @@ def channel_join():
     return dumps(resp)
 
 
-@APP.route("channel/invite/v2", methods=['POST'])
+@APP.route("/channel/invite/v2", methods=['POST'])
 def channel_invite():
     data = request.get_json()
     resp = channel_invite_v2(
@@ -128,7 +128,7 @@ def channel_invite():
     return dumps(resp)
 
 
-@APP.route("channel/messages/v2", methods=['GET'])
+@APP.route("/channel/messages/v2", methods=['GET'])
 def channel_messages():
     token = str(request.args.get('token'))
     channel_id = int(request.args.get('channel_id'))
@@ -137,20 +137,20 @@ def channel_messages():
     return dumps(resp)
 
 
-@APP.route("clear/v1", methods=['DELETE'])
+@APP.route("/clear/v1", methods=['DELETE'])
 def clear():
     resp = clear_v1()
     return dumps(resp)
 
 
-@APP.route("auth/logout/v1", methods=['POST'])
+@APP.route("/auth/logout/v1", methods=['POST'])
 def auth_logout():
     data = request.get_json()
     resp = auth_logout_v1(data['token'], )
     return dumps(resp)
 
 
-@APP.route("channel/leave/v1", methods=['POST'])
+@APP.route("/channel/leave/v1", methods=['POST'])
 def channel_leave():
     data = request.get_json()
     resp = channel_leave_v1(
@@ -160,7 +160,7 @@ def channel_leave():
     return dumps(resp)
 
 
-@APP.route("channel/addowner/v1", methods=['POST'])
+@APP.route("/channel/addowner/v1", methods=['POST'])
 def channel_addowner():
     data = request.get_json()
     resp = channel_addowner_v1(
@@ -171,7 +171,7 @@ def channel_addowner():
     return dumps(resp)
 
 
-@APP.route("channel/removeowner/v1", methods=['POST'])
+@APP.route("/channel/removeowner/v1", methods=['POST'])
 def channel_removeowner():
     data = request.get_json()
     resp = channel_removeowner_v1(
@@ -182,7 +182,7 @@ def channel_removeowner():
     return dumps(resp)
 
 
-@APP.route("message/send/v1", methods=['POST'])
+@APP.route("/message/send/v1", methods=['POST'])
 def message_send():
     data = request.get_json()
     resp = message_send_v1(
@@ -193,7 +193,7 @@ def message_send():
     return dumps(resp)
 
 
-@APP.route("message/edit/v1", methods=['PUT'])
+@APP.route("/message/edit/v1", methods=['PUT'])
 def message_edit():
     data = request.get_json()
     resp = message_edit_v1(
@@ -204,7 +204,7 @@ def message_edit():
     return dumps(resp)
 
 
-@APP.route("message/remove/v1", methods=['DELETE'])
+@APP.route("/message/remove/v1", methods=['DELETE'])
 def message_remove():
     data = request.get_json()
     resp = message_remove_v1(
@@ -214,7 +214,7 @@ def message_remove():
     return dumps(resp)
 
 
-@APP.route("dm/create/v1", methods=['POST'])
+@APP.route("/dm/create/v1", methods=['POST'])
 def dm_create():
     token = request.json.get('token')
     u_ids = [int(u_id) for u_id in request.json.get('u_ids')]
@@ -225,14 +225,14 @@ def dm_create():
     return dumps(resp)
 
 
-@APP.route("dm/list/v1", methods=['GET'])
+@APP.route("/dm/list/v1", methods=['GET'])
 def dm_list():
     token = str(request.args.get('token'))
     resp = dm_list_v1(token)
     return dumps(resp)
 
 
-@APP.route("dm/remove/v1", methods=['DELETE'])
+@APP.route("/dm/remove/v1", methods=['DELETE'])
 def dm_remove():
     data = request.get_json()
     resp = dm_remove_v1(
@@ -242,7 +242,7 @@ def dm_remove():
     return dumps(resp)
 
 
-@APP.route("dm/details/v1", methods=['GET'])
+@APP.route("/dm/details/v1", methods=['GET'])
 def dm_details():
     token = str(request.args.get('token'))
     dm_id = int(request.args.get('dm_id'))
@@ -250,7 +250,7 @@ def dm_details():
     return dumps(resp)
 
 
-@APP.route("dm/leave/v1", methods=['POST'])
+@APP.route("/dm/leave/v1", methods=['POST'])
 def dm_leave():
     data = request.get_json()
     resp = dm_leave_v1(
@@ -260,7 +260,7 @@ def dm_leave():
     return dumps(resp)
 
 
-@APP.route("dm/messages/v1", methods=['GET'])
+@APP.route("/dm/messages/v1", methods=['GET'])
 def dm_messages():
     token = str(request.args.get('token'))
     dm_id = int(request.args.get('dm_id'))
@@ -269,7 +269,7 @@ def dm_messages():
     return dumps(resp)
 
 
-@APP.route("message/senddm/v1", methods=['POST'])
+@APP.route("/message/senddm/v1", methods=['POST'])
 def message_senddm():
     data = request.get_json()
     resp = message_senddm_v1(
@@ -280,14 +280,14 @@ def message_senddm():
     return dumps(resp)
 
 
-@APP.route("users/all/v1", methods=['GET'])
+@APP.route("/users/all/v1", methods=['GET'])
 def user_all():
     token = str(request.args.get('token'))
     resp = users_all_v1(token)
     return dumps(resp)
 
 
-@APP.route("user/profile/v1", methods=['GET'])
+@APP.route("/user/profile/v1", methods=['GET'])
 def user_profile():
     token = str(request.args.get('token'))
     u_id = int(request.args.get('u_id'))
@@ -295,7 +295,7 @@ def user_profile():
     return dumps(resp)
 
 
-@APP.route("user/profile/setname/v1", methods=['PUT'])
+@APP.route("/user/profile/setname/v1", methods=['PUT'])
 def user_profile_setname():
     data = request.get_json()
     resp = user_profile_setname_v1(
@@ -306,7 +306,7 @@ def user_profile_setname():
     return dumps(resp)
 
 
-@APP.route("user/profile/setemail/v1", methods=['PUT'])
+@APP.route("/user/profile/setemail/v1", methods=['PUT'])
 def user_profile_setemail():
     data = request.get_json()
     resp = user_profile_setemail_v1(
@@ -316,7 +316,7 @@ def user_profile_setemail():
     return dumps(resp)
 
 
-@APP.route("user/profile/sethandle/v1", methods=['PUT'])
+@APP.route("/user/profile/sethandle/v1", methods=['PUT'])
 def user_profile_sethandle():
     data = request.get_json()
     resp = user_profile_sethandle_v1(
@@ -326,7 +326,7 @@ def user_profile_sethandle():
     return dumps(resp)
 
 
-@APP.route("admin/user/remove/v1", methods=['DELETE'])
+@APP.route("/admin/user/remove/v1", methods=['DELETE'])
 def admin_user_remove():
     data = request.get_json()
     resp = admin_user_remove_v1(
@@ -336,7 +336,7 @@ def admin_user_remove():
     return dumps(resp)
 
 
-@APP.route("admin/userpermission/change/v1", methods=['POST'])
+@APP.route("/admin/userpermission/change/v1", methods=['POST'])
 def admin_userpermission_change():
     data = request.get_json()
     resp = admin_userpermission_change_v1(
