@@ -1,6 +1,11 @@
 from src.error import InputError
 from src.type import User
 
+
+def auth_login_v2(email, password):
+    pass
+
+
 def auth_login_v1(email, password):
     """Given a registered user's email and password,
     returns their `auth_user_id` value."""
@@ -8,12 +13,17 @@ def auth_login_v1(email, password):
     if not User.check_email_been_used(email):
         raise InputError
     # password is not correct
-    if not User.match_email_password(email,password):
+    if not User.match_email_password(email, password):
         raise InputError
     user = User.find_by_email(email)
     return {
         'auth_user_id': user.u_id,
     }
+
+
+def auth_register_v2(email, password, name_first, name_last):
+    pass
+
 
 def auth_register_v1(email, password, name_first, name_last):
     """register new user if all inputs are valid"""
@@ -35,3 +45,7 @@ def auth_register_v1(email, password, name_first, name_last):
     return {
         'auth_user_id': new_user.u_id,
     }
+
+
+def auth_logout_v1(token):
+    pass
