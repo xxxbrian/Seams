@@ -157,6 +157,7 @@ class User():
         payload = {'u_id': self.u_id}
         token = jwt.encode(payload=payload, key=SECRET, algorithm='HS256')
         store['login_token'].append(token)
+        return token
 
     @staticmethod
     def find_by_token(token):
