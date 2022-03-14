@@ -1,7 +1,10 @@
 import re
 import string
+import jwt
 
 from src.data_store import data_store
+
+from src.config import SECRET
 
 store = data_store.get()
 
@@ -148,6 +151,20 @@ class User():
             fullname_text += str(fullname_digits)
 
         return fullname_text
+
+    def generat_token(self) -> str:
+        payload = {'u_id': self.u_id}
+        token = jwt.encode(payload=payload, key=SECRET, algorithm='HS256')
+        store['login_token'].append(token)
+
+    @staticmethod
+    def find_by_token(token):
+        preload = jwt.decode(token, SECRET, algorithm='HS256')
+        return User.find_by_id(preload['u_id'])
+
+    @staticmethod
+    def token_in_store(token):
+        return token in store['login_token']
 
     @staticmethod
     def check_email_invalid(email: str) -> bool:
