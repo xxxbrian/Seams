@@ -19,7 +19,7 @@ def auth_login_v2(email, password):
     }
 
 
-def auth_register_v1(email, password, name_first, name_last):
+def auth_register_v2(email, password, name_first, name_last):
     """register new user if all inputs are valid"""
 
     if User.check_email_invalid(email):
@@ -36,6 +36,4 @@ def auth_register_v1(email, password, name_first, name_last):
     new_user = User(email, password, name_first, name_last)
     new_user.add_to_store()
 
-    return {
-        'auth_user_id': new_user.u_id,
-    }
+    return auth_login_v2(email, password)
