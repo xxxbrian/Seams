@@ -123,10 +123,10 @@ class User():
     @staticmethod
     def __generat_fullname_text(fullname) -> str:
         fullname_text = ''
-        for cha in fullname:
-            if cha.isdigit() and int(cha) != 0:
+        for i in range(len(fullname)):
+            if fullname[i:].isdigit() and int(fullname[i]) != 0:
                 break
-            fullname_text += cha
+            fullname_text += fullname[i]
         if len(fullname_text) == len(fullname):
             return fullname.rstrip(string.digits)
         else:
