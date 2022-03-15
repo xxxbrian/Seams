@@ -3,7 +3,7 @@ import string
 import pytest
 
 from src.channels import channels_create_v1, channels_list_v1, channels_listall_v1
-from src.auth import auth_register_v1
+from src.auth import auth_register_v2
 from src.error import InputError
 from src.other import clear_v1
 
@@ -15,7 +15,7 @@ def clear():
 def create_user():
     user_list = []
     user_list.append(
-                    auth_register_v1(
+                    auth_register_v2(
                                     'elon.mask@spacex.com',
                                     'Password',
                                     'Elon',
@@ -23,7 +23,7 @@ def create_user():
                                     )
                     )
     user_list.append(
-                    auth_register_v1(
+                    auth_register_v2(
                                     'mark.zuckerberg@meta.com',
                                     'Password',
                                     'Mark',
@@ -31,7 +31,7 @@ def create_user():
                                     )
                     )
     user_list.append(
-                    auth_register_v1(
+                    auth_register_v2(
                                     'tim.cook@icloud.com',
                                     'Password',
                                     'Tim',
@@ -39,7 +39,7 @@ def create_user():
                                     )
                     )
     user_list.append(
-                    auth_register_v1(
+                    auth_register_v2(
                                     'bill.gates@outlook.com',
                                     'Password',
                                     'Bill',
