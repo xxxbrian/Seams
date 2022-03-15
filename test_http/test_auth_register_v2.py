@@ -271,7 +271,7 @@ def test_auth_register_too_short__password(user_list):
                                  'name_last': 'Li'}))
     assert respon.status_code == InputError.code
     
-def test_auth_register_too_short__first_name(user_list):
+def test_auth_register_empty__first_name(user_list):
     """
         This test is testing the user register with too short first name
         
@@ -297,6 +297,32 @@ def test_auth_register_too_short__first_name(user_list):
                                  'name_last': 'Li'}))
     assert respon.status_code == InputError.code
 
+def test_auth_register_empty_last_name(user_list):
+    """
+        This test is testing the user register with too short last name
+        
+        Returns:
+            N/A
+
+        Raises:
+            InputError: When the last name is too short
+
+    """
+    respon = requests.post(url + 'auth/register/v2',
+                             json=json.dumps(
+                                {'email': 'z5374603@ad.unsw.edu.au',
+                                 'password': '123456',
+                                 'name_first': 'Steve',
+                                 'name_last': ''}))
+    assert respon.status_code == InputError.code
+    respon = requests.post(url + 'auth/register/v2',
+                             json=json.dumps(
+                                {'email': 'z5374602@ad.unsw.edu.au',
+                                 'password': '123456',
+                                 'name_first': 'Bojin',
+                                 'name_last': ''}))
+    assert respon.status_code == InputError.code
+    
 def test_auth_register_too_long_first_name(user_list):
     """
         This test is testing the user register with too long first name
@@ -328,13 +354,13 @@ def test_auth_register_too_long_first_name(user_list):
 
 def test_auth_register_too_long_last_name(user_list):
     """
-        This test is testing the user register with too long first name
+        This test is testing the user register with too long last name
         
         Returns:
             N/A
 
         Raises:
-            InputError: When the first name is too long
+            InputError: When the last name is too long
 
     """
     too_long_name = ""
@@ -355,15 +381,41 @@ def test_auth_register_too_long_last_name(user_list):
                                  'name_last': too_long_name}))
     assert respon.status_code == InputError.code   
     
-def test_auth_register_too_long_name(user_list):
+def test_auth_register_empty_name(user_list):
     """
-        This test is testing the user register with too long first name
+        This test is testing the user register with too short name
         
         Returns:
             N/A
 
         Raises:
-            InputError: When the first name is too long
+            InputError: When the name is too short
+
+    """
+    respon = requests.post(url + 'auth/register/v2',
+                             json=json.dumps(
+                                {'email': 'z5374603@ad.unsw.edu.au',
+                                 'password': '123456',
+                                 'name_first': '',
+                                 'name_last': ''}))
+    assert respon.status_code == InputError.code
+    respon = requests.post(url + 'auth/register/v2',
+                             json=json.dumps(
+                                {'email': 'z5374602@ad.unsw.edu.au',
+                                 'password': '123456',
+                                 'name_first': '',
+                                 'name_last': ''}))
+    assert respon.status_code == InputError.code
+    
+def test_auth_register_too_long_name(user_list):
+    """
+        This test is testing the user register with too long name
+        
+        Returns:
+            N/A
+
+        Raises:
+            InputError: When the name is too long
 
     """
     too_long_name = ""
