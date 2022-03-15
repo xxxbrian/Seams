@@ -3,10 +3,6 @@ from src.type import User
 
 
 def auth_login_v2(email, password):
-    pass
-
-
-def auth_login_v1(email, password):
     """Given a registered user's email and password,
     returns their `auth_user_id` value."""
     # email entered does not belong to a user
@@ -16,16 +12,14 @@ def auth_login_v1(email, password):
     if not User.match_email_password(email, password):
         raise InputError
     user = User.find_by_email(email)
+    token = user.generat_token()
     return {
+        'token': token,
         'auth_user_id': user.u_id,
     }
 
 
 def auth_register_v2(email, password, name_first, name_last):
-    pass
-
-
-def auth_register_v1(email, password, name_first, name_last):
     """register new user if all inputs are valid"""
 
     if User.check_email_invalid(email):
@@ -42,10 +36,11 @@ def auth_register_v1(email, password, name_first, name_last):
     new_user = User(email, password, name_first, name_last)
     new_user.add_to_store()
 
-    return {
-        'auth_user_id': new_user.u_id,
-    }
+    return auth_login_v2(email, password)
 
 
 def auth_logout_v1(token):
-    pass
+    if User.token_in_store(token):
+        User.remove_token(token)
+    else:
+        raise InputError
