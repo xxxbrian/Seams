@@ -15,83 +15,78 @@ def create_user_list():
     requests.delete(f"{url}clear/v1", json = {})    # clear all info in server
     user_list = list()
     user_list.append(requests.post(f"{url}auth/register/v2",
-                                   json = json.dumps(
-                                       {'email': 'z5374603@unsw.com',
-                                        'password': '123456',
-                                        'name_first': 'Steve',
-                                        'name_last': 'Yang'})))
+                                   json = { 'email': 'z5374603@unsw.com',
+                                            'password': '123456',
+                                            'name_first': 'Steve',
+                                            'name_last': 'Yang'}))
     user_list.append(requests.post(f"{url}auth/register/v2",
-                                   json = json.dumps(
-                                       {'email': 'z5374602@unsw.com',
-                                        'password': '123456',
-                                        'name_first': 'Brian',
-                                        'name_last': 'Lee'})))
+                                   json = { 'email': 'z5374602@unsw.com',
+                                            'password': '123456',
+                                            'name_first': 'Brian',
+                                            'name_last': 'Lee'}))
     user_list.append(requests.post(f"{url}auth/register/v2",
-                                   json = json.dumps(
-                                       {'email': 'z5374601@unsw.com',
-                                        'password': '123456',
-                                        'name_first': 'Bojin',
-                                        'name_last': 'Li'})))
+                                   json = { 'email': 'z5374601@unsw.com',
+                                            'password': '123456',
+                                            'name_first': 'Bojin',
+                                            'name_last': 'Li'}))
     user_list.append(requests.post(f"{url}auth/register/v2",
-                                   json = json.dumps(
-                                       {'email': 'z5374600@unsw.com',
-                                        'password': '123456',
-                                        'name_first':'Cicy',
-                                        'name_last': 'Zhou'})))
+                                   json ={  'email': 'z5374600@unsw.com',
+                                            'password': '123456',
+                                            'name_first':'Cicy',
+                                            'name_last': 'Zhou'}))
     return user_list
     
 def test_auth_register_type(user_list):
     '''
     This test is testing the return value's types
     
-    Arg:
-        user_list (dict)
+    parameter:
+        user_list (list))
         
     Return:
         N/A
     '''
-    # Assert return type is dict, 'token' is string, 'auth_user_id' is int
+    # Assert return 'token' is string, 'auth_user_id' is int
     for user in user_list:
-        assert type(user).__name__ == 'dict'
-        assert type(user['token']).__name__ == 'str'
-        assert type(user['auth_user_id']).__name__ == 'int'
+        assert type(user.json()['token']).__name__ == 'str'
+        assert type(user.json()['auth_user_id']).__name__ == 'int'
     
 def test_auth_register_unique_user_id(user_list):
     '''
     This test is testing all auth_user_id s are different
     
-    Arg:
-        user_list (dict)
+    parameter:
+        user_list (list)
         
     return:
         N/A
     '''
     user_id_list = list()
     for user in user_list:
-        user_id_list.append(user['auth_user_id'])
+        user_id_list.append(user.json()['auth_user_id'])
     assert len(user_id_list) == len(set(user_id_list))  # user_id is unique
     
 def test_auth_register_unique_token(user_list):
     '''
     This test is testing all token s are different
     
-    Args:
-        user_list(dict)
+    parameters:
+        user_list (list)
         
     return:
         N/A
     '''
     user_token_list = list()
     for user in user_list:    
-        user_token_list.append(user['token'])
+        user_token_list.append(user.json()['token'])
     assert len(user_token_list) == len(set(user_token_list))    # user_token is unique
     
 def test_auth_register_empty_email(user_list):
     '''
     This test is testing empty emails and raising InputError
     
-    Args:
-        user_list(dict)
+    parameters:
+        user_list (list)
         
     Raises:
         InputError
@@ -100,33 +95,30 @@ def test_auth_register_empty_email(user_list):
         N/A
     ''' 
     respon = requests.post(url + 'auth/register/v2',
-                             json=json.dumps(
-                                {'email': '',
-                                 'password': '123456',
-                                 'name_first': 'Empty',
-                                 'name_last': 'Email'}))
+                             json = {'email': '',
+                                    'password': '123456',
+                                    'name_first': 'Empty',
+                                    'name_last': 'Email'})
     assert respon.status_code == InputError.code
     respon = requests.post(url + 'auth/register/v2',
-                             json=json.dumps(
-                                {'email': ' ',
-                                 'password': '123456',
-                                 'name_first': 'Steve',
-                                 'name_last': 'Yang'}))
+                             json = {'email': ' ',
+                                    'password': '123456',
+                                    'name_first': 'Steve',
+                                    'name_last': 'Yang'})
     assert respon.status_code == InputError.code
     respon = requests.post(url + 'auth/register/v2',
-                             json=json.dumps(
-                                {'email': '  ',
-                                 'password': '123456',
-                                 'name_first': 'Bojin',
-                                 'name_last': 'Li'}))
+                             json = {'email': '  ',
+                                    'password': '123456',
+                                    'name_first': 'Bojin',
+                                    'name_last': 'Li'})
     assert respon.status_code == InputError.code
     
 def test_auth_register_no_at_email(user_list):
     '''
     This test is testing non_@ emails and raising InputError
     
-    Args:
-        user_list(dict)
+    parameters:
+        user_list (list)
         
     Raises:
         InputError
@@ -135,33 +127,30 @@ def test_auth_register_no_at_email(user_list):
         N/A
     ''' 
     respon = requests.post(url + 'auth/register/v2',
-                             json=json.dumps(
-                                {'email': 'email',
-                                 'password': '123456',
-                                 'name_first': 'Steve',
-                                 'name_last': 'Yang'}))
+                             json = {'email': 'email',
+                                     'password': '123456',
+                                     'name_first': 'Steve',
+                                     'name_last': 'Yang'})
     assert respon.status_code == InputError.code
     respon = requests.post(url + 'auth/register/v2',
-                             json=json.dumps(
-                                {'email': 'email.com',
-                                 'password': '123456',
-                                 'name_first': 'Bojin',
-                                 'name_last': 'Li'}))
+                             json = {'email': 'email.com',
+                                    'password': '123456',
+                                    'name_first': 'Bojin',
+                                    'name_last': 'Li'})
     assert respon.status_code == InputError.code
     respon = requests.post(url + 'auth/register/v2',
-                             json=json.dumps(
-                                {'email': '12345.com',
-                                 'password': '123456',
-                                 'name_first': 'Brian',
-                                 'name_last': 'Lee'}))
+                             json = {'email': '12345.com',
+                                    'password': '123456',
+                                    'name_first': 'Brian',
+                                    'name_last': 'Lee'})
     assert respon.status_code == InputError.code
     
-def test_auth_register_no_com_email(user_list):
+def test_auth_register_no_dot_email(user_list):
     '''
     This test is testing no '.com' emails and raising InputError
     
-    Args:
-        user_list(dict)
+    parameters:
+        user_list (list)
         
     Raises:
         InputError
@@ -170,28 +159,25 @@ def test_auth_register_no_com_email(user_list):
         N/A
     ''' 
     respon = requests.post(url + 'auth/register/v2',
-                             json=json.dumps(
-                                {'email': 'email@com',
-                                 'password': '123456',
-                                 'name_first': 'Steve',
-                                 'name_last': 'Yang'}))
+                             json = {'email': 'email@com',
+                                    'password': '123456',
+                                    'name_first': 'Steve',
+                                    'name_last': 'Yang'})
     assert respon.status_code == InputError.code
     respon = requests.post(url + 'auth/register/v2',
-                             json=json.dumps(
-                                {'email': '123@Steve',
-                                 'password': '123456',
-                                 'name_first': 'Bojin',
-                                 'name_last': 'Li'}))
+                             json = {'email': '123@Steve',
+                                    'password': '123456',
+                                    'name_first': 'Bojin',
+                                    'name_last': 'Li'})
     assert respon.status_code == InputError.code
     respon = requests.post(url + 'auth/register/v2',
-                             json=json.dumps(
-                                {'email': '123@123',
-                                 'password': '123456',
-                                 'name_first': 'Brian',
-                                 'name_last': 'Lee'}))
+                             json = {'email': '123@123',
+                                    'password': '123456',
+                                    'name_first': 'Brian',
+                                    'name_last': 'Lee'})
     assert respon.status_code == InputError.code
     
-def test_auth_register_email_been_used(dict_list):
+def test_auth_register_email_been_used(user_list):
         """
         This test is testing the user register with email that have been used
 
@@ -205,18 +191,16 @@ def test_auth_register_email_been_used(dict_list):
 
         """
         respon = requests.post(url + 'auth/register/v2',
-                                 json=json.dumps(
-                                    {'email': 'z5374603@unsw.com',
-                                     'password': '123456',
-                                     'name_first': 'Steve',
-                                     'name_last': 'Young'}))
+                                 json = {'email': 'z5374603@unsw.com',
+                                        'password': '123456',
+                                        'name_first': 'Steve',
+                                        'name_last': 'Young'})
         assert respon.status_code == InputError.code
         respon = requests.post(url + 'auth/register/v2',
-                                 json=json.dumps(
-                                    {'email': 'z5374602@unsw.com',
-                                     'password': '123456',
-                                     'name_first': 'Brian',
-                                     'name_last': 'leeeee'}))
+                                 json = {'email': 'z5374602@unsw.com',
+                                        'password': '123456',
+                                        'name_first': 'Brian',
+                                        'name_last': 'leeeee'})
         assert respon.status_code == InputError.code
 
 def test_auth_register_empty_password(user_list):
@@ -231,21 +215,21 @@ def test_auth_register_empty_password(user_list):
 
     """
     respon = requests.post(url + 'auth/register/v2',
-                             json=json.dumps(
+                             json=
                                 {'email': 'z5374603@ad.unsw.edu.au',
                                  'password': '',
                                  'name_first': 'Steve',
-                                 'name_last': 'Yang'}))
+                                 'name_last': 'Yang'})
     assert respon.status_code == InputError.code
     respon = requests.post(url + 'auth/register/v2',
-                             json=json.dumps(
+                             json=
                                 {'email': 'z5374602@ad.unsw.edu.au',
                                  'password': '',
                                  'name_first': 'Bojin',
-                                 'name_last': 'Li'}))
+                                 'name_last': 'Li'})
     assert respon.status_code == InputError.code
     
-def test_auth_register_too_short__password(user_list):
+def test_auth_register_too_short_password(user_list):
     """
         This test is testing the user register with too short password
         
@@ -257,21 +241,21 @@ def test_auth_register_too_short__password(user_list):
 
     """
     respon = requests.post(url + 'auth/register/v2',
-                             json=json.dumps(
+                             json=
                                 {'email': 'z5374603@ad.unsw.edu.au',
                                  'password': '12345',
                                  'name_first': 'Steve',
-                                 'name_last': 'Yang'}))
+                                 'name_last': 'Yang'})
     assert respon.status_code == InputError.code
     respon = requests.post(url + 'auth/register/v2',
-                             json=json.dumps(
+                             json=
                                 {'email': 'z5374602@ad.unsw.edu.au',
                                  'password': 'abc',
                                  'name_first': 'Bojin',
-                                 'name_last': 'Li'}))
+                                 'name_last': 'Li'})
     assert respon.status_code == InputError.code
     
-def test_auth_register_too_short__first_name(user_list):
+def test_auth_register_empty__first_name(user_list):
     """
         This test is testing the user register with too short first name
         
@@ -283,20 +267,46 @@ def test_auth_register_too_short__first_name(user_list):
 
     """
     respon = requests.post(url + 'auth/register/v2',
-                             json=json.dumps(
+                             json=
                                 {'email': 'z5374603@ad.unsw.edu.au',
                                  'password': '123456',
                                  'name_first': '',
-                                 'name_last': 'Yang'}))
+                                 'name_last': 'Yang'})
     assert respon.status_code == InputError.code
     respon = requests.post(url + 'auth/register/v2',
-                             json=json.dumps(
+                             json=
                                 {'email': 'z5374602@ad.unsw.edu.au',
                                  'password': '123456',
                                  'name_first': '',
-                                 'name_last': 'Li'}))
+                                 'name_last': 'Li'})
     assert respon.status_code == InputError.code
 
+def test_auth_register_empty_last_name(user_list):
+    """
+        This test is testing the user register with too short last name
+        
+        Returns:
+            N/A
+
+        Raises:
+            InputError: When the last name is too short
+
+    """
+    respon = requests.post(url + 'auth/register/v2',
+                             json=
+                                {'email': 'z5374603@ad.unsw.edu.au',
+                                 'password': '123456',
+                                 'name_first': 'Steve',
+                                 'name_last': ''})
+    assert respon.status_code == InputError.code
+    respon = requests.post(url + 'auth/register/v2',
+                             json=
+                                {'email': 'z5374602@ad.unsw.edu.au',
+                                 'password': '123456',
+                                 'name_first': 'Bojin',
+                                 'name_last': ''})
+    assert respon.status_code == InputError.code
+    
 def test_auth_register_too_long_first_name(user_list):
     """
         This test is testing the user register with too long first name
@@ -312,76 +322,102 @@ def test_auth_register_too_long_first_name(user_list):
     while len(too_long_name) < 51:
         too_long_name += 'a'
     respon = requests.post(url + 'auth/register/v2',
-                             json=json.dumps(
+                             json=
                                 {'email': 'z5374603@ad.unsw.edu.au',
                                  'password': '123456',
                                  'name_first': too_long_name,
-                                 'name_last': 'Yang'}))
+                                 'name_last': 'Yang'})
     assert respon.status_code == InputError.code
     respon = requests.post(url + 'auth/register/v2',
-                             json=json.dumps(
+                             json=
                                 {'email': 'z5374602@ad.unsw.edu.au',
                                  'password': '123456',
                                  'name_first': too_long_name,
-                                 'name_last': 'Li'}))
+                                 'name_last': 'Li'})
     assert respon.status_code == InputError.code
 
 def test_auth_register_too_long_last_name(user_list):
     """
-        This test is testing the user register with too long first name
+        This test is testing the user register with too long last name
         
         Returns:
             N/A
 
         Raises:
-            InputError: When the first name is too long
+            InputError: When the last name is too long
 
     """
     too_long_name = ""
     while len(too_long_name) < 51:
         too_long_name += 'a'
     respon = requests.post(url + 'auth/register/v2',
-                             json=json.dumps(
+                             json=
                                 {'email': 'z5374603@ad.unsw.edu.au',
                                  'password': '123456',
                                  'name_first': 'Steve',
-                                 'name_last': too_long_name}))
+                                 'name_last': too_long_name})
     assert respon.status_code == InputError.code
     respon = requests.post(url + 'auth/register/v2',
-                             json=json.dumps(
+                             json=
                                 {'email': 'z5374602@ad.unsw.edu.au',
                                  'password': '123456',
                                  'name_first': 'Bojin',
-                                 'name_last': too_long_name}))
+                                 'name_last': too_long_name})
     assert respon.status_code == InputError.code   
     
-def test_auth_register_too_long_last_name(user_list):
+def test_auth_register_empty_name(user_list):
     """
-        This test is testing the user register with too long first name
+        This test is testing the user register with too short name
         
         Returns:
             N/A
 
         Raises:
-            InputError: When the first name is too long
+            InputError: When the name is too short
+
+    """
+    respon = requests.post(url + 'auth/register/v2',
+                             json=
+                                {'email': 'z5374603@ad.unsw.edu.au',
+                                 'password': '123456',
+                                 'name_first': '',
+                                 'name_last': ''})
+    assert respon.status_code == InputError.code
+    respon = requests.post(url + 'auth/register/v2',
+                             json=
+                                {'email': 'z5374602@ad.unsw.edu.au',
+                                 'password': '123456',
+                                 'name_first': '',
+                                 'name_last': ''})
+    assert respon.status_code == InputError.code
+    
+def test_auth_register_too_long_name(user_list):
+    """
+        This test is testing the user register with too long name
+        
+        Returns:
+            N/A
+
+        Raises:
+            InputError: When the name is too long
 
     """
     too_long_name = ""
     while len(too_long_name) < 51:
         too_long_name += 'a'
     respon = requests.post(url + 'auth/register/v2',
-                             json=json.dumps(
+                             json=
                                 {'email': 'z5374603@ad.unsw.edu.au',
                                  'password': '123456',
                                  'name_first': too_long_name,
-                                 'name_last': too_long_name}))
+                                 'name_last': too_long_name})
     assert respon.status_code == InputError.code
     respon = requests.post(url + 'auth/register/v2',
-                             json=json.dumps(
+                             json=
                                 {'email': 'z5374602@ad.unsw.edu.au',
                                  'password': '123456',
                                  'name_first': too_long_name,
-                                 'name_last': too_long_name}))
+                                 'name_last': too_long_name})
     assert respon.status_code == InputError.code   
     
     

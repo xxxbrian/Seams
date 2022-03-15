@@ -1,6 +1,6 @@
 import pytest
 
-from src.auth import auth_login_v1, auth_register_v1
+from src.auth import auth_login_v2, auth_register_v2
 from src.other import clear_v1
 from src.error import InputError
 
@@ -13,13 +13,13 @@ def create_users():
 
     clear_v1()
     user_list = []
-    user_list.append(auth_register_v1("z5374603@ad.unsw.edu.au",
+    user_list.append(auth_register_v2("z5374603@ad.unsw.edu.au",
                                     "Ymc123", "Steve", "Yang"))
-    user_list.append(auth_register_v1("z5201314@ad.unsw.edu.au",
+    user_list.append(auth_register_v2("z5201314@ad.unsw.edu.au",
                                     "Bojin123", "Bojin", "Li"))
-    user_list.append(auth_register_v1("12345678@qq.com",
+    user_list.append(auth_register_v2("12345678@qq.com",
                                     "Cicy123", "Cicy", "Zhou"))
-    user_list.append(auth_register_v1("13579@gmail.com",
+    user_list.append(auth_register_v2("13579@gmail.com",
                                     "Lebron123", "Lebron", "James"))
     return user_list
 
@@ -29,46 +29,46 @@ def test_login_return_type(user_list):
         assert isinstance(login["auth_user_id"], int)
 
 def test_login_user_id(user_list):
-    assert auth_login_v1("z5374603@ad.unsw.edu.au", "Ymc123") == user_list[0]
-    assert auth_login_v1("z5201314@ad.unsw.edu.au", "Bojin123") == user_list[1]
-    assert auth_login_v1("12345678@qq.com", "Cicy123") == user_list[2]
-    assert auth_login_v1("13579@gmail.com", "Lebron123") == user_list[3]
+    assert auth_login_v2("z5374603@ad.unsw.edu.au", "Ymc123") == user_list[0]
+    assert auth_login_v2("z5201314@ad.unsw.edu.au", "Bojin123") == user_list[1]
+    assert auth_login_v2("12345678@qq.com", "Cicy123") == user_list[2]
+    assert auth_login_v2("13579@gmail.com", "Lebron123") == user_list[3]
 
 def test_login_empty_email():
     with pytest.raises(InputError):
-        auth_login_v1("", "asdfg")
+        auth_login_v2("", "asdfg")
 
 def test_login_string_email():
     """test email with plain string"""
     with pytest.raises(InputError):
-        auth_login_v1("email", "123456")
+        auth_login_v2("email", "123456")
 
 def test_login_without_at_email():
     """test email without @"""
     with pytest.raises(InputError):
-        auth_login_v1("email.com", "1234")
+        auth_login_v2("email.com", "1234")
 
 def test_login_without_com_email():
     """test without '.com'"""
     with pytest.raises(InputError):
-        auth_login_v1("email@qq", "1234")
+        auth_login_v2("email@qq", "1234")
 
 def test_login_inexistent_email():
     """test with valid email format but not in user list"""
     with pytest.raises(InputError):
-        auth_login_v1("z5374604@ad.unsw.edu.au", "1234")
+        auth_login_v2("z5374604@ad.unsw.edu.au", "1234")
 
 def test_login_empty_password():
     with pytest.raises(InputError):
-        auth_login_v1("z5374603@ad.unsw.edu.au", "")
+        auth_login_v2("z5374603@ad.unsw.edu.au", "")
 
 def test_login_correct_email_wrong_password():
     with pytest.raises(InputError):
-        auth_login_v1("z5374603@ad.unsw.edu.au", "Ymc1234")
+        auth_login_v2("z5374603@ad.unsw.edu.au", "Ymc1234")
     with pytest. raises(InputError):
-        auth_login_v1("z5201314@ad.unsw.edu.au", "bojin123")
+        auth_login_v2("z5201314@ad.unsw.edu.au", "bojin123")
     with pytest. raises(InputError):
-        auth_login_v1("13579@gmail.com", "Lebron")
+        auth_login_v2("13579@gmail.com", "Lebron")
 
 def test_register_type_and_return_unique_id(user_list):
     user_id = []
@@ -84,57 +84,57 @@ def test_register_type_and_return_unique_id(user_list):
 
 def test_register_empty_email():
     with pytest.raises(InputError):
-        auth_register_v1("", "123456", "Steven", "Curry")
+        auth_register_v2("", "123456", "Steven", "Curry")
     with pytest.raises(InputError):
-        auth_register_v1(" ", "123456", "Kobe", "Bryant")
+        auth_register_v2(" ", "123456", "Kobe", "Bryant")
 
 def test_register_without_both_at_and_com_email():
     with pytest.raises(InputError):
-        auth_register_v1("12345", "123456", "Hayden", "Smith")
+        auth_register_v2("12345", "123456", "Hayden", "Smith")
     with pytest.raises(InputError):
-        auth_register_v1("email", "123456", "Cicy", "Zhou")
+        auth_register_v2("email", "123456", "Cicy", "Zhou")
 
 def test_register_without_at_email():
     with pytest.raises(InputError):
-        auth_register_v1("1234.com", "123456", "Steve", "Yang")
+        auth_register_v2("1234.com", "123456", "Steve", "Yang")
     with pytest.raises(InputError):
-        auth_register_v1("steve.com", "123456", "Allen", "Lee")
+        auth_register_v2("steve.com", "123456", "Allen", "Lee")
 
 def test_register_without_com_email():
     with pytest.raises(InputError):
-        auth_register_v1("steve@yang", "123456", "Steve", "Yang")
+        auth_register_v2("steve@yang", "123456", "Steve", "Yang")
     with pytest.raises(InputError):
-        auth_register_v1("123@456", "123456", "Haha", "Xixi")
+        auth_register_v2("123@456", "123456", "Haha", "Xixi")
 
 def test_register_been_used_email():
     with pytest.raises(InputError):
-        auth_register_v1("z5374603@ad.unsw.edu.au", "Ymc1232", "Steve", "Yang")
+        auth_register_v2("z5374603@ad.unsw.edu.au", "Ymc1232", "Steve", "Yang")
     with pytest.raises(InputError):
-        auth_register_v1("z5201314@ad.unsw.edu.au", "Bojin1232", "Bojin", "Li")
+        auth_register_v2("z5201314@ad.unsw.edu.au", "Bojin1232", "Bojin", "Li")
     with pytest.raises(InputError):
-        auth_register_v1("12345678@qq.com", "Cicy1232", "Cicy", "Zhou")
+        auth_register_v2("12345678@qq.com", "Cicy1232", "Cicy", "Zhou")
     with pytest.raises(InputError):
-        auth_register_v1("13579@gmail.com", "Lebron1232", "Lebron", "James")
+        auth_register_v2("13579@gmail.com", "Lebron1232", "Lebron", "James")
 
 def test_register_empty_password():
     with pytest.raises(InputError):
-        auth_register_v1("1981686549@qq.com", "", "Steve", "Young")
+        auth_register_v2("1981686549@qq.com", "", "Steve", "Young")
     with pytest.raises(InputError):
-        auth_register_v1("1982686549@qq.com", " ", "Steven", "Young")
+        auth_register_v2("1982686549@qq.com", " ", "Steven", "Young")
 
 def test_register_short_password():
     with pytest.raises(InputError):
-        auth_register_v1("123456@qq.com", "12345", "John", "byden")
+        auth_register_v2("123456@qq.com", "12345", "John", "byden")
     with pytest.raises(InputError):
-        auth_register_v1("1357911@gmail.com", "wsxc", "Harden", "James")
+        auth_register_v2("1357911@gmail.com", "wsxc", "Harden", "James")
     with pytest.raises(InputError):
-        auth_register_v1("2468@cc.com", "12fas", "Keven", "Durent")
+        auth_register_v2("2468@cc.com", "12fas", "Keven", "Durent")
 
 def test_register_empty_first_name():
     with pytest.raises(InputError):
-        auth_register_v1("imurfather@unsw.com", "123456KK", "", "Harden")
+        auth_register_v2("imurfather@unsw.com", "123456KK", "", "Harden")
     with pytest.raises(InputError):
-        auth_register_v1("imyourmother@unsw.com", "12345dd", "", "James")
+        auth_register_v2("imyourmother@unsw.com", "12345dd", "", "James")
 
 def test_register_too_long_first_name():
     too_long_first_name_1 = ""
@@ -144,9 +144,9 @@ def test_register_too_long_first_name():
     while len(too_long_first_name_2) < 100:
         too_long_first_name_2 += 'b'
     with pytest.raises(InputError):
-        auth_register_v1("imyourgrangpa1@unsw.com","1234567", too_long_first_name_1, "Haa")
+        auth_register_v2("imyourgrangpa1@unsw.com","1234567", too_long_first_name_1, "Haa")
     with pytest.raises(InputError):
-        auth_register_v1("imyourgrangpa2@unsw.com","1234567", too_long_first_name_2, "Xia")
+        auth_register_v2("imyourgrangpa2@unsw.com","1234567", too_long_first_name_2, "Xia")
 
 def test_register_too_long_last_name():
     too_long_last_name_1 = ""
@@ -156,9 +156,9 @@ def test_register_too_long_last_name():
     while len(too_long_last_name_2) < 100:
         too_long_last_name_2 += 'd'
     with pytest.raises(InputError):
-        auth_register_v1("imyourgrangpa3@unsw.com","1234567", "Haa", too_long_last_name_1)
+        auth_register_v2("imyourgrangpa3@unsw.com","1234567", "Haa", too_long_last_name_1)
     with pytest.raises(InputError):
-        auth_register_v1("imyourgrangpa4@unsw.com","1234567", "Xia", too_long_last_name_2)
+        auth_register_v2("imyourgrangpa4@unsw.com","1234567", "Xia", too_long_last_name_2)
 
 def test_register_too_long_name():
     too_long_last_name_1 = ""
@@ -174,13 +174,13 @@ def test_register_too_long_name():
     while len(too_long_first_name_2) < 100:
         too_long_first_name_2 += 'b'
     with pytest.raises(InputError):
-        auth_register_v1("imyourgrangpa3@unsw.com",
+        auth_register_v2("imyourgrangpa3@unsw.com",
                         "1234567",
                         too_long_first_name_1,
                         too_long_last_name_1
                         )
     with pytest.raises(InputError):
-        auth_register_v1("imyourgrangpa4@unsw.com",
+        auth_register_v2("imyourgrangpa4@unsw.com",
                         "1234567",
                         too_long_first_name_2,
                         too_long_last_name_2
