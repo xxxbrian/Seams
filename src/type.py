@@ -161,7 +161,7 @@ class User():
 
     @staticmethod
     def find_by_token(token):
-        preload = jwt.decode(token, SECRET, algorithm='HS256')
+        preload = jwt.decode(token, SECRET, algorithms=['HS256'])
         return User.find_by_id(preload['u_id'])
 
     @staticmethod
