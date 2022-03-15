@@ -419,7 +419,4 @@ def test_auth_register_too_long_name(user_list):
                                  'name_first': too_long_name,
                                  'name_last': too_long_name})
     assert respon.status_code == InputError.code   
-    
-    
-    
-    
+       

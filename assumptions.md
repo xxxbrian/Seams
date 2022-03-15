@@ -18,3 +18,7 @@
 
 # 6. handle_test:
     About handle test, because we can't return handle in any function, we decide to test it in channel_details_v1_test. We can check if handles are right when we check all informations in a channel. And we do test the situation that 2 users names are the same.
+
+# 7. auth_logout_test:
+    We assume channels_listall is working well in this test. Because we need to test the logout token is invalid. We use channels_listall and assert there will be 
+    an AccessError when we input a logout_user's token.
