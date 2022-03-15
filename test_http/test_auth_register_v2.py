@@ -40,54 +40,53 @@ def test_auth_register_type(user_list):
     '''
     This test is testing the return value's types
     
-    Arg:
-        user_list (dict)
+    parameter:
+        user_list (list))
         
     Return:
         N/A
     '''
-    # Assert return type is dict, 'token' is string, 'auth_user_id' is int
+    # Assert return 'token' is string, 'auth_user_id' is int
     for user in user_list:
-        assert type(user).__name__ == 'dict'
-        assert type(user['token']).__name__ == 'str'
-        assert type(user['auth_user_id']).__name__ == 'int'
+        assert type(user.json()['token']).__name__ == 'str'
+        assert type(user.json()['auth_user_id']).__name__ == 'int'
     
 def test_auth_register_unique_user_id(user_list):
     '''
     This test is testing all auth_user_id s are different
     
-    Arg:
-        user_list (dict)
+    parameter:
+        user_list (list)
         
     return:
         N/A
     '''
     user_id_list = list()
     for user in user_list:
-        user_id_list.append(user['auth_user_id'])
+        user_id_list.append(user.json()['auth_user_id'])
     assert len(user_id_list) == len(set(user_id_list))  # user_id is unique
     
 def test_auth_register_unique_token(user_list):
     '''
     This test is testing all token s are different
     
-    Args:
-        user_list(dict)
+    parameters:
+        user_list (list)
         
     return:
         N/A
     '''
     user_token_list = list()
     for user in user_list:    
-        user_token_list.append(user['token'])
+        user_token_list.append(user.json()['token'])
     assert len(user_token_list) == len(set(user_token_list))    # user_token is unique
     
 def test_auth_register_empty_email(user_list):
     '''
     This test is testing empty emails and raising InputError
     
-    Args:
-        user_list(dict)
+    parameters:
+        user_list (list)
         
     Raises:
         InputError
@@ -118,8 +117,8 @@ def test_auth_register_no_at_email(user_list):
     '''
     This test is testing non_@ emails and raising InputError
     
-    Args:
-        user_list(dict)
+    parameters:
+        user_list (list)
         
     Raises:
         InputError
@@ -146,12 +145,12 @@ def test_auth_register_no_at_email(user_list):
                                     'name_last': 'Lee'})
     assert respon.status_code == InputError.code
     
-def test_auth_register_no_com_email(user_list):
+def test_auth_register_no_dot_email(user_list):
     '''
     This test is testing no '.com' emails and raising InputError
     
-    Args:
-        user_list(dict)
+    parameters:
+        user_list (list)
         
     Raises:
         InputError
@@ -178,7 +177,7 @@ def test_auth_register_no_com_email(user_list):
                                     'name_last': 'Lee'})
     assert respon.status_code == InputError.code
     
-def test_auth_register_email_been_used(dict_list):
+def test_auth_register_email_been_used(user_list):
         """
         This test is testing the user register with email that have been used
 
@@ -230,7 +229,7 @@ def test_auth_register_empty_password(user_list):
                                  'name_last': 'Li'})
     assert respon.status_code == InputError.code
     
-def test_auth_register_too_short__password(user_list):
+def test_auth_register_too_short_password(user_list):
     """
         This test is testing the user register with too short password
         
