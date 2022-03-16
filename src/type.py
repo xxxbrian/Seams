@@ -45,14 +45,16 @@ class User():
         self.name_first = name_first
         self.name_last = name_last
         self.handle_str = self.generat_handle()
+        self.group_id = 500 if self.u_id else 0
 
     def __str__(self):
         info = 'User object:\n'+\
-            f' - u_id:     {self.u_id}\n' + \
-            f' - email:    {self.email}\n' + \
-            f' - password: {self.password}\n' + \
-            f' - name:     {self.name_first} {self.name_last}\n' + \
-            f' - handle:   {self.handle_str}'
+            f' - u_id:       {self.u_id}\n' + \
+            f' - email:      {self.email}\n' + \
+            f' - password:   {self.password}\n' + \
+            f' - name:       {self.name_first} {self.name_last}\n' + \
+            f' - handle:     {self.handle_str}\n' + \
+            f' - group_id:   {self.group_id}'
         return info
 
     def todict(self,
@@ -64,7 +66,7 @@ class User():
         }
 
     @staticmethod
-    def find_by_id(u_id: int):
+    def find_by_id(u_id: int, only_active=True):
         '''
         Find user by user's u_id
 
@@ -76,12 +78,12 @@ class User():
         '''
 
         for user in store['users']:
-            if user.u_id == u_id:
+            if user.u_id == u_id and (not only_active or user.is_active()):
                 return user
         return None
 
     @staticmethod
-    def find_by_email(email: str):
+    def find_by_email(email: str, only_active=True):
         '''
         Find user by user's email
 
@@ -93,7 +95,7 @@ class User():
         '''
 
         for user in store['users']:
-            if user.email == email:
+            if user.email == email and (not only_active or user.is_active()):
                 return user
         return None
 
@@ -140,7 +142,8 @@ class User():
         if len(fullname_text) != len(fullname):
             fullname_digits = int(fullname[len(fullname_text):])
 
-        for user in list(reversed(store['users'])):
+        for user in list(reversed([i for i in store['users']
+                                   if i.is_active()])):
             last_text = user.handle_str[:len(fullname_text)]
             last_digit_str = user.handle_str[len(fullname_text):]
             last_digit = int(
@@ -180,7 +183,18 @@ class User():
 
     @staticmethod
     def find_all():
-        return store['users']
+        return [i for i in store['users'] if i.is_active()]
+
+    def del_account(self):
+        self.group_id = -1
+        self.name_first = 'Removed'
+        self.name_last = 'user'
+
+    def is_active(self):
+        return self.group_id >= 0
+
+    def is_admin(self):
+        return self.group_id == 0
 
     @staticmethod
     def check_handle_been_used(handle_str: str) -> bool:
@@ -315,10 +329,17 @@ class Channel():
     def has_user(self, user: User) -> bool:
         return user in self.members
 
+    def addowner(self, user: User) -> None:
+        self.owners.append(user)
+
+    def removeowner(self, user: User) -> None:
+        self.owners.remove(user)
+
+    def leave(self, user: User) -> None:
+        self.members.remove(user)
+
     def join(self, user: User) -> None:
         self.members.append(user)
-        if user.u_id == 0:
-            self.owners.append(user)
 
     @staticmethod
     def check_name_invalid(name: str) -> bool:
