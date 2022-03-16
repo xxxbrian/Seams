@@ -45,14 +45,16 @@ class User():
         self.name_first = name_first
         self.name_last = name_last
         self.handle_str = self.generat_handle()
+        self.group_id = 500 if self.u_id else 0
 
     def __str__(self):
         info = 'User object:\n'+\
-            f' - u_id:     {self.u_id}\n' + \
-            f' - email:    {self.email}\n' + \
-            f' - password: {self.password}\n' + \
-            f' - name:     {self.name_first} {self.name_last}\n' + \
-            f' - handle:   {self.handle_str}'
+            f' - u_id:       {self.u_id}\n' + \
+            f' - email:      {self.email}\n' + \
+            f' - password:   {self.password}\n' + \
+            f' - name:       {self.name_first} {self.name_last}\n' + \
+            f' - handle:     {self.handle_str}\n' + \
+            f' - group_id:   {self.group_id}'
         return info
 
     def todict(self,
@@ -315,10 +317,17 @@ class Channel():
     def has_user(self, user: User) -> bool:
         return user in self.members
 
+    def addowner(self, user: User) -> None:
+        self.owners.append(user)
+
+    def removeowner(self, user: User) -> None:
+        self.owners.remove(user)
+
+    def leave(self, user: User) -> None:
+        self.members.remove(user)
+
     def join(self, user: User) -> None:
         self.members.append(user)
-        if user.u_id == 0:
-            self.owners.append(user)
 
     @staticmethod
     def check_name_invalid(name: str) -> bool:
