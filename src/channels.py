@@ -8,7 +8,7 @@ def channels_list_v2(token):
 
     user = User.find_by_token(token)
     if user is None:
-        raise AccessError
+        raise AccessError(description='Permission denied')
 
     channels_list = Channel.get_allchannel()
     info = []
@@ -27,7 +27,7 @@ def channels_listall_v2(token):
         and their associated details"""
 
     if User.find_by_token(token) is None:
-        raise AccessError
+        raise AccessError(description='Permission denied')
     channels_list = Channel.get_allchannel()
     info = []
     for channel in channels_list:
@@ -44,9 +44,9 @@ def channels_create_v2(token, name, is_public):
 
     user = User.find_by_token(token)
     if user is None:
-        raise AccessError
+        raise AccessError(description='Permission denied')
     if Channel.check_name_invalid(name):
-        raise InputError
+        raise InputError(description='Channel name invalid')
     new_channel = Channel(user.u_id, name, is_public)
     new_channel.add_to_store()
 
