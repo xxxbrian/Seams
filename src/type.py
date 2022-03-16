@@ -179,6 +179,10 @@ class User():
         store['login_token'].remove(token)
 
     @staticmethod
+    def find_all():
+        return store['users']
+
+    @staticmethod
     def check_email_invalid(email: str) -> bool:
         """Check whether the email address is valid"""
         regx = r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$'
