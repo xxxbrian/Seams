@@ -45,4 +45,14 @@ def user_profile_setemail_v1(token, email):
 
 
 def user_profile_sethandle_v1(token, handle_str):
-    pass
+    user = User.find_by_token(token)
+    if user is None:
+        raise AccessError
+    if User.check_handle_length_invalid(handle_str):
+        raise InputError
+    if User.check_handle_content_invalid(handle_str):
+        raise InputError
+    if User.check_handle_been_used(handle_str):
+        raise InputError
+    user.handle_str = handle_str
+    return {}
