@@ -66,7 +66,7 @@ class User():
         }
 
     @staticmethod
-    def find_by_id(u_id: int):
+    def find_by_id(u_id: int, only_active=True):
         '''
         Find user by user's u_id
 
@@ -78,12 +78,12 @@ class User():
         '''
 
         for user in store['users']:
-            if user.u_id == u_id:
+            if user.u_id == u_id and (not only_active or user.is_active()):
                 return user
         return None
 
     @staticmethod
-    def find_by_email(email: str):
+    def find_by_email(email: str, only_active=True):
         '''
         Find user by user's email
 
@@ -95,7 +95,7 @@ class User():
         '''
 
         for user in store['users']:
-            if user.email == email:
+            if user.email == email and (not only_active or user.is_active()):
                 return user
         return None
 
@@ -142,7 +142,8 @@ class User():
         if len(fullname_text) != len(fullname):
             fullname_digits = int(fullname[len(fullname_text):])
 
-        for user in list(reversed(store['users'])):
+        for user in list(reversed([i for i in store['users']
+                                   if i.is_active()])):
             last_text = user.handle_str[:len(fullname_text)]
             last_digit_str = user.handle_str[len(fullname_text):]
             last_digit = int(
@@ -183,6 +184,17 @@ class User():
     @staticmethod
     def find_all():
         return store['users']
+
+    def del_account(self):
+        self.group_id = -1
+        self.name_first = 'Removed'
+        self.name_last = 'user'
+
+    def is_active(self):
+        return self.group_id >= 0
+
+    def is_admin(self):
+        return self.group_id == 0
 
     @staticmethod
     def check_handle_been_used(handle_str: str) -> bool:
