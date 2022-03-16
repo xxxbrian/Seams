@@ -33,7 +33,15 @@ def user_profile_setname_v1(token, name_first, name_last):
 
 
 def user_profile_setemail_v1(token, email):
-    pass
+    user = User.find_by_token(token)
+    if user is None:
+        raise AccessError
+    if User.check_email_invalid(email):
+        raise InputError
+    if User.check_email_been_used(email):
+        raise InputError
+    user.email = email
+    return {}
 
 
 def user_profile_sethandle_v1(token, handle_str):
