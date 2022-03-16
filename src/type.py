@@ -183,7 +183,7 @@ class User():
 
     @staticmethod
     def find_all():
-        return store['users']
+        return [i for i in store['users'] if i.is_active()]
 
     def del_account(self):
         self.group_id = -1
