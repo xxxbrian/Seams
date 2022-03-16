@@ -193,7 +193,7 @@ def test_user_profile_setname_v1_valid_name(user_list):
     })
     
     # get the profile of the user who reset name
-    respon = requests.get(url + 'user/profile/setname/v1', params={
+    respon = requests.get(url + 'user/profile/v1', params={
         'token': user_list[0]['token'],
         'u_id': user_list[0]['auth_user_id'],
     })
@@ -263,7 +263,7 @@ def test_user_profile_setname_v1_too_long_first_name(user_list):
     
     '''
     too_long_name = ''
-    while too_long_name < 51:
+    while len(too_long_name) < 51:
         too_long_name += 'a'
     respon = requests.put(url + 'user/profile/setname/v1', json={
         'token': user_list[0]['token'],
@@ -283,7 +283,7 @@ def test_user_profile_setname_v1_too_long_last_name(user_list):
     
     '''
     too_long_name = ''
-    while too_long_name < 51:
+    while len(too_long_name) < 51:
         too_long_name += 'a'
     respon = requests.put(url + 'user/profile/setname/v1', json={
         'token': user_list[0]['token'],
@@ -303,7 +303,7 @@ def test_user_profile_setname_v1_too_long_name(user_list):
     
     '''
     too_long_name = ''
-    while too_long_name < 51:
+    while len(too_long_name) < 51:
         too_long_name += 'a'
     respon = requests.put(url + 'user/profile/setname/v1', json={
         'token': user_list[0]['token'],
@@ -323,7 +323,7 @@ def test_user_profile_setname_v1_invalid_token(user_list):
         
     '''
     too_long_name = ''
-    while too_long_name < 51:
+    while len(too_long_name) < 51:
         too_long_name += 'a'
         
     # valid name
@@ -404,7 +404,7 @@ def test_user_profile_setemail_valid_email(user_list):
     })
 
     # get the profile of the user
-    respon = requests.get(url + 'user/profile/setname/v1', params={
+    respon = requests.get(url + 'user/profile/v1', params={
         'token': user_list[0]['token'],
         'u_id': user_list[0]['auth_user_id'],
     })
@@ -539,4 +539,179 @@ def test_user_profile_setemail_invalid_token(user_list):
     assert response_4.status_code == AccessError.code
     assert response_5.status_code == AccessError.code
     assert response_6.status_code == AccessError.code
+    
+################################################ user/profile/sethandle/v1 test ################################################
+
+def test_user_profile_sethandle_valid_handle(user_list):
+    '''
+    
+    Successfully change the handle
+    
+    '''
+
+    # handle with lower_chareacters
+    requests.put(url + 'user/profile/sethandle/v1', json={
+        'token': user_list[0]['token'],
+        'handle': 'stttteve',
+    })
+    
+    # handle with number
+    requests.put(url + 'user/profile/sethandle/v1', json={
+        'token': user_list[1]['token'],
+        'handle': 'sttteve1',
+    })
+
+    # handle with upper_characters
+    requests.put(url + 'user/profile/sethandle/v1', json={
+        'token': user_list[2]['token'],
+        'handle': 'Sttteve1',
+    })
+
+    response_1 = requests.get(url + 'user/profile/v1', params={
+        'token': user_list[0]['token'],
+        'u_id': user_list[0]['auth_user_id'],
+    })
+    
+    response_2 = requests.get(url + 'user/profile/v1', params={
+        'token': user_list[1]['token'],
+        'u_id': user_list[1]['auth_user_id'],
+    })
+    
+    response_3 = requests.get(url + 'user/profile/v1', params={
+        'token': user_list[2]['token'],
+        'u_id': user_list[2]['auth_user_id'],
+    })
+    
+    assert response_1.json()['handle'] == 'stttteve'
+    assert response_2.json()['handle'] == 'sttteve1'
+    assert response_3.json()['handle'] == 'Sttteve1'
+    
+def test_user_profile_sethandle_too_short_handle(user_list):
+    '''
+    
+    Test new handle is less than 3 characters
+    
+    Raises:
+        InputError
+        
+    '''
+    response_1 = requests.put(url + 'user/profile/sethandle/v1', json={
+        'token': user_list[0]['token'],
+        'handle': '',
+    })
+    
+    response_2 = requests.put(url + 'user/profile/sethandle/v1', json={
+        'token': user_list[1]['token'],
+        'handle': 'a',
+    })
+    
+    response_3 = requests.put(url + 'user/profile/sethandle/v1', json={
+        'token': user_list[2]['token'],
+        'handle': 'ab',
+    })
+    
+    assert response_1.status_code == InputError.code
+    assert response_2.status_code == InputError.code
+    assert response_3.status_code == InputError.code
+    
+def test_user_profile_sethandle_too_long_handle(user_list):
+    '''
+    
+    Test new handle is more than 20 characters
+    
+    Raises:
+        InputError
+        
+    '''
+    too_long_handle = ""
+    while len(too_long_handle) < 21:
+        too_long_handle += 'a'
+        
+    response_1 = requests.put(url + 'user/profile/sethandle/v1', json={
+        'token': user_list[0]['token'],
+        'handle': too_long_handle,
+    })
+    
+    assert response_1.status_code == InputError.code
+    
+def test_user_profile_sethandle_not_alphanumeric_handle(user_list):
+    '''
+    
+    Test new handle is not alphanumeric
+    
+    Raises:
+        InputError
+        
+    '''
+    response_1 = requests.put(url + 'user/profile/sethandle/v1', json={
+        'token': user_list[0]['token'],
+        'handle': '@qwasS&^%$!',
+    })
+    
+    assert response_1.status_code == InputError.code
+    
+def test_user_profile_sethandle_has_been_used_handle(user_list):
+    '''
+    
+    Test new handle has been used
+    
+    Raises:
+        InputError
+        
+    '''
+    response_1 = requests.put(url + 'user/profile/sethandle/v1', json={
+        'token': user_list[0]['token'],
+        'handle': 'cicyzhou',
+    })
+    
+    assert response_1.status_code == InputError.code
+    
+def test_user_profile_sethandle_invalid_token(user_list):
+    '''
+    
+    Test when token is invalid, including those InputError but still raises AccessError 
+     
+    Raises:
+        AccessError
+        
+    '''
+    too_long_handle = ""
+    while len(too_long_handle) < 21:
+        too_long_handle += 'a'
+        
+    # valid handle
+    response_1 = requests.put(url + 'user/profile/sethandle/v1', json={
+        'token': -100,
+        'handle': 'SSSSssssteve',
+    })
+    
+    # too_short_handle
+    response_2 = requests.put(url + 'user/profile/sethandle/v1', json={
+        'token': -100,
+        'handle': 'SS',
+    })
+    
+    # too long handle
+    response_3 = requests.put(url + 'user/profile/sethandle/v1', json={
+        'token': -100,
+        'handle': too_long_handle,
+    })
+    
+    # has been used handle
+    response_4 = requests.put(url + 'user/profile/sethandle/v1', json={
+        'token': -100,
+        'handle': 'bojinli',
+    })
+    
+    # not alphanumeric handle
+    response_5 = requests.put(url + 'user/profile/sethandle/v1', json={
+        'token': -100,
+        'handle': 'bojinli!@#',
+    })
+    
+    assert response_1.status_code == AccessError.code
+    assert response_2.status_code == AccessError.code
+    assert response_3.status_code == AccessError.code
+    assert response_4.status_code == AccessError.code
+    assert response_5.status_code == AccessError.code
     
