@@ -93,38 +93,12 @@ def test_auth_login_correct_user_id(user_list):
     for index, login_user in enumerate(login_list):
         assert login_user.json()['auth_user_id'] == user_list[index].json()['auth_user_id']
         
-def test_auth_login_correct_token(user_list):
-    '''
-    Test login user return correct token
-    
-    parameter:
-        user_list (list)
-        
-    return:
-        N/A
-    '''
-    login_list = list()
-    login_list.append(requests.post(url + 'auth/login/v2',
-                                    json = {'email': 'z5374603@unsw.com',
-                                            'password': '123456'}))
-    login_list.append(requests.post(url + 'auth/login/v2',
-                                    json = {'email': 'z5374602@unsw.com',
-                                            'password': '123456'}))
-    login_list.append(requests.post(url + 'auth/login/v2',
-                                    json = {'email': 'z5374601@unsw.com',
-                                            'password': '123456'}))
-    login_list.append(requests.post(url + 'auth/login/v2',
-                                    json = {'email': 'z5374600@unsw.com',
-                                            'password': '123456'}))
-    for index, login_user in enumerate(login_list):
-        assert login_user.json()['token'] == user_list[index].json()['token']
-        
 def test_auth_login_empty_email(user_list):
     '''
     This test is testing empty emails and raising InputError
     
     parameters:
-        user_list(dict)
+        user_list(list)
         
     Raises:
         InputError
@@ -153,7 +127,7 @@ def test_auth_login_no_at_email(user_list):
     This test is testing non_@ emails and raising InputError
     
     parameters:
-        user_list(dict)
+        user_list(list)
         
     Raises:
         InputError
@@ -182,7 +156,7 @@ def test_auth_login_no_dot_email(user_list):
     This test is testing no '.com' emails and raising InputError
     
     parameters:
-        user_list(dict)
+        user_list(list)
         
     Raises:
         InputError
@@ -206,12 +180,12 @@ def test_auth_login_no_dot_email(user_list):
                                  'password': '123456'})
     assert respon.status_code == InputError.code
     
-def test_auth_login_empty_password():
+def test_auth_login_empty_password(user_list):
     '''
     Test correct email with empty password
     
     parameters:
-        user_list(dict)
+        user_list(list)
         
     Raises:
         InputError
@@ -230,12 +204,12 @@ def test_auth_login_empty_password():
                                  'password': ''})
     assert respon.status_code == InputError.code
     
-def test_auth_login_wrong_password():
+def test_auth_login_wrong_password(user_list):
     '''
     Test correct email with empty password
     
     parameters:
-        user_list(dict)
+        user_list(list)
         
     Raises:
         InputError
@@ -253,4 +227,40 @@ def test_auth_login_wrong_password():
                                 {'email': 'z5374602@unsw.com',
                                  'password': 'abc'})
     assert respon.status_code == InputError.code
+
+def test_auth_login_the_same_user_login_twice(user_list):
+    '''
+    When the same user login twice, test tokens are different
+    
+    parameters:
+        user_list
+        
+    return:
+        N/A
+    '''
+    response_1 = requests.post(url + 'auth/login/v2',
+                  json = {'email' : 'z5374603@unsw.com',
+                          'password' : '123456'})
+    response_2 = requests.post(url + 'auth/login/v2',
+                  json = {'email' : 'z5374603@unsw.com',
+                          'password' : '123456'})
+    assert response_1.json()['token'] != response_2.json()['token']
+    
+def test_auth_login_different_user_login(user_list):
+    '''
+    When different users login, return different token
+    
+    parameters:
+        user_list
+        
+    return:
+        N/A
+    '''
+    response_1 = requests.post(url + 'auth/login/v2',
+                  json = {'email' : 'z5374603@unsw.com',
+                          'password' : '123456'})
+    response_2 = requests.post(url + 'auth/login/v2',
+                  json = {'email' : 'z5374602@unsw.com',
+                          'password' : '123456'})
+    assert response_1.json()['token'] != response_2.json()['token']
     
