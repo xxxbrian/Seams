@@ -183,6 +183,11 @@ class User():
         return store['users']
 
     @staticmethod
+    def check_handle_been_used(handle_str: str) -> bool:
+        all_handle = [user.handle_str for user in store['users']]
+        return handle_str in all_handle
+
+    @staticmethod
     def check_email_invalid(email: str) -> bool:
         """Check whether the email address is valid"""
         regx = r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$'
