@@ -41,6 +41,8 @@ def create_user_list():
                                         'name_last': 'Zhou'}).json())
     return user_list
 
+
+@pytest.fixture(name = 'users')
 def users(user_list):
     '''
     Make a list of users' info 
