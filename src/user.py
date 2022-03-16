@@ -20,7 +20,16 @@ def user_profile_v1(token, u_id):
 
 
 def user_profile_setname_v1(token, name_first, name_last):
-    pass
+    user = User.find_by_token(token)
+    if user is None:
+        raise AccessError
+    if User.check_name_invalid(name_first):
+        raise InputError
+    if User.check_name_invalid(name_last):
+        raise InputError
+    user.name_first = name_first
+    user.name_last = name_last
+    return {}
 
 
 def user_profile_setemail_v1(token, email):
