@@ -103,7 +103,7 @@ def test_users_all_valid_token(user_list, users):
 
     # assert all users in the response return
     for i in range(4):
-        assert users[i] in respon.json()
+        assert users[i] in respon.json()['users']
 
 def test_users_all_invalid_token(user_list):
     '''
@@ -140,8 +140,8 @@ def test_user_profile_valid_token_and_uid(user_list, users):
                                   'u_id': user_list[1]['auth_user_id']
                               })
     
-    assert response_1.json() == users[0]
-    assert response_2.json() == users[1]
+    assert response_1.json()['user'] == users[0]
+    assert response_2.json()['user'] == users[1]
     
 def test_users_profile_invalid_uid(user_list):
     '''
@@ -201,8 +201,8 @@ def test_user_profile_setname_v1_valid_name(user_list):
     })
 
     # assert the frofile of this user will be changed and the first name and last name will match the new
-    assert respon.json()['name_first'] == 'Newfname'
-    assert respon.json()['name_last'] == 'Newlname'
+    assert respon.json()['user']['name_first'] == 'Newfname'
+    assert respon.json()['user']['name_last'] == 'Newlname'
 
 def test_user_profile_setname_v1_empty_first_name(user_list):
     '''
@@ -412,7 +412,7 @@ def test_user_profile_setemail_valid_email(user_list):
     })
     
     # users email will be changed
-    assert respon.json()['email'] == '1981686549@qq.com'
+    assert respon.json()['user']['email'] == '1981686549@qq.com'
     
 def test_user_profile_setemail_without_both_dot_and_at_email(user_list):
     '''
@@ -554,19 +554,19 @@ def test_user_profile_sethandle_valid_handle(user_list):
     # handle with lower_chareacters
     requests.put(url + 'user/profile/sethandle/v1', json={
         'token': user_list[0]['token'],
-        'handle': 'stttteve',
+        'handle_str': 'stttteve',
     })
     
     # handle with number
     requests.put(url + 'user/profile/sethandle/v1', json={
         'token': user_list[1]['token'],
-        'handle': 'sttteve1',
+        'handle_str': 'sttteve1',
     })
 
     # handle with upper_characters
     requests.put(url + 'user/profile/sethandle/v1', json={
         'token': user_list[2]['token'],
-        'handle': 'Sttteve1',
+        'handle_str': 'Sttteve1',
     })
 
     response_1 = requests.get(url + 'user/profile/v1', params={
@@ -583,10 +583,10 @@ def test_user_profile_sethandle_valid_handle(user_list):
         'token': user_list[2]['token'],
         'u_id': user_list[2]['auth_user_id'],
     })
-    
-    assert response_1.json()['handle'] == 'stttteve'
-    assert response_2.json()['handle'] == 'sttteve1'
-    assert response_3.json()['handle'] == 'Sttteve1'
+
+    assert response_1.json()['user']['handle_str'] == 'stttteve'
+    assert response_2.json()['user']['handle_str'] == 'sttteve1'
+    assert response_3.json()['user']['handle_str'] == 'Sttteve1'
     
 def test_user_profile_sethandle_too_short_handle(user_list):
     '''
@@ -599,17 +599,17 @@ def test_user_profile_sethandle_too_short_handle(user_list):
     '''
     response_1 = requests.put(url + 'user/profile/sethandle/v1', json={
         'token': user_list[0]['token'],
-        'handle': '',
+        'handle_str': '',
     })
     
     response_2 = requests.put(url + 'user/profile/sethandle/v1', json={
         'token': user_list[1]['token'],
-        'handle': 'a',
+        'handle_str': 'a',
     })
     
     response_3 = requests.put(url + 'user/profile/sethandle/v1', json={
         'token': user_list[2]['token'],
-        'handle': 'ab',
+        'handle_str': 'ab',
     })
     
     assert response_1.status_code == InputError.code
@@ -631,7 +631,7 @@ def test_user_profile_sethandle_too_long_handle(user_list):
         
     response_1 = requests.put(url + 'user/profile/sethandle/v1', json={
         'token': user_list[0]['token'],
-        'handle': too_long_handle,
+        'handle_str': too_long_handle,
     })
     
     assert response_1.status_code == InputError.code
@@ -647,7 +647,7 @@ def test_user_profile_sethandle_not_alphanumeric_handle(user_list):
     '''
     response_1 = requests.put(url + 'user/profile/sethandle/v1', json={
         'token': user_list[0]['token'],
-        'handle': '@qwasS&^%$!',
+        'handle_str': '@qwasS&^%$!',
     })
     
     assert response_1.status_code == InputError.code
@@ -663,7 +663,7 @@ def test_user_profile_sethandle_has_been_used_handle(user_list):
     '''
     response_1 = requests.put(url + 'user/profile/sethandle/v1', json={
         'token': user_list[0]['token'],
-        'handle': 'cicyzhou',
+        'handle_str': 'cicyzhou',
     })
     
     assert response_1.status_code == InputError.code
@@ -684,31 +684,31 @@ def test_user_profile_sethandle_invalid_token(user_list):
     # valid handle
     response_1 = requests.put(url + 'user/profile/sethandle/v1', json={
         'token': -100,
-        'handle': 'SSSSssssteve',
+        'handle_str': 'SSSSssssteve',
     })
     
     # too_short_handle
     response_2 = requests.put(url + 'user/profile/sethandle/v1', json={
         'token': -100,
-        'handle': 'SS',
+        'handle_str': 'SS',
     })
     
     # too long handle
     response_3 = requests.put(url + 'user/profile/sethandle/v1', json={
         'token': -100,
-        'handle': too_long_handle,
+        'handle_str': too_long_handle,
     })
     
     # has been used handle
     response_4 = requests.put(url + 'user/profile/sethandle/v1', json={
         'token': -100,
-        'handle': 'bojinli',
+        'handle_str': 'bojinli',
     })
     
     # not alphanumeric handle
     response_5 = requests.put(url + 'user/profile/sethandle/v1', json={
         'token': -100,
-        'handle': 'bojinli!@#',
+        'handle_str': 'bojinli!@#',
     })
     
     assert response_1.status_code == AccessError.code
