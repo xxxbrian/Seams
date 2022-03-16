@@ -112,4 +112,66 @@ def test_users_all_invalid_token(user_list):
         'token': -100})
     
     assert respon.status_code == AccessError.code
+    
+################################################ users/profile/v1 test ################################################ 
 
+def test_users_profile_valid_token_and_uid(user_list, users):
+    '''
+    Test when u_id and token are both correct
+    
+    parameters:
+        user_list
+        
+    returns:
+        N/A
+    '''
+    response_1 = requests.get(url + "users/profile/v1", 
+                              params = {
+                                  'token': user_list[0]['token'],
+                                  'u_id': user_list[0]['auth_user_id']
+                              })
+    response_2 = requests.get(url + "users/profile/v1", 
+                              params = {
+                                  'token': user_list[1]['token'],
+                                  'u_id': user_list[1]['auth_user_id']
+                              })
+    
+    assert response_1.json() == users[0]
+    assert response_2.json() == users[1]
+    
+def test_users_profile_invalid_uid(user_list):
+    '''
+    Test when input u_id is wrong but token is correct
+    
+    Raises:
+        InpuError
+    '''
+    response_1 = requests.get(url + "users/profile/v1", 
+                              params = {
+                                  'token': user_list[0]['token'],
+                                  'u_id': -100
+                              })
+    assert response_1.status_code == InputError.code
+    
+def test_users_profile_invalid_token(user_list):
+    '''
+    Test when input token is wrong but u_id is correct
+    and when token and u_id are both wrong
+    
+    Raises:
+        AccessError
+    '''
+    response_1 = requests.get(url + "users/profile/v1", 
+                              params = {
+                                  'token': -100,
+                                  'u_id': user_list[0]['auth_user_id']
+                              })
+    response_2 = requests.get(url + "users/profile/v1", 
+                              params = {
+                                  'token': -100,
+                                  'u_id': -100
+                              })
+    
+    assert response_1.status_code == AccessError.code
+    assert response_2.status_code == AccessError.code
+    
