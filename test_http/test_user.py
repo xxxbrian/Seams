@@ -85,6 +85,7 @@ def users(user_list):
  
 def test_users_all_valid_token(user_list, users):
     '''
+    
     This test is testing token is valid for user/all/v1
     
     parameters:
@@ -92,6 +93,7 @@ def test_users_all_valid_token(user_list, users):
         
     returns:
         N/A
+        
     '''
     respon = requests.get(url + "users/all/v1", params = {
         'token': user_list[0]['token']
@@ -381,4 +383,160 @@ def test_user_profile_setname_v1_invalid_token(user_list):
     assert response_6.status_code == AccessError.code
     assert response_7.status_code == AccessError.code
     
+################################################ user/profile/setemail/v1 test ################################################
+
+def test_user_profile_setemail_valid_email(user_list):
+    '''
+    
+    Test user set a valid new email and change profile successfully
+    
+    parameters:
+        user_list
+        
+    returns:
+        N/A
+    
+    '''
+    # change email successfully
+    requests.put(url + 'user/profile/setemail/v1', json={
+        'token': user_list[0]['token'],
+        'email': '1981686549@qq.com',
+    })
+
+    # get the profile of the user
+    respon = requests.get(url + 'user/profile/setname/v1', params={
+        'token': user_list[0]['token'],
+        'u_id': user_list[0]['auth_user_id'],
+    })
+    
+    # users email will be changed
+    assert respon.json()['email'] == '1981686549@qq.com'
+    
+def test_user_profile_setemail_without_both_dot_and_at_email(user_list):
+    '''
+    
+    Test user set a without both . and @ new email 
+    
+    Raises:
+        InputError
+        
+    '''
+    response_1 = requests.put(url + 'user/profile/setemail/v1', json={
+        'token': user_list[0]['token'],
+        'email': '1981686549qqcom',
+    })
+    
+    # empty email
+    response_2 = requests.put(url + 'user/profile/setemail/v1', json={
+        'token': user_list[0]['token'],
+        'email': '',
+    })
+    
+    assert response_1.status_code == InputError.code
+    assert response_2.status_code == InputError.code
+    
+def test_user_profile_setemail_without_dot_email(user_list):
+    '''
+    
+    Test user set a without both . new email 
+    
+    Raises:
+        InputError
+        
+    '''
+    response_1 = requests.put(url + 'user/profile/setemail/v1', json={
+        'token': user_list[0]['token'],
+        'email': '1981686549@qqcom',
+    })
+    
+    assert response_1.status_code == InputError.code
+    
+def test_user_profile_setemail_without_at_email(user_list):
+    '''
+    
+    Test user set a without both . new email 
+    
+    Raises:
+        InputError
+        
+    '''
+    response_1 = requests.put(url + 'user/profile/setemail/v1', json={
+        'token': user_list[0]['token'],
+        'email': '1981686549qq.com',
+    })
+    
+    assert response_1.status_code == InputError.code
+    
+def test_user_profile_setemail_email_has_been_used(user_list):
+    '''
+    
+    Test user set a new email, which has been used
+    
+    Raises:
+        InputError
+        
+    '''
+    response_1 = requests.put(url + 'user/profile/setemail/v1', json={
+        'token': user_list[0]['token'],
+        'email': 'z5374602@unsw.com',
+    })
+    response_2 = requests.put(url + 'user/profile/setemail/v1', json={
+        'token': user_list[0]['token'],
+        'email': 'z5374601@unsw.com',
+    })
+    
+    assert response_1.status_code == InputError.code
+    assert response_2.status_code == InputError.code
+    
+def test_user_profile_setemail_invalid_token(user_list):
+    '''
+    
+    Test when token is invalid, including those InputError but still raises AccessError 
+     
+    Raises:
+        AccessError
+        
+    '''
+    # valid email
+    response_1 = requests.put(url + 'user/profile/setemail/v1', json={
+        'token': -100,
+        'email': '1981686549@qq.com',
+    })
+    
+    # empty email
+    response_2 = requests.put(url + 'user/profile/setemail/v1', json={
+        'token': -100,
+        'email': '',
+    })
+    
+    # without . anmd @
+    response_3 = requests.put(url + 'user/profile/setemail/v1', json={
+        'token': -100,
+        'email': '1981686549qqcom',
+    })
+    
+    # without .
+    response_4 = requests.put(url + 'user/profile/setemail/v1', json={
+        'token': -100,
+        'email': '1981686549@qqcom',
+    })
+    
+    # without @
+    response_5 = requests.put(url + 'user/profile/setemail/v1', json={
+        'token': -100,
+        'email': '1981686549qq.com',
+    })
+    
+    # email has been used
+    response_6 = requests.put(url + 'user/profile/setemail/v1', json={
+        'token': -100,
+        'email': 'z5374602@unsw.com',
+    })
+    
+    assert response_1.status_code == AccessError.code
+    assert response_2.status_code == AccessError.code
+    assert response_3.status_code == AccessError.code
+    assert response_4.status_code == AccessError.code
+    assert response_5.status_code == AccessError.code
+    assert response_6.status_code == AccessError.code
     
