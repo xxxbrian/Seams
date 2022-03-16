@@ -1,5 +1,12 @@
+from src.type import User
+from src.error import AccessError, InputError
+
+
 def users_all_v1(token):
-    pass
+    user = User.find_by_token(token)
+    if user is None:
+        raise AccessError
+    return {'users': [user.todict() for user in User.find_all()]}
 
 
 def user_profile_v1(token, u_id):
