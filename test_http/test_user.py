@@ -113,9 +113,9 @@ def test_users_all_invalid_token(user_list):
     
     assert respon.status_code == AccessError.code
     
-################################################ users/profile/v1 test ################################################ 
+################################################ user/profile/v1 test ################################################ 
 
-def test_users_profile_valid_token_and_uid(user_list, users):
+def test_user_profile_valid_token_and_uid(user_list, users):
     '''
     Test when u_id and token are both correct
     
@@ -125,12 +125,12 @@ def test_users_profile_valid_token_and_uid(user_list, users):
     returns:
         N/A
     '''
-    response_1 = requests.get(url + "users/profile/v1", 
+    response_1 = requests.get(url + "user/profile/v1", 
                               params = {
                                   'token': user_list[0]['token'],
                                   'u_id': user_list[0]['auth_user_id']
                               })
-    response_2 = requests.get(url + "users/profile/v1", 
+    response_2 = requests.get(url + "user/profile/v1", 
                               params = {
                                   'token': user_list[1]['token'],
                                   'u_id': user_list[1]['auth_user_id']
@@ -146,7 +146,7 @@ def test_users_profile_invalid_uid(user_list):
     Raises:
         InpuError
     '''
-    response_1 = requests.get(url + "users/profile/v1", 
+    response_1 = requests.get(url + "user/profile/v1", 
                               params = {
                                   'token': user_list[0]['token'],
                                   'u_id': -100
@@ -161,12 +161,12 @@ def test_users_profile_invalid_token(user_list):
     Raises:
         AccessError
     '''
-    response_1 = requests.get(url + "users/profile/v1", 
+    response_1 = requests.get(url + "user/profile/v1", 
                               params = {
                                   'token': -100,
                                   'u_id': user_list[0]['auth_user_id']
                               })
-    response_2 = requests.get(url + "users/profile/v1", 
+    response_2 = requests.get(url + "user/profile/v1", 
                               params = {
                                   'token': -100,
                                   'u_id': -100
@@ -174,4 +174,211 @@ def test_users_profile_invalid_token(user_list):
     
     assert response_1.status_code == AccessError.code
     assert response_2.status_code == AccessError.code
+    
+################################################ user/profile/setname/v1 test ################################################
+
+def test_user_profile_setname_v1_valid_name(user_list):
+    '''
+    
+    Test when user's new name is valid and set name successfully
+    
+    '''
+    # set a new name
+    requests.put(url + 'user/profile/setname/v1', json={
+        'token': user_list[0]['token'],
+        'name_first': 'Newfname',
+        'name_last': 'Newlname',
+    })
+    
+    # get the profile of the user who reset name
+    respon = requests.get(url + 'user/profile/setname/v1', params={
+        'token': user_list[0]['token'],
+        'u_id': user_list[0]['auth_user_id'],
+    })
+
+    # assert the frofile of this user will be changed and the first name and last name will match the new
+    assert respon.json()['name_first'] == 'Newfname'
+    assert respon.json()['name_last'] == 'Newlname'
+
+def test_user_profile_setname_v1_empty_first_name(user_list):
+    '''
+    
+    Test when user's first name is empty
+    
+    Raises:
+        InpuError
+    
+    '''
+    respon = requests.put(url + 'user/profile/setname/v1', json={
+        'token': user_list[0]['token'],
+        'name_first': '',
+        'name_last': 'Newlname',
+    })
+
+    assert respon.status_code == InputError.code
+    
+def test_user_profile_setname_v1_empty_last_name(user_list):
+    '''
+    
+    Test when user's last name is empty
+    
+    Raises:
+        InpuError
+    
+    '''
+    respon = requests.put(url + 'user/profile/setname/v1', json={
+        'token': user_list[0]['token'],
+        'name_first': 'Newfname',
+        'name_last': '',
+    })
+
+    assert respon.status_code == InputError.code
+    
+def test_user_profile_setname_v1_empty_name(user_list):
+    '''
+    
+    Test when user's name is empty
+    
+    Raises:
+        InpuError
+    
+    '''
+    respon = requests.put(url + 'user/profile/setname/v1', json={
+        'token': user_list[0]['token'],
+        'name_first': '',
+        'name_last': '',
+    })
+
+    assert respon.status_code == InputError.code
+    
+def test_user_profile_setname_v1_too_long_first_name(user_list):
+    '''
+    
+    Test when user's first name is too long
+    
+    Raises:
+        InpuError
+    
+    '''
+    too_long_name = ''
+    while too_long_name < 51:
+        too_long_name += 'a'
+    respon = requests.put(url + 'user/profile/setname/v1', json={
+        'token': user_list[0]['token'],
+        'name_first': too_long_name,
+        'name_last': 'Newlname',
+    })
+
+    assert respon.status_code == InputError.code
+    
+def test_user_profile_setname_v1_too_long_last_name(user_list):
+    '''
+    
+    Test when user's last name is too long
+    
+    Raises:
+        InpuError
+    
+    '''
+    too_long_name = ''
+    while too_long_name < 51:
+        too_long_name += 'a'
+    respon = requests.put(url + 'user/profile/setname/v1', json={
+        'token': user_list[0]['token'],
+        'name_first': 'Newfname',
+        'name_last': too_long_name,
+    })
+
+    assert respon.status_code == InputError.code
+    
+def test_user_profile_setname_v1_too_long_name(user_list):
+    '''
+    
+    Test when user's name is too long
+    
+    Raises:
+        InpuError
+    
+    '''
+    too_long_name = ''
+    while too_long_name < 51:
+        too_long_name += 'a'
+    respon = requests.put(url + 'user/profile/setname/v1', json={
+        'token': user_list[0]['token'],
+        'name_first': too_long_name,
+        'name_last': too_long_name,
+    })
+
+    assert respon.status_code == InputError.code
+ 
+def test_user_profile_setname_v1_invalid_token(user_list):
+    '''
+     
+    Test when token is invalid, including those InputError but still raises AccessError 
+     
+    Raises:
+        AccessError
+        
+    '''
+    too_long_name = ''
+    while too_long_name < 51:
+        too_long_name += 'a'
+        
+    # valid name
+    response_1 = requests.put(url + 'user/profile/setname/v1', json={
+        'token': -100,
+        'name_first': 'Newfname',
+        'name_last': 'Newlname',
+    })
+    
+    # empty new first name
+    response_2 = requests.put(url + 'user/profile/setname/v1', json={
+        'token': -100,
+        'name_first': '',
+        'name_last': 'Newlname',
+    })
+    
+    # empty new last name
+    response_3 = requests.put(url + 'user/profile/setname/v1', json={
+        'token': -100,
+        'name_first': 'Newfname',
+        'name_last': '',
+    })
+    
+    # empty new name
+    response_4 = requests.put(url + 'user/profile/setname/v1', json={
+        'token': -100,
+        'name_first': '',
+        'name_last': '',
+    })
+    
+    # too long first name
+    response_5 = requests.put(url + 'user/profile/setname/v1', json={
+        'token': -100,
+        'name_first': too_long_name,
+        'name_last': 'Newlname',
+    })
+    
+    # too long last name
+    response_6 = requests.put(url + 'user/profile/setname/v1', json={
+        'token': -100,
+        'name_first': 'Newfname',
+        'name_last': too_long_name,
+    })
+    
+    # too long name
+    response_7 = requests.put(url + 'user/profile/setname/v1', json={
+        'token': -100,
+        'name_first': too_long_name,
+        'name_last': too_long_name,
+    })
+    
+    assert response_1.status_code == AccessError.code
+    assert response_2.status_code == AccessError.code
+    assert response_3.status_code == AccessError.code
+    assert response_4.status_code == AccessError.code
+    assert response_5.status_code == AccessError.code
+    assert response_6.status_code == AccessError.code
+    assert response_7.status_code == AccessError.code
+    
     
