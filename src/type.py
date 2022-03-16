@@ -2,6 +2,7 @@ import re
 import string
 import jwt
 import hashlib
+import time
 
 from src.data_store import data_store
 
@@ -154,7 +155,10 @@ class User():
         return fullname_text
 
     def generat_token(self) -> str:
-        payload = {'u_id': self.u_id}
+        payload = {
+            'u_id': self.u_id,
+            'exp': int(time.time() * 1000000),
+        }
         token = jwt.encode(payload=payload, key=SECRET, algorithm='HS256')
         store['login_token'].append(token)
         return token
