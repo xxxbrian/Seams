@@ -188,6 +188,14 @@ class User():
         return handle_str in all_handle
 
     @staticmethod
+    def check_handle_content_invalid(handle_str: str) -> bool:
+        return not handle_str.isalnum()
+
+    @staticmethod
+    def check_handle_length_invalid(handle_str: str) -> bool:
+        return len(handle_str) < 3 or len(handle_str) > 20
+
+    @staticmethod
     def check_email_invalid(email: str) -> bool:
         """Check whether the email address is valid"""
         regx = r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$'
