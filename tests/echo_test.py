@@ -1,3 +1,4 @@
+'''
 import pytest
 
 from src.echo import echo
@@ -11,3 +12,4 @@ def test_echo():
 def test_echo_except():
     with pytest.raises(InputError):
         assert echo("echo")
+'''
