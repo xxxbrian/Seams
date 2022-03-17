@@ -146,7 +146,7 @@ def clear():
 @APP.route("/auth/logout/v1", methods=['POST'])
 def auth_logout():
     data = request.get_json()
-    resp = auth_logout_v1(data['token'], )
+    resp = auth_logout_v1(data['token'])
     return dumps(resp)
 
 
