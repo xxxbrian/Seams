@@ -18,7 +18,17 @@ def dm_create_v1(token, u_ids):
 
 
 def dm_list_v1(token):
-    return {}
+    user = User.find_by_token(token)
+    if user is None:
+        raise AccessError(description='Permission denied')
+    dm_list = DM.get_all()
+    info = []
+    for dm in dm_list:
+        if user in dm.members:
+            info.append(dm.todict())
+    return {
+        'dms': info,
+    }
 
 
 def dm_remove_v1(token, dm_id):
