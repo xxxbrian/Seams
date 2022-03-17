@@ -102,7 +102,7 @@ class User():
     @staticmethod
     def clear() -> None:
         """clear user"""
-        store['users'] = []
+        store['users'].clear()
 
     @staticmethod
     def get_last_id() -> int:
@@ -298,8 +298,8 @@ class Channel():
 
     @staticmethod
     def get_last_id() -> int:
-        users = list(reversed(store['channels']))
-        channel_id = users[0].channel_id if len(users) > 0 else 0
+        channel = list(reversed(store['channels']))
+        channel_id = channel[0].channel_id if len(channel) > 0 else -1
         return channel_id
 
     @staticmethod
@@ -321,7 +321,7 @@ class Channel():
 
     @staticmethod
     def clear() -> None:
-        store['channels'] = []
+        store['channels'].clear()
 
     def add_to_store(self) -> None:
         store['channels'].append(self)
@@ -360,6 +360,80 @@ class Channel():
         return self.messages[start:end]
 
 
+class DM():
+
+    def __init__(self, u_id: int, u_ids: list) -> None:
+        self.name = self.generat_name(u_ids)
+        self.owner = User.find_by_id(u_id)
+        self.members = [User.find_by_id(u_id) for u_id in u_ids]
+        self.dm_id = DM.get_last_id() + 1
+        self.messages = []
+
+    def __str__(self):
+        info = 'DM object:\n'+\
+            f' - name:        {self.name}\n'+\
+            f' - DM_id:       {self.dm_id}\n'+\
+            f' - owner:       id({self.owner.u_id})\n'+\
+            f' - members:     {len(self.members)}'
+        return info
+
+    def todict(self, show={'dm_id', 'name'}):
+        info_dict = {
+            key: value
+            for key, value in self.__dict__.items() if key in show
+        }
+        if 'owner' in show:
+            info_dict['owner'] = self.owner.todict()
+        if 'members' in show:
+            info_dict['members'] = list(user.todict() for user in self.members)
+
+        return info_dict
+
+    @staticmethod
+    def get_last_id() -> int:
+        dm = list(reversed(store['dms']))
+        dm_id = dm[0].dm_id if len(dm) > 0 else -1
+        return dm_id
+
+    def generat_name(u_ids: list) -> str:
+        name_list = [User.find_by_id(u_id).name for u_id in u_ids]
+        return ', '.join(reversed(name_list))
+
+    @staticmethod
+    def find_by_id(dm_id):
+        '''
+        Find dm by dm's dm_id
+
+        Args:
+            dm_id
+
+        Return:
+            DM
+        '''
+
+        for dm in store['dms']:
+            if dm.dm_id == dm_id:
+                return dm
+        return None
+
+    @staticmethod
+    def clear() -> None:
+        store['dms'].clear()
+
+    def add_to_store(self) -> None:
+        store['dms'].append(self)
+
+    def has_user(self, user: User) -> bool:
+        return user in self.members
+
+    def leave(self, user: User) -> None:
+        self.members.remove(user)
+
+    def get_messages(self, start: int, end: int) -> list:
+        end = len(self.messages) if end < 0 else end
+        return self.messages[start:end]
+
+
 class Message():
 
     def __init__(self, u_id: int, content: str, time_sent: int) -> None:
@@ -379,9 +453,9 @@ class Message():
 
     @staticmethod
     def get_last_id() -> int:
-        users = store['messages']
-        channel_id = users[0].channel_id if len(users) > 0 else 0
-        return channel_id
+        msg = store['messages']
+        message_id = msg[0].message_id if len(msg) > 0 else -1
+        return message_id
 
     @staticmethod
     def find_by_id(channel_id):
@@ -402,10 +476,13 @@ class Message():
 
     @staticmethod
     def clear() -> None:
-        store['messages'] = []
+        store['messages'].clear()
 
     def add_to_store(self) -> None:
         store['messages'].insert(0, self)
 
     def add_to_channel(self, channel: Channel) -> None:
         channel.messages.insert(0, self)
+
+    def add_to_dm(self, dm: DM) -> None:
+        dm.messages.insert(0, self)
