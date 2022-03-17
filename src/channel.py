@@ -1,4 +1,3 @@
-from tkinter.messagebox import NO
 from src.error import InputError, AccessError
 from src.type import User, Channel
 
@@ -11,15 +10,15 @@ def channel_invite_v2(token, channel_id, u_id):
     user = User.find_by_id(u_id)
     channel = Channel.find_by_id(channel_id)
     if auth_user is None:
-        raise AccessError
+        raise AccessError(description='Permission denied')
     if channel is None:
-        raise InputError
-    if user is None:
-        raise InputError
-    if channel.has_user(user):
-        raise InputError
+        raise InputError(description='Channel not found')
     if not channel.has_user(auth_user):
-        raise AccessError
+        raise AccessError(description='Permission denied')
+    if user is None:
+        raise InputError(description='User not found')
+    if channel.has_user(user):
+        raise InputError(description='Already in channel')
 
     channel.join(user)
     return {}
@@ -32,11 +31,11 @@ def channel_details_v2(token, channel_id):
     user = User.find_by_token(token)
     channel = Channel.find_by_id(channel_id)
     if user is None:
-        raise AccessError
+        raise AccessError(description='Permission denied')
     if channel is None:
-        raise InputError
+        raise InputError(description='Channel not found')
     if not channel.has_user(user):
-        raise AccessError
+        raise AccessError(description='Permission denied: Join channel first')
 
     channel_info = channel.todict(
         {'name', 'is_public', 'owner_members', 'all_members'})
@@ -51,13 +50,13 @@ def channel_messages_v2(token, channel_id, start):
     user = User.find_by_token(token)
     channel = Channel.find_by_id(channel_id)
     if user is None:
-        raise AccessError
+        raise AccessError(description='Permission denied')
     if channel is None:
-        raise InputError
+        raise InputError(description='Channel not found')
     if not channel.has_user(user):
-        raise AccessError
+        raise AccessError(description='Permission denied: Join channel first')
     if start > len(channel.messages):
-        raise InputError
+        raise InputError(description='Message not found')
 
     # Message with index 0 is the most recent message in the channel.
     end = start + 50 if start + 50 <= len(channel.messages) else -1
@@ -77,13 +76,14 @@ def channel_join_v2(token, channel_id):
     channel = Channel.find_by_id(channel_id)
 
     if user is None:
-        raise AccessError
+        raise AccessError(description='Permission denied')
     if channel is None:
-        raise InputError
+        raise InputError(description='Channel not found')
     if channel.has_user(user):
-        raise InputError
-    if not channel.is_public and user.u_id != 0:
-        raise AccessError
+        raise InputError(description='Already in channel')
+    if not channel.is_public and user.group_id != 0:
+        raise AccessError(
+            description='Permission denied: Channel not available')
 
     channel.join(user)
     return {}
@@ -93,11 +93,11 @@ def channel_leave_v1(token, channel_id):
     user = User.find_by_token(token)
     channel = Channel.find_by_id(channel_id)
     if user is None:
-        raise AccessError
+        raise AccessError(description='Permission denied')
     if channel is None:
-        raise InputError
+        raise InputError(description='Channel not found')
     if not channel.has_user(user):
-        raise AccessError
+        raise AccessError(description='Permission denied: Not member')
     if user in channel.owners:
         channel.removeowner(user)
     channel.leave(user)
@@ -109,17 +109,17 @@ def channel_addowner_v1(token, channel_id, u_id):
     channel = Channel.find_by_id(channel_id)
     user = User.find_by_id(u_id)
     if auth_user is None:
-        raise AccessError
+        raise AccessError(description='Permission denied')
     if channel is None:
-        raise InputError
+        raise InputError(description='Channel not found')
     if not auth_user in channel.owners:
-        raise AccessError
+        raise AccessError(description='Permission denied: Not owner')
     if user is None:
-        raise InputError
+        raise InputError(description='User not found')
     if not channel.has_user(user):
-        raise InputError
+        raise InputError(description='Invite user join first')
     if user in channel.owners:
-        raise InputError
+        raise InputError(description='Already a owner')
     channel.addowner(user)
     return {}
 
@@ -129,16 +129,16 @@ def channel_removeowner_v1(token, channel_id, u_id):
     channel = Channel.find_by_id(channel_id)
     user = User.find_by_id(u_id)
     if auth_user is None:
-        raise AccessError
+        raise AccessError(description='Permission denied')
     if channel is None:
-        raise InputError
+        raise InputError(description='Channel not found')
     if not auth_user in channel.owners:
-        raise AccessError
+        raise AccessError(description='Permission denied: Not owner')
     if user is None:
-        raise InputError
+        raise InputError(description='User not found')
     if not user in channel.owners:
-        raise InputError
+        raise InputError(description='Not a owner')
     if len(channel.owners) < 2:
-        raise InputError
+        raise InputError(description='Cannot remove last owner')
     channel.removeowner(user)
     return {}
