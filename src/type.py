@@ -350,9 +350,6 @@ class Channel():
 
     @staticmethod
     def get_allchannel() -> list:
-        """
-        Check whether the length of user is satisfy length request
-        """
         return store['channels']
 
     def get_messages(self, start: int, end: int) -> list:
@@ -432,6 +429,10 @@ class DM():
     def get_messages(self, start: int, end: int) -> list:
         end = len(self.messages) if end < 0 else end
         return self.messages[start:end]
+
+    @staticmethod
+    def get_all() -> list:
+        return store['dms']
 
 
 class Message():
