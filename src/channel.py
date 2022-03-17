@@ -104,7 +104,23 @@ def channel_leave_v1(token, channel_id):
 
 
 def channel_addowner_v1(token, channel_id, u_id):
-    pass
+    auth_user = User.find_by_token(token)
+    channel = Channel.find_by_id(channel_id)
+    user = User.find_by_id(u_id)
+    if auth_user is None:
+        raise AccessError
+    if not auth_user in channel.owners:
+        raise AccessError
+    if channel is None:
+        raise InputError
+    if user is None:
+        raise InputError
+    if not channel.has_user(user):
+        raise InputError
+    if user in channel.owners:
+        raise InputError
+    channel.addowner(user)
+    return {}
 
 
 def channel_removeowner_v1(token, channel_id, u_id):
