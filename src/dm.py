@@ -48,7 +48,15 @@ def dm_remove_v1(token, dm_id):
 
 
 def dm_details_v1(token, dm_id):
-    return {}
+    user = User.find_by_token(token)
+    dm = DM.find_by_id(dm_id)
+    if user is None:
+        raise AccessError(description='Permission denied')
+    if dm is None:
+        raise InputError(description='DM not found')
+    if not dm.has_user(user):
+        raise AccessError(description='Permission denied: Not member')
+    return dm.todict({'name', 'member'})
 
 
 def dm_leave_v1(token, dm_id):
