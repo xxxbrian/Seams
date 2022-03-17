@@ -73,7 +73,7 @@ def channel_join_v2(token, channel_id):
     adds them to that channel."""
 
     user = User.find_by_token(token)
-    channel = Channel.find_by_(channel_id)
+    channel = Channel.find_by_id(channel_id)
 
     if user is None:
         raise AccessError
