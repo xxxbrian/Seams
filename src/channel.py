@@ -89,7 +89,18 @@ def channel_join_v2(token, channel_id):
 
 
 def channel_leave_v1(token, channel_id):
-    pass
+    user = User.find_by_token(token)
+    channel = Channel.find_by_id(channel_id)
+    if user is None:
+        raise AccessError
+    if channel is None:
+        raise InputError
+    if not channel.has_user(user):
+        raise AccessError
+    if user in channel.owners:
+        channel.removeowner(user)
+    channel.leave(user)
+    return {}
 
 
 def channel_addowner_v1(token, channel_id, u_id):
