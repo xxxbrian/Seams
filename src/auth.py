@@ -44,3 +44,4 @@ def auth_logout_v1(token):
         User.remove_token(token)
     else:
         raise InputError(description='Token invalid')
+    return {}
