@@ -449,8 +449,7 @@ class Message():
             for key, value in self.__dict__.items() if key in show
         }
         if 'message' in show:
-            info_dict['message'] = list(content.todict()
-                                        for content in self.content)
+            info_dict['message'] = self.content
 
     @staticmethod
     def get_last_id() -> int:

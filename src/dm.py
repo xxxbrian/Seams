@@ -12,7 +12,7 @@ def dm_create_v1(token, u_ids):
     users = [u for u in input_users if u is not None]
     if len(users) != len(set(users)):
         raise InputError(description='Duplicate u_id')
-    new_dm = DM(user.u_id, [u.u_id for u in users])
+    new_dm = DM(user.u_id, [u.u_id for u in users].append(user.u_id))
     new_dm.add_to_store()
     return {'dm_id': new_dm.dm_id}
 
