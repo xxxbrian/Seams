@@ -7,7 +7,7 @@ def dm_create_v1(token, u_ids):
     input_users = [User.find_by_id(u_id) for u_id in u_ids]
     if user is None:
         raise AccessError(description='Permission denied')
-    if all(users) is None:
+    if all(input_users) is None:
         raise InputError(description='All user not found')
     users = [u for u in input_users if u is not None]
     if len(users) != len(set(users)):

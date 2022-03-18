@@ -392,8 +392,8 @@ class DM():
         dm_id = dm[0].dm_id if len(dm) > 0 else -1
         return dm_id
 
-    def generat_name(u_ids: list) -> str:
-        name_list = [User.find_by_id(u_id).name for u_id in u_ids]
+    def generat_name(self, u_ids: list) -> str:
+        name_list = [User.find_by_id(u_id).handle_str for u_id in u_ids]
         return ', '.join(reversed(name_list))
 
     @staticmethod
