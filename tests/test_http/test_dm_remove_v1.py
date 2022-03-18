@@ -48,9 +48,9 @@ def one_user_create_dm(user_list):
     auth_user_id = payload['auth_user_id']
     # User01 create a dm
     u_id = []
-    u_id.append(dict_list[1]['auth_user_id'])
-    u_id.append(dict_list[2]['auth_user_id'])
-    u_id.append(dict_list[3]['auth_user_id'])
+    u_id.append(dict_list[1].json()['auth_user_id'])
+    u_id.append(dict_list[2].json()['auth_user_id'])
+    u_id.append(dict_list[3],json()['auth_user_id'])
     r = requests.post(url + 'dm/create/v1', 
                     json = {'token': token,
                             'u_ids': u_id,})
@@ -100,7 +100,7 @@ def test_author_not_creator(user_list, dm1):
     then raise AccessError."""
 
     resp = requests.delete(url + 'dm/remove/v1',
-                            json = {"token": user_list[3]["token"], 
+                            json = {"token": user_list[3].json()["token"], 
                                     "dm_id": dm1["dm_id"]})
     assert resp.status_code == AccessError.code
 
@@ -110,9 +110,9 @@ def test_remove_success(user_list, dm1):
     User1 remove dm1 successfully.
     """ 
     requests.delete(url + 'dm/remove/v1',
-                    json = {"token": user_list[0]["token"], 
+                    json = {"token": user_list[0].json()["token"], 
                             "dm_id": dm1["dm_id"]})
 
     resp = requests.get(url + 'dm/list/v1',
-                        params = {"token": user_list[0]["token"]}) 
+                        params = {"token": user_list[0].json()["token"]}) 
     assert json.loads(resp.text) == {"dms": []}

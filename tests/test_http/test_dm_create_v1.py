@@ -52,9 +52,9 @@ def one_user_create_dm(user_list):
     auth_user_id = payload['auth_user_id']
     # User01 create a dm
     u_id = []
-    u_id.append(dict_list[1]['auth_user_id'])
-    u_id.append(dict_list[2]['auth_user_id'])
-    u_id.append(dict_list[3]['auth_user_id'])
+    u_id.append(dict_list[1].json()['auth_user_id'])
+    u_id.append(dict_list[2].json()['auth_user_id'])
+    u_id.append(dict_list[3].json()['auth_user_id'])
     r = requests.post(url + 'dm/create/v1', 
                     json = {'token': token,
                             'u_ids': u_id,})
