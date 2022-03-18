@@ -1,12 +1,7 @@
-"""
-u_ids contains the user(s) that this DM is directed to, and will not include the creator. The creator is the owner of the DM. name should be automatically generated based on the users that are in this DM. The name should be an alphabetically-sorted, comma-and-space-separated list of user handles, e.g. 'ahandle1, bhandle2, chandle3'.
-"""
-
 import pytest
 import requests
 import json
 from src.config import url
-from src.error import InputError
 
 @pytest.fixture(name = 'user_list')
 def create_user_list():
@@ -66,35 +61,12 @@ def one_user_create_dm(user_list):
         'dm_id': dm_id,
     }
 
-def test_dm_create_invalid_uid(info):
-    """
-        Test invalid user id
-        Raises:
-            InputError
-    """
-    res = requests.post(url + 'dm/create/v1',
-                        json = {'token': info['token'],
-                                'u_ids': [-5, -80],})
-    assert res.status_code == InputError.code
-
-def test_dm_create_multiple_uid(info):
-    """
-        Test duplicated user id
-        Raises:
-            InputError
-    """
-
-    res = requests.post(url + 'dm/create/v1',
-                        json = {'token': info['token'],
-                                'u_ids': [1,1,1],})
-    payload = res.json()
-    temp = -999
-    is_duplicate = False
-
-    for i in payload['u_ids']:
-        if i == temp:
-            is_duplicate = True
-        temp = i
-
-    if is_duplicate is True:
-        assert res.status_code == InputError.code
+def test_dm_list_success(info):
+        r = requests.get(url + 'dm/list/v1', 
+                        params = {'token': info['token'],})
+        test = r.json()
+        idx = 0
+        for i in test['dms']:
+            assert i[idx]['dm_id'] == idx
+            assert i[idx]['name'] == info['dm_name']
+            idx += 1
