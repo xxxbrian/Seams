@@ -73,4 +73,21 @@ def dm_leave_v1(token, dm_id):
 
 
 def dm_messages_v1(token, dm_id, start):
-    return {}
+    user = User.find_by_token(token)
+    dm = DM.find_by_id(dm_id)
+    if user is None:
+        raise AccessError(description='Permission denied')
+    if dm is None:
+        raise InputError(description='DM not found')
+    if not dm.has_user(user):
+        raise AccessError(description='Permission denied: Not member')
+    if start > len(dm.messages):
+        raise InputError(description='Message not found')
+
+    end = start + 50 if start + 50 <= len(dm.messages) else -1
+    msg_list = list(msg.todict() for msg in dm.get_messages(start, end))
+    return {
+        'messages': msg_list,
+        'start': start,
+        'end': end,
+    }
