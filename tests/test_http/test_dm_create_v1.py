@@ -83,6 +83,7 @@ def test_dm_create_multiple_uid(info):
         Raises:
             InputError
     """
+    
     res = requests.post(url + 'dm/create/v1',
                         json = {'token': info['token'],
                                 'u_ids': [1,1,1],})
