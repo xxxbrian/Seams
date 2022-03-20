@@ -1,4 +1,3 @@
-from email import message
 import re
 import string
 import jwt
@@ -104,6 +103,7 @@ class User():
     def clear() -> None:
         """clear user"""
         store['users'].clear()
+        store['login_token'].clear()
 
     @staticmethod
     def get_last_id() -> int:
