@@ -141,15 +141,15 @@ def test_normal_channel_messages(user_list, login_list, channel_list):
                           'channel_id': channel_list[3]['channel_id'],
                           'message': 'message4'})
     
-    response_1 = json.loads(requests.get(url + 'channel/messages/v2',
-                                         params = {'token': login_list[0]['token'],
-                                                   'channel_id': channel_list[0]['channel_id'],
-                                                   'start': 0}))
-    response_2 = json.loads(requests.get(url + 'channel/messages/v2',
-                                         params = {'token': login_list[3]['token'],
-                                                   'channel_id': channel_list[3]['channel_id'],
-                                                   'start': 0}))
-    
+    response_1 = requests.get(url + 'channel/messages/v2',
+                              params = {'token': login_list[0]['token'],
+                                        'channel_id': channel_list[0]['channel_id'],
+                                        'start': 0}).json()
+    response_2 = requests.get(url + 'channel/messages/v2',
+                              params = {'token': login_list[3]['token'],
+                                        'channel_id': channel_list[3]['channel_id'],
+                                        'start': 0}).json()
+
     assert response_1['messages'][0]['message'] == "message4"
     assert response_1['messages'][1]['message'] == "message3"
     assert response_1['messages'][2]['message'] == "message2"
@@ -164,7 +164,7 @@ def test_normal_channel_messages(user_list, login_list, channel_list):
     assert response_1['end'] == -1
     assert response_2['end'] == -1
     
-def test_channel_message_more_message(user_list, login_list, channel_list):
+def test_channel_message_more_messages(user_list, login_list, channel_list):
     '''
     
     This tests is to test when sending more than 50 messages, the end value is start +50
@@ -183,10 +183,10 @@ def test_channel_message_more_message(user_list, login_list, channel_list):
                           'channel_id': channel_list[0]['channel_id'],
                           'message': 'messages'})
     
-    response_1 = json.loads(requests.get(url + 'channel/messages/v2',
-                                         params = {'token': login_list[0]['token'],
-                                                   'channel_id': channel_list[0]['channel_id'],
-                                                   'start': 0}))
+    response_1 = requests.get(url + 'channel/messages/v2',
+                              params = {'token': login_list[0]['token'],
+                                        'channel_id': channel_list[0]['channel_id'],
+                                        'start': 0}).json()
     
     for i in range(50):
         # test messages are correct
@@ -356,5 +356,4 @@ def test_channel_messages_invalid_user_token(user_list, login_list, channel_list
                                         'channel_id': -1,
                                         'start': 0})
     assert response_3.status_code == AccessError.code
-    
     
