@@ -45,7 +45,7 @@ def message_edit_v1(token, message_id, message):
 
 
 def message_remove_v1(token, message_id):
-    return {}
+    return message_edit_v1(token, message_id, '')
 
 
 def message_senddm_v1(token, dm_id, message):
