@@ -357,6 +357,9 @@ class Channel():
         end = len(self.messages) if end < 0 else end
         return self.messages[start:end]
 
+    def add_message(self, msg):
+        self.messages.insert(0, msg)
+
 
 class DM():
 
@@ -435,14 +438,19 @@ class DM():
     def get_all() -> list:
         return store['dms']
 
+    def add_message(self, msg):
+        self.messages.insert(0, msg)
+
 
 class Message():
 
-    def __init__(self, u_id: int, content: str, time_sent: int) -> None:
+    def __init__(self, u_id: int, content: str, time_sent: int, sub) -> None:
         self.message_id = Message.get_last_id() + 1
         self.u_id = u_id
         self.content = content
         self.time_sent = time_sent
+        self.is_active = True
+        self.sub = sub
 
     def todict(self, show={'message_id', 'u_id', 'message', 'time_sent'}):
         info_dict = {
@@ -459,20 +467,19 @@ class Message():
         return message_id
 
     @staticmethod
-    def find_by_id(channel_id):
+    def find_by_id(message_id):
         '''
-        Find channel by channel's channel_id
+        Find message by message's message_id
 
         Args:
-            channel_id
+            message
 
         Return:
-            Channel
+            Message
         '''
-
-        for channel in store['channels']:
-            if channel.channel_id == channel_id:
-                return channel
+        for msg in store['messages']:
+            if msg.message_id == message_id and msg.is_active:
+                return msg
         return None
 
     @staticmethod
@@ -481,13 +488,21 @@ class Message():
 
     def add_to_store(self) -> None:
         store['messages'].insert(0, self)
+        self.sub.add_message(self)
+        # if type(self.sub) is Channel:
+        #     self.add_to_channel(self.sub)
+        # if type(self.sub) is DM:
+        #     self.add_to_dm(self.sub)
 
-    def add_to_channel(self, channel: Channel) -> None:
-        channel.messages.insert(0, self)
+    # def add_to_channel(self, channel: Channel) -> None:
+    #     channel.messages.insert(0, self)
 
-    def add_to_dm(self, dm: DM) -> None:
-        dm.messages.insert(0, self)
+    # def add_to_dm(self, dm: DM) -> None:
+    #     dm.messages.insert(0, self)
 
     @staticmethod
     def check_length_invalid(msg: str) -> bool:
         return len(message) < 1 or len(message) > 1000
+
+    def remove(self):
+        self.is_active = False
