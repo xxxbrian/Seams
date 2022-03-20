@@ -2,6 +2,7 @@ import pytest
 import requests
 import json
 from src.config import url
+from src.error import AccessError
 
 @pytest.fixture(name = 'user_list')
 def create_user_list():
@@ -35,38 +36,136 @@ def create_user_list():
                                             'name_last': 'Zhou'}))
     return user_list
 
-@pytest.fixture(name = 'info')
-def one_user_create_dm(user_list):
-    dict_list = user_list
-    """User01 logs in"""
-    r = requests.post(url + 'auth/login/v2', 
-                    json = {'email': 'z5374603@unsw.com',
-                            'password': '123456',})
-    payload = r.json()
-    token = payload['token']
-    auth_user_id = payload['auth_user_id']
-    # User01 create a dm
-    u_id = []
-    u_id.append(dict_list[1].json()['auth_user_id'])
-    u_id.append(dict_list[2].json()['auth_user_id'])
-    u_id.append(dict_list[3].json()['auth_user_id'])
-    r = requests.post(url + 'dm/create/v1', 
-                    json = {'token': token,
-                            'u_ids': u_id,})
-    payload = r.json()
-    dm_id = payload['dm_id']
-    return {
-        'token': token,
-        'u_id': auth_user_id,
-        'dm_id': dm_id,
-    }
+@pytest.fixture(name = 'login_list')
+def login_users():
+    '''
+    
+    This function is to pre-login 4 users for further tests
+    
+    returns:
+        login_list, contains 4 pre-register users' information
+        
+    '''
+    login_list = []
+    login_list.append(requests.post(url + "auth/login/v2",
+                                    json = {"email": "z5374603@unsw.com",
+                                            "password": "123456"}).json())
+    login_list.append(requests.post(url + "auth/login/v2",
+                                    json = {"email": "z5374602@unsw.com",
+                                            "password": "123456"}).json())
+    login_list.append(requests.post(url + "auth/login/v2",
+                                    json = {"email": "z5374601@unsw.com",
+                                            "password": "123456"}).json())
+    login_list.append(requests.post(url + "auth/login/v2",
+                                    json = {"email": "z5374600@unsw.com",
+                                            "password": "123456"}).json())
+    return login_list
 
-def test_dm_list_success(info):
-        r = requests.get(url + 'dm/list/v1', 
-                        params = {'token': info['token'],})
-        test = r.json()
-        idx = 0
-        for i in test['dms']:
-            assert i[idx]['dm_id'] == idx
-            assert i[idx]['name'] == info['dm_name']
-            idx += 1
+@pytest.fixture(name = 'dm_list')
+def create_dm(login_list):
+    '''
+    This function is to pre-create some dms for further tests
+    
+    Return:
+        dm_list, contain dm_id and name
+    '''
+    dm_list = []
+    # dm_list[0]: user[0], user[1], user[2]
+    dm_list.append(requests.post(url + "dm/create/v1",
+                                 json = {'token': login_list[0]['token'],
+                                         'u_ids': [login_list[1]['auth_user_id'], login_list[2]['auth_user_id']]}))
+    # dm_list[1]: user[0], user[2]. user[3]
+    dm_list.append(requests.post(url + "dm/create/v1",
+                                 json = {'token': login_list[0]['token'],
+                                         'u_ids': [login_list[3]['auth_user_id'], login_list[2]['auth_user_id']]}))
+    
+    # dm_list[2]: user[1], user[2]. user[3]
+    dm_list.append(requests.post(url + "dm/create/v1",
+                                 json = {'token': login_list[1]['token'],
+                                         'u_ids': [login_list[2]['auth_user_id'], login_list[3]['auth_user_id']]}))
+    
+    return dm_list
+
+def test_dm_list_normal(user_list, login_list, dm_list):
+    '''
+    
+    Test for all correct
+    
+    Parameters:
+        user_list, login_list, dm_list
+        
+    Return:
+        N/A
+    
+    '''
+    dm_0 = 'steveyang brianlee bojinli'
+    dm_1 = 'steveyang cicyzhou bojinli'
+    dm_2 = 'brianlee bojinli cicyzhou'
+    
+    response_1 = requests.get(url + "dm/list/v1",
+                              params = {'token': login_list[0]['token']}).json()
+    response_2 = requests.get(url + "dm/list/v1",
+                              params = {'token': login_list[1]['token']}).json()
+    response_3 = requests.get(url + "dm/list/v1",
+                              params = {'token': login_list[2]['token']}).json()
+    response_4 = requests.get(url + "dm/list/v1",
+                              params = {'token': login_list[3]['token']}).json()
+   
+    assert response_1 == [
+        {
+            'dm_id': dm_list[0],
+            'name': dm_0
+        },
+        {
+            'dm_id': dm_list[1],
+            'name': dm_1
+        },
+    ]
+    assert response_2 == [
+        {
+            'dm_id': dm_list[0],
+            'name': dm_0
+        },
+        {
+            'dm_id': dm_list[2],
+            'name': dm_2
+        },
+    ]
+    assert response_3 == [
+        {
+            'dm_id': dm_list[0],
+            'name': dm_0
+        },
+        {
+            'dm_id': dm_list[1],
+            'name': dm_1
+        },
+        {
+            'dm_id': dm_list[2],
+            'name': dm_2
+        },
+    ]
+    assert response_4 ==[
+        {
+            'dm_id': dm_list[1],
+            'name': dm_1
+        },
+        {
+            'dm_id': dm_list[2],
+            'name': dm_2
+        },
+    ]
+    
+def test_dm_list_invalid_token(user_list, login_list, dm_list):
+    '''
+    
+    This test is to test input token is invalid
+    
+    Raises:
+        AccessError
+    
+    '''
+    response_1 = requests.get(url + "dm/list/v1",
+                              params = {'token': -1})
+    assert response_1.status_code == AccessError.code
+    
