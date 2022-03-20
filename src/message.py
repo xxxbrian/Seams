@@ -49,4 +49,19 @@ def message_remove_v1(token, message_id):
 
 
 def message_senddm_v1(token, dm_id, message):
+    dt = datetime.datetime.now(timezone.utc)
+    utc_time = dt.replace(tzinfo=timezone.utc)
+    utc_timestamp = utc_time.timestamp()
+    user = User.find_by_token(token)
+    dm = DM.find_by_id(dm_id)
+    if user is None:
+        raise AccessError(description='Permission denied')
+    if dm is None:
+        raise InputError(description='DM not found')
+    if not dm.has_user(user):
+        raise AccessError(description='Permission denied: Not member')
+    if Message.check_length_invalid(message):
+        raise InputError('Message lenght invalid')
+    new_msg = Message(user.u_id, message, utc_timestamp, dm)
+    new_msg.add_to_store()
     return {}
