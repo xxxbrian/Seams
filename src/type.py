@@ -399,7 +399,8 @@ class DM():
 
     def generat_name(self, u_ids: list) -> str:
         name_list = [User.find_by_id(u_id).handle_str for u_id in u_ids]
-        return ', '.join(reversed(name_list))
+        name_list.sort()
+        return ', '.join(name_list)
 
     @staticmethod
     def find_by_id(dm_id):
