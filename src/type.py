@@ -1,3 +1,4 @@
+from email import message
 import re
 import string
 import jwt
@@ -486,3 +487,7 @@ class Message():
 
     def add_to_dm(self, dm: DM) -> None:
         dm.messages.insert(0, self)
+
+    @staticmethod
+    def check_length_invalid(msg: str) -> bool:
+        return len(message) < 1 or len(message) > 1000
