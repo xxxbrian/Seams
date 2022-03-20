@@ -42,15 +42,15 @@ def login_two_users():
 
 @pytest.fixture(name = 'channel_id_list')
 def test_create_channel_normal(user_list, login_list):
-#         """
-#         Test cases for create channel normal
-#         Args:
-#             token: user token
-#             name:  normal
-#             is_public: true
-#         Returns:
-#             200
-#         """
+    """
+    Test cases for create channel normal
+    Args:
+    token: user token
+    name:  normal
+    is_public: true
+    Returns:
+    200
+    """
     channel_id_list = list()
     for login_user in login_list:
         channel_id_list.append(requests.post(f"{url}channels/create/v2",
