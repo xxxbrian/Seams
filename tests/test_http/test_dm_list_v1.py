@@ -98,9 +98,9 @@ def test_dm_list_normal(user_list, login_list, dm_list):
         N/A
     
     '''
-    dm_0 = 'steveyang brianlee bojinli'
-    dm_1 = 'steveyang cicyzhou bojinli'
-    dm_2 = 'brianlee bojinli cicyzhou'
+    dm_0 = 'bojinli, brianlee, steveyang'
+    dm_1 = 'bojinli, cicyzhou, steveyang'
+    dm_2 = 'bojinli, brianlee, cicyzhou'
     
     response_1 = requests.get(url + "dm/list/v1",
                               params = {'token': login_list[0]['token']}).json()
