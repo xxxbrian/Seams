@@ -2,7 +2,6 @@
 u_ids contains the user(s) that this DM is directed to, and will not include the creator. The creator is the owner of the DM. name should be automatically generated based on the users that are in this DM. The name should be an alphabetically-sorted, comma-and-space-separated list of user handles, e.g. 'ahandle1, bhandle2, chandle3'.
 """
 import random
-from urllib import response
 import pytest
 import requests
 import json
@@ -91,9 +90,9 @@ def test_dm_create_invalid_uid(user_list, login_list):
             InputError
     """
     invalid_u_ids = []
-    while(len(invalid_u_ids)<3):
+    while(len(invalid_u_ids) < 3):
         new_id = random.random()
-        if not new_id in [login_list[i]['auth_user_id'] for i in range(0,3)]:
+        if not new_id in [login_list[i]['auth_user_id'] for i in range(0,4)]:
             invalid_u_ids.append(new_id)
     response_1 = requests.post(url + "dm/create/v1",
                                json = {'token': login_list[0]['token'],
