@@ -73,16 +73,16 @@ def create_dm(login_list):
     # dm_list[0]: user[0], user[1], user[2]
     dm_list.append(requests.post(url + "dm/create/v1",
                                  json = {'token': login_list[0]['token'],
-                                         'u_ids': [login_list[1]['auth_user_id'], login_list[2]['auth_user_id']]}))
+                                         'u_ids': [login_list[1]['auth_user_id'], login_list[2]['auth_user_id']]}).json())
     # dm_list[1]: user[0], user[2]. user[3]
     dm_list.append(requests.post(url + "dm/create/v1",
                                  json = {'token': login_list[0]['token'],
-                                         'u_ids': [login_list[3]['auth_user_id'], login_list[2]['auth_user_id']]}))
+                                         'u_ids': [login_list[3]['auth_user_id'], login_list[2]['auth_user_id']]}).json())
     
     # dm_list[2]: user[1], user[2]. user[3]
     dm_list.append(requests.post(url + "dm/create/v1",
                                  json = {'token': login_list[1]['token'],
-                                         'u_ids': [login_list[2]['auth_user_id'], login_list[3]['auth_user_id']]}))
+                                         'u_ids': [login_list[2]['auth_user_id'], login_list[3]['auth_user_id']]}).json())
     
     return dm_list
 
@@ -111,50 +111,54 @@ def test_dm_list_normal(user_list, login_list, dm_list):
     response_4 = requests.get(url + "dm/list/v1",
                               params = {'token': login_list[3]['token']}).json()
    
-    assert response_1 == [
+    assert response_1 == {
+        'dms':[
         {
-            'dm_id': dm_list[0],
+            'dm_id': dm_list[0]['dm_id'],
             'name': dm_0
         },
         {
-            'dm_id': dm_list[1],
+            'dm_id': dm_list[1]['dm_id'],
             'name': dm_1
         },
-    ]
-    assert response_2 == [
+    ]}
+    assert response_2 == {
+        'dms':[
         {
-            'dm_id': dm_list[0],
+            'dm_id': dm_list[0]['dm_id'],
             'name': dm_0
         },
         {
-            'dm_id': dm_list[2],
+            'dm_id': dm_list[2]['dm_id'],
             'name': dm_2
         },
-    ]
-    assert response_3 == [
+    ]}
+    assert response_3 == {
+        'dms':[
         {
-            'dm_id': dm_list[0],
+            'dm_id': dm_list[0]['dm_id'],
             'name': dm_0
         },
         {
-            'dm_id': dm_list[1],
+            'dm_id': dm_list[1]['dm_id'],
             'name': dm_1
         },
         {
-            'dm_id': dm_list[2],
+            'dm_id': dm_list[2]['dm_id'],
             'name': dm_2
         },
-    ]
-    assert response_4 ==[
+    ]}
+    assert response_4 == {
+        'dms':[
         {
-            'dm_id': dm_list[1],
+            'dm_id': dm_list[1]['dm_id'],
             'name': dm_1
         },
         {
-            'dm_id': dm_list[2],
+            'dm_id': dm_list[2]['dm_id'],
             'name': dm_2
         },
-    ]
+    ]}
     
 def test_dm_list_invalid_token(user_list, login_list, dm_list):
     '''
