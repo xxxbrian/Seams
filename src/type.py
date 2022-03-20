@@ -502,7 +502,7 @@ class Message():
 
     @staticmethod
     def check_length_invalid(msg: str) -> bool:
-        return len(message) < 1 or len(message) > 1000
+        return len(msg) < 1 or len(msg) > 1000
 
     def remove(self):
         self.is_active = False
