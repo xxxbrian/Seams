@@ -131,7 +131,7 @@ def test_dm_create_invalid_token(user_list, login_list):
     # invalid_u_id
     invalid_u_ids = []
     while(len(invalid_u_ids)<3):
-        new_id = random.random()
+        new_id = random.randint(-65535, 65535)
         if not new_id in [login_list[i]['auth_user_id'] for i in range(0,3)]:
             invalid_u_ids.append(new_id)
     response_1 = requests.post(url + "dm/create/v1",
