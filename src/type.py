@@ -459,6 +459,7 @@ class Message():
         }
         if 'message' in show:
             info_dict['message'] = self.content
+        return info_dict
 
     @staticmethod
     def get_last_id() -> int:
