@@ -1,4 +1,5 @@
-from src.type import User, Channel, Message
+from src.type import User, Channel, DM, Message
+
 
 def clear_v1():
     """Resets the internal data of the application
@@ -6,5 +7,6 @@ def clear_v1():
 
     User.clear()
     Channel.clear()
+    DM.clear()
     Message.clear()
     return {}
