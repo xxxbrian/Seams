@@ -1,4 +1,3 @@
-from urllib import response
 import pytest
 import requests
 import json
