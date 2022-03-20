@@ -139,4 +139,66 @@ _Status:_
 >   - Write up allocated tests for iteration 2
 > 
 
-## 18/03 Weekly Meeting (Next Meeting)
+## 18/03 Weekly Meeting
+
+**Participation:** _Bojin Li_, _Cicy Zhou_, _Weihou Zeng_, _Quan Gu_, _Steve Yang_
+
+**Minute taker:** _Cicy Zhou_
+
+**Topics to discuss:**
+- [x] Discuss the progress of iteration 2 so far
+- [x] Discuss how to accomodate better to the leaderboard system
+- [x] Discuss bugs that needs to be fixed
+- [x] Standups
+
+### Minutes
+- we will start the implementation of files as soon as pytest is finished
+- ideally, we need to implement as much feature as possible before the date on each leaderboard release to know if there are things that we need to change or improve on
+- this was learnt from past experience in iteration 1, we only realised bug existed until the last leaderboard update and could not check if we fixed the problem entirely (we didn't)
+- some pytests are failing black box testing principle and needs to be revised
+
+ #### Stand Ups
+
+> - Cicy Zhou
+>   - Completed: 
+>      - Asked the tutor for feedback
+>      - Fixed iteration 1's pylint problem
+>      - Fixed style in interation 1 using PEP8 guidelines
+>      - written allocated tests for iteration 2 (in test)
+>   - Will complete:
+>      - pylint fix for iteration 2
+>      - finish testing written pytest
+>   - Issues:
+>      - some pytests seems to have problem with json and need help
+>
+> - Bojin Li
+>   - Completed:
+>      - Fixed bug in iteration 1's result
+>      - Implemented channels list needs to return error
+>      - Fixed style in `type.py` using PEP8 guidelines
+>      - Written allocated tests for iteration 2
+>      - added a `group_id` value to solve admin status problem in `type.py`
+>   - Will complete:
+>      - debugging currently implemented feature
+>      - implementing new features after tests is written
+>   - Issues:
+>      - None
+> 
+> - Steve Yang
+>   - Completed:
+>      - Written allocated tests for iteration 2
+>      - improved on overall pylint and PEP8 style
+>   - Will complete:
+>      - debugging currently implemented feature
+>      - implementing new features after tests is written
+>   - Issues:
+>      - None
+>
+> - Quan Gu
+>   - Written allocated tests for iteration 2
+> 
+> - Weihou Zeng
+>   - Written allocated tests for iteration 2
+> 
+
+## 25/03 Weekly Meeting (Next Meeting)
