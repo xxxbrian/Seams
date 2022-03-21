@@ -107,36 +107,36 @@ def test_normal_channel_messages(user_list, login_list, channel_list):
         N/A
         
     '''
-    requests.post(url + 'message/send/v2',
+    requests.post(url + 'message/send/v1',
                   json = {'token': login_list[0]['token'],
                           'channel_id': channel_list[0]['channel_id'],
                           'message': 'message1'})
-    requests.post(url + 'message/send/v2',
+    requests.post(url + 'message/send/v1',
                   json = {'token': login_list[0]['token'],
                           'channel_id': channel_list[0]['channel_id'],
                           'message': 'message2'})
-    requests.post(url + 'message/send/v2',
+    requests.post(url + 'message/send/v1',
                   json = {'token': login_list[0]['token'],
                           'channel_id': channel_list[0]['channel_id'],
                           'message': 'message3'})
-    requests.post(url + 'message/send/v2',
+    requests.post(url + 'message/send/v1',
                   json = {'token': login_list[0]['token'],
                           'channel_id': channel_list[0]['channel_id'],
                           'message': 'message4'})
     
-    requests.post(url + 'message/send/v2',
+    requests.post(url + 'message/send/v1',
                   json = {'token': login_list[3]['token'],
                           'channel_id': channel_list[3]['channel_id'],
                           'message': 'message1'})
-    requests.post(url + 'message/send/v2',
+    requests.post(url + 'message/send/v1',
                   json = {'token': login_list[3]['token'],
                           'channel_id': channel_list[3]['channel_id'],
                           'message': 'message2'})
-    requests.post(url + 'message/send/v2',
+    requests.post(url + 'message/send/v1',
                   json = {'token': login_list[3]['token'],
                           'channel_id': channel_list[3]['channel_id'],
                           'message': 'message3'})
-    requests.post(url + 'message/send/v2',
+    requests.post(url + 'message/send/v1',
                   json = {'token': login_list[3]['token'],
                           'channel_id': channel_list[3]['channel_id'],
                           'message': 'message4'})
@@ -149,7 +149,7 @@ def test_normal_channel_messages(user_list, login_list, channel_list):
                               params = {'token': login_list[3]['token'],
                                         'channel_id': channel_list[3]['channel_id'],
                                         'start': 0}).json()
-
+    print(response_1)
     assert response_1['messages'][0]['message'] == "message4"
     assert response_1['messages'][1]['message'] == "message3"
     assert response_1['messages'][2]['message'] == "message2"
@@ -178,7 +178,7 @@ def test_channel_message_more_messages(user_list, login_list, channel_list):
     '''
     for i in range(55):
         # sending 55 messages in channel 0
-        requests.post(url + 'message/send/v2',
+        requests.post(url + 'message/send/v1',
                   json = {'token': login_list[0]['token'],
                           'channel_id': channel_list[0]['channel_id'],
                           'message': 'messages'})
@@ -216,19 +216,19 @@ def test_channel_messages_invalid_start(user_list, login_list, channel_list):
     assert response_1.status_code == InputError.code
     
     # 4 messages but start at 10
-    requests.post(url + 'message/send/v2',
+    requests.post(url + 'message/send/v1',
                   json = {'token': login_list[0]['token'],
                           'channel_id': channel_list[0]['channel_id'],
                           'message': 'message1'})
-    requests.post(url + 'message/send/v2',
+    requests.post(url + 'message/send/v1',
                   json = {'token': login_list[0]['token'],
                           'channel_id': channel_list[0]['channel_id'],
                           'message': 'message2'})
-    requests.post(url + 'message/send/v2',
+    requests.post(url + 'message/send/v1',
                   json = {'token': login_list[0]['token'],
                           'channel_id': channel_list[0]['channel_id'],
                           'message': 'message3'})
-    requests.post(url + 'message/send/v2',
+    requests.post(url + 'message/send/v1',
                   json = {'token': login_list[0]['token'],
                           'channel_id': channel_list[0]['channel_id'],
                           'message': 'message4'})
@@ -250,19 +250,19 @@ def test_channel_messages_invalid_channel_id(user_list, login_list, channel_list
         InputError
         
     '''
-    requests.post(url + 'message/send/v2',
+    requests.post(url + 'message/send/v1',
                   json = {'token': login_list[0]['token'],
                           'channel_id': channel_list[0]['channel_id'],
                           'message': 'message1'})
-    requests.post(url + 'message/send/v2',
+    requests.post(url + 'message/send/v1',
                   json = {'token': login_list[0]['token'],
                           'channel_id': channel_list[0]['channel_id'],
                           'message': 'message2'})
-    requests.post(url + 'message/send/v2',
+    requests.post(url + 'message/send/v1',
                   json = {'token': login_list[0]['token'],
                           'channel_id': channel_list[0]['channel_id'],
                           'message': 'message3'})
-    requests.post(url + 'message/send/v2',
+    requests.post(url + 'message/send/v1',
                   json = {'token': login_list[0]['token'],
                           'channel_id': channel_list[0]['channel_id'],
                           'message': 'message4'})
@@ -285,19 +285,19 @@ def test_channel_messages_user_not_in_channel(user_list, login_list, channel_lis
         
     '''
     # all normal
-    requests.post(url + 'message/send/v2',
+    requests.post(url + 'message/send/v1',
                   json = {'token': login_list[0]['token'],
                           'channel_id': channel_list[0]['channel_id'],
                           'message': 'message1'})
-    requests.post(url + 'message/send/v2',
+    requests.post(url + 'message/send/v1',
                   json = {'token': login_list[0]['token'],
                           'channel_id': channel_list[0]['channel_id'],
                           'message': 'message2'})
-    requests.post(url + 'message/send/v2',
+    requests.post(url + 'message/send/v1',
                   json = {'token': login_list[0]['token'],
                           'channel_id': channel_list[0]['channel_id'],
                           'message': 'message3'})
-    requests.post(url + 'message/send/v2',
+    requests.post(url + 'message/send/v1',
                   json = {'token': login_list[0]['token'],
                           'channel_id': channel_list[0]['channel_id'],
                           'message': 'message4'})
@@ -321,19 +321,19 @@ def test_channel_messages_invalid_user_token(user_list, login_list, channel_list
         
     '''
     # normal situation
-    requests.post(url + 'message/send/v2',
+    requests.post(url + 'message/send/v1',
                   json = {'token': login_list[0]['token'],
                           'channel_id': channel_list[0]['channel_id'],
                           'message': 'message1'})
-    requests.post(url + 'message/send/v2',
+    requests.post(url + 'message/send/v1',
                   json = {'token': login_list[0]['token'],
                           'channel_id': channel_list[0]['channel_id'],
                           'message': 'message2'})
-    requests.post(url + 'message/send/v2',
+    requests.post(url + 'message/send/v1',
                   json = {'token': login_list[0]['token'],
                           'channel_id': channel_list[0]['channel_id'],
                           'message': 'message3'})
-    requests.post(url + 'message/send/v2',
+    requests.post(url + 'message/send/v1',
                   json = {'token': login_list[0]['token'],
                           'channel_id': channel_list[0]['channel_id'],
                           'message': 'message4'})

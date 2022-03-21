@@ -100,7 +100,7 @@ def test_dm_remove_normal(user_list, login_list, dm_list):
         dm/list/v1 is working well
 
     '''
-    dm_1 = 'steveyang cicyzhou bojinli'
+    dm_1 = 'bojinli, cicyzhou, steveyang'
     requests.delete(url + 'dm/remove/v1',
                     json = {"token": login_list[0]["token"], 
                             "dm_id": dm_list[0]['dm_id']})
