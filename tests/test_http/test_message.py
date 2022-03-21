@@ -473,12 +473,12 @@ def test_message_edit_dm_invalid_user(user_list, login_list, dm_list):
         
     '''
     response_1 = requests.post(url + "message/senddm/v1",
-                               json = {'token': login_list[0],
+                               json = {'token': login_list[0]['token'],
                                        'dm_id': dm_list[0]['dm_id'],
                                        'message': 'Hello world!'}).json()
     response_2 = requests.put(url + 'message/edit/v1',
                               json = {'token': login_list[1]['token'],
-                                      'message_id': response_1['message-id'],
+                                      'message_id': response_1['message_id'],
                                       'message': "Hi hi"})
     assert response_2.status_code == AccessError.code
     
@@ -527,11 +527,11 @@ def test_channel_message_edit_owner_edit_message(user_list, login_list, dm_list)
         
     '''
     response_1 = requests.post(url + "message/senddm/v1",
-                               json = {'token': login_list[1],
+                               json = {'token': login_list[1]['token'],
                                        'dm_id': dm_list[0]['dm_id'],
                                        'message': 'Hello world!'}).json()
     response_2 = requests.post(url + "message/senddm/v1",
-                               json = {'token': login_list[2],
+                               json = {'token': login_list[2]['token'],
                                        'dm_id': dm_list[0]['dm_id'],
                                        'message': 'Steve'}).json()
     requests.put(url + 'message/edit/v1',
@@ -668,7 +668,7 @@ def test_dm_message_remove_invalid_message_id(user_list, login_list, dm_list):
             invalid_message_id.append(new_id)
     response_2 = requests.delete(url + "message/remove/v1",
                                  json = {'token': login_list[0]['token'],
-                                         ['message_id']: invalid_message_id})
+                                         'message_id': invalid_message_id})
     assert response_2.status_code == InputError.code
 
 def test_channel_message_remove_invalid_user(user_list, login_list, channel_list):
@@ -709,12 +709,12 @@ def test_message_remove_dm_invalid_user(user_list, login_list, dm_list):
         
     '''
     response_1 = requests.post(url + "message/senddm/v1",
-                               json = {'token': login_list[0],
+                               json = {'token': login_list[0]['token'],
                                        'dm_id': dm_list[0]['dm_id'],
                                        'message': 'Hello world!'}).json()
     response_2 = requests.delete(url + 'message/remove/v1',
                               json = {'token': login_list[1]['token'],
-                                      'message_id': response_1['message-id']})
+                                      'message_id': response_1['message_id']})
     assert response_2.status_code == AccessError.code
     
 def test_message_remove_owner_remove_message(user_list, login_list, channel_list):
@@ -765,15 +765,15 @@ def test_channel_message_remove_owner_remove_message(user_list, login_list, dm_l
         
     '''
     requests.post(url + "message/senddm/v1",
-                  json = {'token': login_list[0],
+                  json = {'token': login_list[0]['token'],
                           'dm_id': dm_list[0]['dm_id'],
                           'message': 'Hello world!'})
     response_1 = requests.post(url + "message/senddm/v1",
-                               json = {'token': login_list[1],
+                               json = {'token': login_list[1]['token'],
                                        'dm_id': dm_list[0]['dm_id'],
                                        'message': 'Hello world!'}).json()
     response_2 = requests.post(url + "message/senddm/v1",
-                               json = {'token': login_list[2],
+                               json = {'token': login_list[2]['token'],
                                        'dm_id': dm_list[0]['dm_id'],
                                        'message': 'Steve'}).json()
     requests.delete(url + 'message/remove/v1',
