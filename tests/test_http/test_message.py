@@ -371,7 +371,7 @@ def test_dm_message_edit_too_long_message(user_list, login_list, dm_list):
     response_1 = requests.post(url + 'message/senddm/v1',
                                json = {'token': login_list[0]['token'],
                                        'dm_id': dm_list[0]['dm_id'],
-                                       'message': 'Hello world!'})
+                                       'message': 'Hello world!'}).json()
     response_2 = requests.put(url + 'message/edit/v1',
                               json = {'token': login_list[0]['token'],
                                       'message_id': response_1['message_id'],
@@ -394,7 +394,7 @@ def test_channel_message_edit_wrong_message_id(user_list, login_list, channel_li
     response_1 = requests.post(url + 'message/send/v1',
                                json = {'token': login_list[0]['token'],
                                        'channel_id': channel_list[0]['channel_id'],
-                                       'message': 'Hello world!'})
+                                       'message': 'Hello world!'}).json()
     new_id = random.randint(-65535, 65535)
     invalid_message_id = []
     while len(invalid_message_id) < 1:
@@ -422,7 +422,7 @@ def test_dm_message_edit_wrong_message_id(user_list, login_list, dm_list):
     response_1 = requests.post(url + 'message/senddm/v1',
                                json = {'token': login_list[0]['token'],
                                        'dm_id': dm_list[0]['dm_id'],
-                                       'message': 'Hello world!'})
+                                       'message': 'Hello world!'}).json()
     new_id = random.randint(-65535, 65535)
     invalid_message_id = []
     while len(invalid_message_id) < 1:
@@ -475,7 +475,7 @@ def test_message_edit_dm_invalid_user(user_list, login_list, dm_list):
     response_1 = requests.post(url + "message/senddm/v1",
                                json = {'token': login_list[0],
                                        'dm_id': dm_list[0]['dm_id'],
-                                       'message': 'Hello world!'})
+                                       'message': 'Hello world!'}).json()
     response_2 = requests.put(url + 'message/edit/v1',
                               json = {'token': login_list[1]['token'],
                                       'message_id': response_1['message-id'],
@@ -529,11 +529,11 @@ def test_channel_message_edit_owner_edit_message(user_list, login_list, dm_list)
     response_1 = requests.post(url + "message/senddm/v1",
                                json = {'token': login_list[1],
                                        'dm_id': dm_list[0]['dm_id'],
-                                       'message': 'Hello world!'})
+                                       'message': 'Hello world!'}).json()
     response_2 = requests.post(url + "message/senddm/v1",
                                json = {'token': login_list[2],
                                        'dm_id': dm_list[0]['dm_id'],
-                                       'message': 'Steve'})
+                                       'message': 'Steve'}).json()
     requests.put(url + 'message/edit/v1',
                  json = {'token': login_list[0]['token'],
                          'message_id': response_1['message_id'],
@@ -634,7 +634,7 @@ def test_channel_message_remove_invalid_message_id(user_list, login_list, channe
     response_1 = requests.post(url + 'message/send/v1',
                                json = {'token': login_list[0]['token'],
                                        'channel_id': channel_list[0]['channel_id'],
-                                       'message': 'Hello'})
+                                       'message': 'Hello'}).json()
     new_id = random.randint(-65535, 65535)
     invalid_message_id = []
     while len(invalid_message_id) < 1:
@@ -660,7 +660,7 @@ def test_dm_message_remove_invalid_message_id(user_list, login_list, dm_list):
     response_1 = requests.post(url + 'message/senddm/v1',
                                json = {'token': login_list[0]['token'],
                                        'dm_id': dm_list[0]['dm_id'],
-                                       'message': 'Hello'})
+                                       'message': 'Hello'}).json()
     new_id = random.randint(-65535, 65535)
     invalid_message_id = []
     while len(invalid_message_id) < 1:
@@ -711,7 +711,7 @@ def test_message_remove_dm_invalid_user(user_list, login_list, dm_list):
     response_1 = requests.post(url + "message/senddm/v1",
                                json = {'token': login_list[0],
                                        'dm_id': dm_list[0]['dm_id'],
-                                       'message': 'Hello world!'})
+                                       'message': 'Hello world!'}).json()
     response_2 = requests.delete(url + 'message/remove/v1',
                               json = {'token': login_list[1]['token'],
                                       'message_id': response_1['message-id']})
@@ -771,11 +771,11 @@ def test_channel_message_remove_owner_remove_message(user_list, login_list, dm_l
     response_1 = requests.post(url + "message/senddm/v1",
                                json = {'token': login_list[1],
                                        'dm_id': dm_list[0]['dm_id'],
-                                       'message': 'Hello world!'})
+                                       'message': 'Hello world!'}).json()
     response_2 = requests.post(url + "message/senddm/v1",
                                json = {'token': login_list[2],
                                        'dm_id': dm_list[0]['dm_id'],
-                                       'message': 'Steve'})
+                                       'message': 'Steve'}).json()
     requests.delete(url + 'message/remove/v1',
                  json = {'token': login_list[0]['token'],
                          'message_id': response_1['message_id']})
