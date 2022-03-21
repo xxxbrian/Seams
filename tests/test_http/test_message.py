@@ -229,16 +229,17 @@ def test_message_send_invalid_token(user_list, channel_list, login_list):
     
 ######################################## Test_message_edit_v1 ########################################
 
-def test_message_edit_normal(user_list, login_list, channel_list):
+def test_channel_message_edit_normal(user_list, login_list, channel_list):
     '''
     
-    This test is to test edit message successfully
+    This test is to test edit message successfully in channel
     
     Assumption:
-        channel_messages is working well 
+        message/send/v1 is working well
+        message/edit/v1 is working well 
     
     '''
-    # send a message in channel[0]
+    # send 3 messages in channel[0]
     response_1 = requests.post(url + 'message/send/v1',
                                json = {'token': login_list[0]['token'],
                                        'channel_id': channel_list[0]['channel_id'],
@@ -276,14 +277,66 @@ def test_message_edit_normal(user_list, login_list, channel_list):
     assert response_5['messages'][0]['message'] == 'Hello world!'
     assert response_5['messages'][1]['message'] == 'Hello'
     
-def test_message_edit_too_long_message(user_list, login_list, channel_list):
+def test_dm_message_edit_normal(user_list, login_list, dm_list):
+    '''
+    
+    This test is to test edit message successfully in DM
+    
+    Assumption:
+        message/senddm/v1 is working well
+        dm/messages/v1 is working well 
+    
+    '''
+    # send 3 messages in dm[0]
+    response_1 = requests.post(url + 'message/senddm/v1',
+                               json = {'token': login_list[0]['token'],
+                                       'dm_id': dm_list[0]['dm_id'],
+                                       'message': 'Hello world!'}).json()
+    response_2 = requests.post(url + 'message/senddm/v1',
+                               json = {'token': login_list[0]['token'],
+                                       'dm_id': dm_list[0]['dm_id'],
+                                       'message': 'Hello world!'}).json()
+    response_3 = requests.post(url + 'message/senddm/v1',
+                               json = {'token': login_list[0]['token'],
+                                       'dm_id': dm_list[0]['dm_id'],
+                                       'message': 'Hello world!'}).json()
+    
+    # change message[2]
+    requests.put(url + 'message/edit/v1',
+                 json = {'token': login_list[0]['token'],
+                         'message_id': response_1['message_id'],
+                         'message':'Hello'})
+    
+    response_4 = requests.get(url + 'dm/messages/v1',
+                              params = {'token': login_list[0]['token'],
+                                        'dm_id': dm_list[0]['dm_id'],
+                                        'start': 0}).json()
+    assert response_4['messages'][2]['message'] == 'Hello'
+    
+    # delete message[1]
+    requests.put(url + 'message/edit/v1',
+                 json = {'token': login_list[0]['token'],
+                         'message_id': response_2['message_id'],
+                         'message':''})
+    response_5 = requests.get(url + 'dm/messages/v1',
+                              params = {'token': login_list[0]['token'],
+                                        'dm_id': dm_list[0]['dm_id'],
+                                        'start': 0}).json()
+    assert response_5['messages'][0]['message'] == 'Hello world!'
+    assert response_5['messages'][1]['message'] == 'Hello'
+    
+def test_channel_message_edit_too_long_message(user_list, login_list, channel_list):
     '''
     
     This test is to test the message which has been edit is more than 1000 characters
+    in channel
     
     Raises:
         Inputerror
         
+     Assumption:
+        message/send/v1 is working well
+
     '''
     too_long_message = ""
     while(len(too_long_message) < 1001):
@@ -293,6 +346,32 @@ def test_message_edit_too_long_message(user_list, login_list, channel_list):
                                json = {'token': login_list[0]['token'],
                                        'channel_id': channel_list[0]['channel_id'],
                                        'message': 'Hello world!'}).json()
+    response_2 = requests.put(url + 'message/edit/v1',
+                              json = {'token': login_list[0]['token'],
+                                      'message_id': response_1['message_id'],
+                                      'message': too_long_message})
+    assert response_2.status_code == InputError.code
+    
+def test_dm_message_edit_too_long_message(user_list, login_list, dm_list):
+    '''
+    
+    This test is to test the message which has been edit is more than 1000 characters
+     in DM
+    
+    Raises:
+        InputError
+        
+    Assumption:
+        message/senddm/v1 is working well
+        
+    '''  
+    too_long_message = ""
+    while(len(too_long_message) < 1001):
+        too_long_message += 'a'
+    response_1 = requests.post(url + 'message/senddm/v1',
+                               json = {'token': login_list[0]['token'],
+                                       'dm_id': dm_list[0]['dm_id'],
+                                       'message': 'Hello world!'})
     response_2 = requests.put(url + 'message/edit/v1',
                               json = {'token': login_list[0]['token'],
                                       'message_id': response_1['message_id'],
@@ -317,13 +396,13 @@ def test_channel_message_edit_wrong_message_id(user_list, login_list, channel_li
                                        'channel_id': channel_list[0]['channel_id'],
                                        'message': 'Hello world!'})
     new_id = random.randint(-65535, 65535)
-    invalid_channel_id = []
-    while len(invalid_channel_id) < 1:
+    invalid_message_id = []
+    while len(invalid_message_id) < 1:
         if new_id != response_1['message_id']:
-            invalid_channel_id.append(new_id)
+            invalid_message_id.append(new_id)
     response_2 = requests.put(url + 'message/edit/v1',
                               json = {'token': login_list[0]['token'],
-                                      'message_id': invalid_channel_id[0],
+                                      'message_id': invalid_message_id[0],
                                       'message': "Hi hi"})
     assert response_2.status_code == InputError.code
       
@@ -345,13 +424,13 @@ def test_dm_message_edit_wrong_message_id(user_list, login_list, dm_list):
                                        'dm_id': dm_list[0]['dm_id'],
                                        'message': 'Hello world!'})
     new_id = random.randint(-65535, 65535)
-    invalid_channel_id = []
-    while len(invalid_channel_id) < 1:
+    invalid_message_id = []
+    while len(invalid_message_id) < 1:
         if new_id != response_1['message_id']:
-            invalid_channel_id.append(new_id)
+            invalid_message_id.append(new_id)
     response_2 = requests.put(url + 'message/edit/v1',
                               json = {'token': login_list[0]['token'],
-                                      'message_id': invalid_channel_id[0],
+                                      'message_id': invalid_message_id[0],
                                       'message': "Hi hi"})
     assert response_2.status_code == InputError.code
     
@@ -403,7 +482,7 @@ def test_message_edit_dm_invalid_user(user_list, login_list, dm_list):
                                       'message': "Hi hi"})
     assert response_2.status_code == AccessError.code
     
-def test_message_edit_owner_edit_message(user_list, login_list, channel_list):
+def test_channel_message_edit_owner_edit_message(user_list, login_list, channel_list):
     '''
     
     This test it to test owner edit message successfully
@@ -412,6 +491,7 @@ def test_message_edit_owner_edit_message(user_list, login_list, channel_list):
         channel/addowner/v1 is working well
         channel/join/v2 is working well
         channel/messages/v2 is working well
+        message/send/v1 is working well
         
     '''
     # add user[1] as an owner in channel[0]
@@ -435,4 +515,277 @@ def test_message_edit_owner_edit_message(user_list, login_list, channel_list):
                                         'channel_id': channel_list[0]['channel_id'],
                                         'start': 0}).json()
     assert response_3['messages'][0]['message'] == 'Hi hi'
+    
+def test_channel_message_edit_owner_edit_message(user_list, login_list, dm_list):
+    '''
+    
+    This test is to test dm owner edit message from other users successfully
+    
+    Assumption:
+        message/senddm/v1 is working well
+        dm/messages/v1 is working well 
+        
+    '''
+    response_1 = requests.post(url + "message/senddm/v1",
+                               json = {'token': login_list[1],
+                                       'dm_id': dm_list[0]['dm_id'],
+                                       'message': 'Hello world!'})
+    response_2 = requests.post(url + "message/senddm/v1",
+                               json = {'token': login_list[2],
+                                       'dm_id': dm_list[0]['dm_id'],
+                                       'message': 'Steve'})
+    requests.put(url + 'message/edit/v1',
+                 json = {'token': login_list[0]['token'],
+                         'message_id': response_1['message_id'],
+                         'message': "Hi"})
+    requests.put(url + 'message/edit/v1',
+                 json = {'token': login_list[0]['token'],
+                         'message_id': response_2['message_id'],
+                         'message': "Yang"})
+    response_3 = requests.get(url + 'dm/messages/v1',
+                              params = {'token': login_list[0]['token'],
+                                        'dm_id': dm_list[0]['dm_id'],
+                                        'start': 0}).json()
+    assert response_3['messages'][0]['message'] == 'Yang'
+    assert response_3['messages'][1]['message'] == 'Hi'
+    
+######################################## message/remove/v1 ########################################
+
+def test_channel_message_remove_normal(user_list, login_list, channel_list):
+    '''
+    
+    This test is to test the normal situation of removing test from a channel
+    
+    Assumpition:
+        message/send/v1 is working well
+        channel/messages/v2 is working well (for check)
+        
+    '''
+    requests.post(url + 'message/send/v1',
+                  json = {'token': login_list[0]['token'],
+                          'channel_id': channel_list[0]['channel_id'],
+                          'message': 'Hello'})
+    requests.post(url + 'message/send/v1',
+                  json = {'token': login_list[0]['token'],
+                          'channel_id': channel_list[0]['channel_id'],
+                          'message': 'world'})
+    response_1 = requests.post(url + 'message/send/v1',
+                               json = {'token': login_list[0]['token'],
+                                       'channel_id': channel_list[0]['channel_id'],
+                                       'message': 'Steve'}).json()  
+    # remove 'Steve'
+    requests.delete(url + "message/remove/v1",
+                    json = {'token': login_list[0]['token'],
+                            'message_id': response_1['message_id']})
+    response_2 = requests.get(url + 'channel/messages/v2',
+                              params = {'token': login_list[0]['token'],
+                                        'channel_id': channel_list[0]['channel_id'],
+                                        'start': 0}).json()
+    assert response_2['messages'][0]['message'] == 'world'
+    assert response_2['messages'][1]['message'] == 'Hello'
+    
+def test_dm_message_remove_normal(user_list, login_list, dm_list):
+    '''
+    
+    This test is to test the normal situation of removing test from a DM
+    
+    Assumption:
+        message/senddm/v1 is working well
+        dm/messages/v1 is working well 
+    
+    '''
+    # send 3 messages in dm[0]
+    response_1 = requests.post(url + 'message/senddm/v1',
+                               json = {'token': login_list[0]['token'],
+                                       'dm_id': dm_list[0]['dm_id'],
+                                       'message': 'Hello'}).json()
+    response_2 = requests.post(url + 'message/senddm/v1',
+                               json = {'token': login_list[0]['token'],
+                                       'dm_id': dm_list[0]['dm_id'],
+                                       'message': 'Hello world!'}).json()
+    response_3 = requests.post(url + 'message/senddm/v1',
+                               json = {'token': login_list[0]['token'],
+                                       'dm_id': dm_list[0]['dm_id'],
+                                       'message': 'world!'}).json()
+    
+    # remove the second message
+    requests.delete(url + "message/remove/v1",
+                    json = {'token': login_list[0]['token'],
+                            'message_id': response_2['message_id']})
+    response_4 = requests.get(url + 'dm/messages/v1',
+                              params = {'token': login_list[0]['token'],
+                                        'dm_id': dm_list[0]['dm_id'],
+                                        'start': 0}).json()
+    assert response_4['messages'][0]['message'] == 'world!'
+    assert response_4['messages'][1]['message'] == 'Hello'
+    
+def test_channel_message_remove_invalid_message_id(user_list, login_list, channel_list):
+    '''
+    
+    This test is to test when remove a message, which message_id is invalid in channel
+    
+    Raises:
+        InputError
+        
+    Assumpition:
+        message/send/v1 is working well
+        
+    '''
+    response_1 = requests.post(url + 'message/send/v1',
+                               json = {'token': login_list[0]['token'],
+                                       'channel_id': channel_list[0]['channel_id'],
+                                       'message': 'Hello'})
+    new_id = random.randint(-65535, 65535)
+    invalid_message_id = []
+    while len(invalid_message_id) < 1:
+        if new_id != response_1['message_id']:
+            invalid_message_id.append(new_id)
+    response_2 = requests.delete(url + "message/remove/v1",
+                                 json = {'token': login_list[0]['token'],
+                                         'message_id': invalid_message_id})
+    assert response_2.status_code == InputError.code
+    
+def test_dm_message_remove_invalid_message_id(user_list, login_list, dm_list):
+    '''
+    
+    This test is to test when remove a message, which message_id is invalid in dm
+    
+    Raises:
+        InputError
+        
+    Assumpition:
+        message/senddm/v1 is working well
+        
+    '''
+    response_1 = requests.post(url + 'message/senddm/v1',
+                               json = {'token': login_list[0]['token'],
+                                       'dm_id': dm_list[0]['dm_id'],
+                                       'message': 'Hello'})
+    new_id = random.randint(-65535, 65535)
+    invalid_message_id = []
+    while len(invalid_message_id) < 1:
+        if new_id != response_1['message_id']:
+            invalid_message_id.append(new_id)
+    response_2 = requests.delete(url + "message/remove/v1",
+                                 json = {'token': login_list[0]['token'],
+                                         ['message_id']: invalid_message_id})
+    assert response_2.status_code == InputError.code
+
+def test_channel_message_remove_invalid_user(user_list, login_list, channel_list):
+    '''
+    
+    This test is to test when invalid user remove message
+    
+    Raises:
+        AccessError
+        
+    Assumption:
+        message/send/v1 is working well
+        channel/join/v2 is working well
+        
+    '''
+    requests.post(url + "channel/join/v2",
+                  json = {'token': login_list[1]['token'],
+                          'channel_id': channel_list[0]['channel_id']})
+    response_1 = requests.post(url + 'message/send/v1',
+                               json = {'token': login_list[0]['token'],
+                                       'channel_id': channel_list[0]['channel_id'],
+                                       'message': 'Hello world!'}).json()
+    response_2 = requests.delete(url + 'message/remove/v1',
+                              json = {'token': login_list[1]['token'],
+                                      'message_id': response_1['message_id']})
+    assert response_2.status_code == AccessError.code
+    
+def test_message_remove_dm_invalid_user(user_list, login_list, dm_list):
+    '''
+    
+    This test is to test when invalid user want to remove a valid message in valid channel
+    
+    Raises:
+        Accesserror
+        
+    Assumption:
+        message/senddm/v1 is working well
+        
+    '''
+    response_1 = requests.post(url + "message/senddm/v1",
+                               json = {'token': login_list[0],
+                                       'dm_id': dm_list[0]['dm_id'],
+                                       'message': 'Hello world!'})
+    response_2 = requests.delete(url + 'message/remove/v1',
+                              json = {'token': login_list[1]['token'],
+                                      'message_id': response_1['message-id']})
+    assert response_2.status_code == AccessError.code
+    
+def test_message_remove_owner_remove_message(user_list, login_list, channel_list):
+    '''
+    
+    This test it to test owner remove message successfully
+    
+    Assumption:
+        channel/addowner/v1 is working well
+        channel/join/v2 is working well
+        channel/messages/v2 is working well
+        message/send/v1 is working well
+        
+    '''
+    # add user[1] as an owner in channel[0]
+    requests.post(url + "channel/join/v2",
+                  json = {'token': login_list[1]['token'],
+                          'channel_id': channel_list[0]['channel_id']})
+    requests.post(url + "channel/addowner/v1",
+                  json = {'token': login_list[0]['token'],
+                          'channel_id': channel_list[0]['channel_id'],
+                          'u_id': login_list[1]['auth_user_id']})
+    response_1 = requests.post(url + 'message/send/v1',
+                               json = {'token': login_list[0]['token'],
+                                       'channel_id': channel_list[0]['channel_id'],
+                                       'message': 'Hello'}).json()
+    requests.post(url + 'message/send/v1',
+                  json = {'token': login_list[0]['token'],
+                          'channel_id': channel_list[0]['channel_id'],
+                          'message': 'world!'}).json()
+    requests.delete(url + 'message/remove/v1',
+                 json = {'token': login_list[1]['token'],
+                         'message_id': response_1['message_id']})
+    response_3 = requests.get(url + 'channel/messages/v2',
+                              params = {'token': login_list[0]['token'],
+                                        'channel_id': channel_list[0]['channel_id'],
+                                        'start': 0}).json()
+    assert response_3['messages'][0]['message'] == 'world!'
+    
+def test_channel_message_remove_owner_remove_message(user_list, login_list, dm_list):
+    '''
+    
+    This test is to test dm owner remove message from other users successfully
+    
+    Assumption:
+        message/senddm/v1 is working well
+        dm/messages/v1 is working well 
+        
+    '''
+    requests.post(url + "message/senddm/v1",
+                  json = {'token': login_list[0],
+                          'dm_id': dm_list[0]['dm_id'],
+                          'message': 'Hello world!'})
+    response_1 = requests.post(url + "message/senddm/v1",
+                               json = {'token': login_list[1],
+                                       'dm_id': dm_list[0]['dm_id'],
+                                       'message': 'Hello world!'})
+    response_2 = requests.post(url + "message/senddm/v1",
+                               json = {'token': login_list[2],
+                                       'dm_id': dm_list[0]['dm_id'],
+                                       'message': 'Steve'})
+    requests.delete(url + 'message/remove/v1',
+                 json = {'token': login_list[0]['token'],
+                         'message_id': response_1['message_id']})
+    requests.delete(url + 'message/remove/v1',
+                 json = {'token': login_list[0]['token'],
+                         'message_id': response_2['message_id']})
+    response_3 = requests.get(url + 'dm/messages/v1',
+                              params = {'token': login_list[0]['token'],
+                                        'dm_id': dm_list[0]['dm_id'],
+                                        'start': 0}).json()
+    assert response_3['messages'][0]['message'] == 'Hello world!'
+
     
