@@ -356,7 +356,7 @@ class Channel():
     def get_messages(self, start: int, end: int) -> list:
         all_message = [msg for msg in self.messages if msg.is_active]
         end = len(all_message) if end < 0 else end
-        return self.messages[start:end]
+        return all_message[start:end]
 
     def add_message(self, msg):
         self.messages.insert(0, msg)
@@ -435,7 +435,7 @@ class DM():
     def get_messages(self, start: int, end: int) -> list:
         all_message = [msg for msg in self.messages if msg.is_active]
         end = len(all_message) if end < 0 else end
-        return self.messages[start:end]
+        return all_message[start:end]
 
     @staticmethod
     def get_all() -> list:
