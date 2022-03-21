@@ -64,4 +64,4 @@ def message_senddm_v1(token, dm_id, message):
         raise InputError('Message lenght invalid')
     new_msg = Message(user.u_id, message, utc_timestamp, dm)
     new_msg.add_to_store()
-    return {}
+    return {'message_id': new_msg.message_id}
