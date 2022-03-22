@@ -1,4 +1,3 @@
-from urllib import response
 import pytest
 import requests
 import json
@@ -104,17 +103,20 @@ def create_dm(login_list):
     # dm_list[0]: user[0], user[1], user[2]
     dm_list.append(requests.post(url + "dm/create/v1",
                                  json = {'token': login_list[0]['token'],
-                                         'u_ids': [login_list[1]['auth_user_id'], login_list[2]['auth_user_id']]}).json())
+                                         'u_ids': [login_list[1]['auth_user_id'], 
+                                                   login_list[2]['auth_user_id']]}).json())
     
     # dm_list[1]: user[0], user[2]. user[3]
     dm_list.append(requests.post(url + "dm/create/v1",
                                  json = {'token': login_list[0]['token'],
-                                         'u_ids': [login_list[3]['auth_user_id'], login_list[2]['auth_user_id']]}).json())
+                                         'u_ids': [login_list[3]['auth_user_id'], 
+                                                   login_list[2]['auth_user_id']]}).json())
     
     # dm_list[2]: user[1], user[2]. user[3]
     dm_list.append(requests.post(url + "dm/create/v1",
                                  json = {'token': login_list[1]['token'],
-                                         'u_ids': [login_list[2]['auth_user_id'], login_list[3]['auth_user_id']]}).json())
+                                         'u_ids': [login_list[2]['auth_user_id'], 
+                                                   login_list[3]['auth_user_id']]}).json())
     
     return dm_list
 
@@ -251,7 +253,7 @@ def test_channel_message_edit_normal(user_list, login_list, channel_list):
     requests.post(url + 'message/send/v1',
                   json = {'token': login_list[0]['token'],
                           'channel_id': channel_list[0]['channel_id'],
-                          'message': 'Hello world!'}).json()
+                          'message': 'Hello world!'})
     
     # change message[2]
     requests.put(url + 'message/edit/v1',
