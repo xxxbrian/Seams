@@ -225,6 +225,20 @@ def test_dm_details_invalid_auth_user(user_list, login_list, dm_list):
                               params = {'token': login_list[3]['token'],
                                         'dm_id': dm_list[0]['dm_id']})
     assert response_1.status_code == AccessError.code
+
+def test_dm_details_invalid_token(user_list, login_list, dm_list):
+    '''
+    
+    This test is to test when input invalid token
+    
+    Raises: 
+        AccessError
+        
+    '''
+    response_1 = requests.get(url + 'dm/details/v1',
+                              params = {'token': -1,
+                                        'dm_id': dm_list[0]['dm_id']})
+    assert response_1.status_code == AccessError.code
     
 ######################################## Test_dm/leave/v1 ########################################
     
@@ -336,6 +350,20 @@ def test_dm_leave_invalid_auth_user(user_list, login_list, dm_list):
     response_1 = requests.post(url + "dm/leave/v1",
                                json = {'token': login_list[3]['token'],
                                        'dm_id': dm_list[0]['dm_id']})
+    assert response_1.status_code == AccessError.code
+    
+def test_dm_leave_invalid_token(user_list, login_list, dm_list):
+    '''
+    
+    This test is to test when input invalid token
+    
+    Raises: 
+        AccessError
+        
+    '''
+    response_1 = requests.post(url + "dm/leave/v1",
+                  json = {'token': -1,
+                          'dm_id': dm_list[0]['dm_id']})
     assert response_1.status_code == AccessError.code
     
 ######################################## Test_dm/messages/v1 ########################################

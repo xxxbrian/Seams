@@ -102,14 +102,14 @@ def test_channels_join_new_user(user_list, login_list, channel_id_list):
 #         Returns:
 #             N/A
 #         """
-        respon = requests.post(f"{url}channel/join/v2",
+        response_1 = requests.post(f"{url}channel/join/v2",
                                 json= {'token': login_list[0].json()['token'],
                                         'channel_id': channel_id_list[1].json()['channel_id']})
-        assert respon.status_code == 200
-        respon = requests.get(f"{url}channel/details/v2",
+        assert response_1.status_code == 200
+        response_2 = requests.get(f"{url}channel/details/v2",
                                 params= {'token': login_list[0].json()['token'],
                                         'channel_id': channel_id_list[1].json()['channel_id']})
-        assert respon.status_code == 200
+        assert response_2.status_code == 200
 
 def test_channels_join_new_user_with_invalid_channel_id(user_list, login_list, channel_id_list):
 #         """
@@ -140,3 +140,37 @@ def test_channels_join_with_exist_user(user_list, login_list, channel_id_list):
                                 json= {'token': login_list[0].json()['token'],
                                         'channel_id': channel_id_list[0].json()['channel_id']})
         assert respon.status_code == InputError.code
+        
+def test_channel_join_invalid_token(user_list, login_list, channel_id_list):
+    '''
+    
+    This test is to test when token is invalid
+    
+    Raises:
+        AccessError
+        
+    '''
+    response_1 = requests.get(f"{url}channel/details/v2",
+                                params= {'token': -1,
+                                        'channel_id': channel_id_list[0].json()['channel_id']})
+    assert response_1.status_code == AccessError.code
+        
+    response_2 = requests.post(f"{url}channel/join/v2",
+                                json= {'token': -1,
+                                        'channel_id': channel_id_list[1].json()['channel_id']})
+    assert response_2.status_code == AccessError.code
+    response_3 = requests.get(f"{url}channel/details/v2",
+                                params= {'token': -1,
+                                        'channel_id': channel_id_list[1].json()['channel_id']})
+    assert response_3.status_code == AccessError.code 
+    response_4 = requests.post(f"{url}channel/join/v2",
+                                json= {'token': -1,
+                                        'channel_id': '999999999'})
+    assert response_4.status_code == AccessError.code
+    response_5 = requests.post(f"{url}channel/join/v2",
+                                json= {'token': -1,
+                                        'channel_id': channel_id_list[0].json()['channel_id']})
+    assert response_5.status_code == AccessError.code
+        
+        
+        

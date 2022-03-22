@@ -93,17 +93,41 @@ def test_channels_detail_with_invalid_channelid(user_list, login_list, channel_i
         assert respon.status_code == InputError.code
 
 def test_channels_detail_with_valid_channelid_and_unauthorised_user(user_list, login_list, channel_id_list):
-        """
-        Test cases for show channel detail with invalid channelid
-            token: user token
-            channel_id:  valid id, but unauthorised user
-        Returns:
-            AccessError.code
-        Returns:
-            N/A
-        """
-        respon = requests.get(f"{url}channel/details/v2",
-                                params= {'token': login_list[0].json()['token'],
+    """
+    Test cases for show channel detail with invalid channelid
+        token: user token
+        channel_id:  valid id, but unauthorised user
+    Returns:
+        AccessError.code
+    Returns:
+        N/A
+    """
+    respon = requests.get(f"{url}channel/details/v2",
+                            params= {'token': login_list[0].json()['token'],
+                                    'channel_id': channel_id_list[1].json()['channel_id']})
+    assert respon.status_code == AccessError.code
+    
+def test_channel_details_invalid_token(user_list, login_list, channel_id_list):
+    '''
+    
+    This test is to test when token is invalid 
+    
+    Raises:
+        AccessError
+        
+    '''
+    response_1 = requests.get(f"{url}channel/details/v2",
+                                params= {'token': -1,
+                                        'channel_id': channel_id_list[0].json()['channel_id']})
+    assert response_1.status_code == AccessError.code
+        
+    response_2 = requests.get(f"{url}channel/details/v2",
+                                params= {'token': -1,
+                                        'channel_id': '99999999999'})
+    assert response_2.status_code == AccessError.code
+        
+    response_3 = requests.get(f"{url}channel/details/v2",
+                                params= {'token': -1,
                                         'channel_id': channel_id_list[1].json()['channel_id']})
-        assert respon.status_code == AccessError.code
-     
+    assert response_3.status_code == AccessError.code
+    

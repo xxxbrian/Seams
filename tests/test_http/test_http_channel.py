@@ -189,6 +189,41 @@ def test_channel_leave_invalid_user(user_list, login_list, channel_list):
                                        'channel_id': channel_list[0]['channel_id']})
     assert response_1.status_code == AccessError.code
     
+def test_channel_leave_invalid_token(user_list, login_list, channel_list):
+    '''
+    
+    This test is to test when input invalid token
+    
+    Raises: 
+        AccessError
+        
+    '''
+    # user[1] joins channel[0]
+    requests.post(url + 'channel/join/v2',
+                  json = {'token': login_list[1]['token'],
+                          'channel_id': channel_list[0]['channel_id']})
+    # user[1] leaves channel[0]
+    response_1 = requests.post(url + 'channel/leave/v1',
+                  json = {'token': -1,
+                          'channel_id': channel_list[0]['channel_id']})
+    assert response_1.status_code == AccessError.code
+    
+    # user[0] leaves channel[0]
+    response_2 = requests.post(url + 'channel/leave/v1',
+                  json = {'token': -1,
+                          'channel_id': channel_list[0]['channel_id']})
+    assert response_2.status_code == AccessError.code
+    
+    new_id = random.randint(-65535, 65535)
+    invalid_channel_id = []
+    while len(invalid_channel_id) < 1:
+        if not new_id in [channel_list[i]['channel_id'] for i in range(0,2)]:
+            invalid_channel_id.append(new_id)
+    response_3 = requests.post(url + 'channel/leave/v1',
+                               json = {'token': -1,
+                                       'channel_id': invalid_channel_id[0]})
+    assert response_3.status_code == AccessError.code
+    
 ######################################## Test_channel/addowner/v1 ########################################
 
 def test_channel_add_owner_normal(user_list, login_list, channel_list):
@@ -355,6 +390,66 @@ def test_channel_add_owner_no_permissions(user_list, login_list, channel_list):
                                        'channel_id': channel_list[0]['channel_id'],
                                        'u_id': login_list[2]['auth_user_id']})
     assert response_1.status_code == AccessError.code
+    
+def test_channel_add_owner_invalid_token(user_list, login_list, channel_list):
+    '''
+    
+    This test is to test when input invalid token
+    
+    Raises: 
+        AccessError
+        
+    '''
+    requests.post(url + "channel/join/v2",
+                  json = {'token': login_list[1]['token'],
+                          'channel_id': channel_list[0]['channel_id']})
+    response_1 = requests.post(url + "channel/addowner/v1",
+                  json = {'token': -1,
+                          'channel_id': channel_list[0]['channel_id'],
+                          'u_id': login_list[1]['auth_user_id']})
+    assert response_1.status_code == AccessError.code
+    
+    new_id = random.randint(-65535, 65535)
+    invalid_channel_id = []
+    while len(invalid_channel_id) < 1:
+        if not new_id in [channel_list[i]['channel_id'] for i in range(0,2)]:
+            invalid_channel_id.append(new_id)
+            
+    requests.post(url + "channel/join/v2",
+                  json = {'token': login_list[1]['token'],
+                          'channel_id': channel_list[0]['channel_id']})
+    response_2 = requests.post(url + "channel/addowner/v1",
+                               json = {'token': -1,
+                                       'channel_id': invalid_channel_id[0],
+                                       'u_id': login_list[1]['auth_user_id']})
+    assert response_2.status_code == AccessError.code
+    
+    new_id = random.randint(-65535, 65535)
+    invalid_u_id = []
+    while len(invalid_u_id) < 1:
+        if not new_id in [login_list[i]['auth_user_id'] for i in range(0,4)]:
+            invalid_u_id.append(new_id)
+            
+    requests.post(url + "channel/join/v2",
+                  json = {'token': login_list[1]['token'],
+                          'channel_id': channel_list[0]['channel_id']})
+    response_3 = requests.post(url + "channel/addowner/v1",
+                               json = {'token': -1,
+                                       'channel_id': channel_list[0]['channel_id'],
+                                       'u_id': invalid_u_id[0]})
+    assert response_3.status_code == AccessError.code
+    
+    response_4 = requests.post(url + "channel/addowner/v1",
+                               json = {'token': -1,
+                                       'channel_id': channel_list[0]['channel_id'],
+                                       'u_id': login_list[1]['auth_user_id']})
+    assert response_4.status_code == AccessError.code
+    
+    response_5 = requests.post(url + "channel/addowner/v1",
+                               json = {'token': -1,
+                                       'channel_id': channel_list[0]['channel_id'],
+                                       'u_id': login_list[0]['auth_user_id']})
+    assert response_5.status_code == AccessError.code
     
 ######################################## Test_channel/removeowner/v1 ########################################
     
@@ -533,5 +628,27 @@ def test_channel_remove_owner_no_permissions(user_list, login_list, channel_list
                                json = {'token': login_list[1]['token'],
                                        'channel_id': channel_list[0]['channel_id'],
                                        'u_id': login_list[0]['auth_user_id']})
+    assert response_1.status_code == AccessError.code
+    
+def test_channel_remove_owner_invalid_token(user_list, login_list, channel_list):
+    '''
+    
+    This test is to test when input invalid token
+    
+    Raises: 
+        AccessError
+        
+    '''
+    requests.post(url + "channel/join/v2",
+                  json = {'token': login_list[1]['token'],
+                          'channel_id': channel_list[0]['channel_id']})
+    requests.post(url + "channel/addowner/v1",
+                  json = {'token': login_list[0]['token'],
+                          'channel_id': channel_list[0]['channel_id'],
+                          'u_id': login_list[1]['auth_user_id']})
+    response_1 = requests.post(url + "channel/removeowner/v1",
+                  json = {'token': -1,
+                          'channel_id': channel_list[0]['channel_id'],
+                          'u_id': login_list[1]['auth_user_id']})
     assert response_1.status_code == AccessError.code
     
