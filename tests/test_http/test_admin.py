@@ -1,3 +1,4 @@
+from urllib import response
 import pytest
 import requests
 import json
@@ -166,7 +167,7 @@ def test_admin_user_remove_normal(user_list, login_list, channel_list, dm_list):
             'name_first': 'Removed',
             'name_last': 'user',
             'handle_str': 'brianlee'
-        },
+        }
     # user[0] joins channel[1]
     requests.post(url + 'channel/join/v2',
                   json = {'token': login_list[0]['token'],
@@ -264,7 +265,6 @@ def test_admin_user_remove_normal(user_list, login_list, channel_list, dm_list):
     assert users == response_3['users']
     assert response_4['messages'][0]['message'] == 'Hello world!'
     assert response_5['messages'][0]['message'] == 'Hi hi'
-    print(response_6)
     assert response_6['user'] == remove_user
     assert response_7.status_code == 200
     assert response_8['user'] == {
@@ -274,3 +274,179 @@ def test_admin_user_remove_normal(user_list, login_list, channel_list, dm_list):
             'name_last': 'Lee',
             'handle_str': 'brianlee'
         }
+    
+def test_admin_user_remove_invalid_u_id(user_list, login_list):
+    '''
+    
+    This test is to test when u_id does not refer to a valid user
+    
+    Raises:
+        InputError
+        
+    '''
+    new_id = random.randint(-65535, 65535)
+    invalid_u_id = []
+    while len(invalid_u_id) < 1:
+        if not new_id in [login_list[i]['auth_user_id'] for i in range(0,4)]:
+            invalid_u_id.append(new_id)
+    
+    response_1  = requests.delete(url + 'admin/user/remove/v1',
+                                  json = {'token': login_list[0]['token'],
+                                          'u_id': invalid_u_id})
+    assert response_1.status_code == InputError.code
+    
+def test_admin_user_remove_global_owner_u_id(user_list, login_list):
+    '''
+    
+    This test is to test when u_id refers to a user who is the only global owner
+    
+    Raises:
+        InputError
+        
+    '''
+    response_1  = requests.delete(url + 'admin/user/remove/v1',
+                                  json = {'token': login_list[0]['token'],
+                                          'u_id': login_list[0]['auth_user_id']})
+    assert response_1.status_code == InputError.code
+    
+def test_admin_user_remove_not_global_owner(user_list, login_list):
+    '''
+    
+    This test is to test when the authorised user is not a global owner
+    
+    Raises:
+        AccessError
+        
+    '''
+    response_1  = requests.delete(url + 'admin/user/remove/v1',
+                                  json = {'token': login_list[1]['token'],
+                                          'u_id': login_list[2]['auth_user_id']})
+    assert response_1.status_code == AccessError.code
+    
+######################################## Test_admin/userpermission/change/v1 ########################################
+
+def test_admin_userpermission_change_to_1(user_list, login_list):
+    '''
+    
+    This test is to test change user's permission to 1 successfully
+    
+    '''
+    # set user[1] as a owner
+    requests.post(url + 'admin/userpermission/change/v1',
+                  json = {'token': login_list[0]['token'],
+                          'u_id': login_list[1]['auth_user_id'],
+                          'permission_id': 1})
+    # user[1] should able to remove user[2]
+    response_1  = requests.delete(url + 'admin/user/remove/v1',
+                                  json = {'token': login_list[1]['token'],
+                                          'u_id': login_list[2]['auth_user_id']})
+    assert response_1.status_code == 200
+    
+def test_admin_userpermission_change_to_2(user_list, login_list):
+    '''
+    
+    This test is to test change user's permission to 2 successfully
+    
+    '''
+    # set user[1] as a owner
+    requests.post(url + 'admin/userpermission/change/v1',
+                  json = {'token': login_list[0]['token'],
+                          'u_id': login_list[1]['auth_user_id'],
+                          'permission_id': 1})
+    # set user[0] as a user
+    requests.post(url + 'admin/userpermission/change/v1',
+                  json = {'token': login_list[1]['token'],
+                          'u_id': login_list[0]['auth_user_id'],
+                          'permission_id': 2})
+    response_1  = requests.delete(url + 'admin/user/remove/v1',
+                                  json = {'token': login_list[0]['token'],
+                                          'u_id': login_list[2]['auth_user_id']})
+    assert response_1.status_code == AccessError.code
+    
+def test_admin_userpermission_change_invalid_u_id(user_list, login_list):
+    '''
+    
+    This test is to test when u_id does not refer to a valid user
+    
+    Raises:
+        InputError
+        
+    '''
+    new_id = random.randint(-65535, 65535)
+    invalid_u_id = []
+    while len(invalid_u_id) < 1:
+        if not new_id in [login_list[i]['auth_user_id'] for i in range(0,4)]:
+            invalid_u_id.append(new_id)
+    
+    response_1 = requests.post(url + 'admin/userpermission/change/v1',
+                               json = {'token': login_list[0]['token'],
+                                       'u_id': invalid_u_id[0],
+                                       'permission_id': 1})
+    assert response_1.status_code == InputError.code
+    
+def test_admin_userpermission_change_the_only_owner(user_list, login_list):
+    '''
+    
+    This test is to test when u_id refers to a user who is the only global 
+    owner and they are being demoted to a user
+    
+    Raises:
+        InputError
+    
+    '''
+    response_1 = requests.post(url + 'admin/userpermission/change/v1',
+                               json = {'token': login_list[0]['token'],
+                                       'u_id': login_list[0]['auth_user_id'],
+                                       'permission_id': 2})
+    assert response_1.status_code == InputError.code
+    
+def test_admin_userpermission_change_invalid_permission_id(user_list, login_list):
+    '''
+    
+    This test is to test when permission_id is invalid
+    
+    Raises:
+        InputError
+    
+    '''
+    response_1 = requests.post(url + 'admin/userpermission/change/v1',
+                               json = {'token': login_list[0]['token'],
+                                       'u_id': login_list[1]['auth_user_id'],
+                                       'permission_id': 10})
+    assert response_1.status_code == InputError.code
+    
+def test_admin_userpermission_change_already_owner(user_list, login_list):
+    '''
+    
+    This test is to test when the user already has the permissions level of permission_id
+    
+    Raises:
+        InputError
+    
+    '''
+    response_1 = requests.post(url + 'admin/userpermission/change/v1',
+                               json = {'token': login_list[0]['token'],
+                                       'u_id': login_list[0]['auth_user_id'],
+                                       'permission_id': 1})
+    assert response_1.status_code == InputError.code
+    
+def test_admin_userpermission_change_invalid_auth_user(user_list, login_list):
+    '''
+    
+    This test is to test when the authorised user is not a global owner
+    
+    Raises:
+        AccessError
+    
+    '''
+    response_1 = requests.post(url + 'admin/userpermission/change/v1',
+                               json = {'token': login_list[1]['token'],
+                                       'u_id': login_list[2]['auth_user_id'],
+                                       'permission_id': 1})
+    assert response_1.status_code == AccessError.code
+    response_2 = requests.post(url + 'admin/userpermission/change/v1',
+                               json = {'token': login_list[1]['token'],
+                                       'u_id': login_list[2]['auth_user_id'],
+                                       'permission_id': 2})
+    assert response_2.status_code == AccessError.code
+    
