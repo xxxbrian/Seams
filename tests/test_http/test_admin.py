@@ -429,6 +429,11 @@ def test_admin_userpermission_change_already_owner(user_list, login_list):
                                        'u_id': login_list[0]['auth_user_id'],
                                        'permission_id': 1})
     assert response_1.status_code == InputError.code
+    response_2 = requests.post(url + 'admin/userpermission/change/v1',
+                               json = {'token': login_list[0]['token'],
+                                       'u_id': login_list[1]['auth_user_id'],
+                                       'permission_id': 2})
+    assert response_2.status_code == InputError.code
     
 def test_admin_userpermission_change_invalid_auth_user(user_list, login_list):
     '''
