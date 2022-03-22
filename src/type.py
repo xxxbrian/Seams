@@ -293,7 +293,8 @@ class Channel():
                                               for user in self.owners)
         if 'all_members' in show:
             info_dict['all_members'] = list(user.todict()
-                                            for user in self.members)
+                                            for user in self.members
+                                            if user.is_active())
 
         return info_dict
 
@@ -390,7 +391,8 @@ class DM():
         if 'owner' in show:
             info_dict['owner'] = self.owner.todict()
         if 'members' in show:
-            info_dict['members'] = list(user.todict() for user in self.members)
+            info_dict['members'] = list(user.todict() for user in self.members
+                                        if user.is_active())
 
         return info_dict
 
