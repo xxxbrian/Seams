@@ -1,11 +1,9 @@
-from urllib import response
 import pytest
 import requests
 import json
 import random
 from src.config import url
 from src.error import InputError, AccessError
-from src.echo import echo
 
 @pytest.fixture(name = 'user_list')
 def create_user_list():
@@ -456,11 +454,3 @@ def test_admin_userpermission_change_invalid_auth_user(user_list, login_list):
                                        'permission_id': 2})
     assert response_2.status_code == AccessError.code
     
-def test_echo():
-    assert echo("1") == "1", "1 == 1"
-    assert echo("abc") == "abc", "abc == abc"
-    assert echo("trump") == "trump", "trump == trump"
-
-def test_echo_except():
-    with pytest.raises(InputError):
-        assert echo("echo")

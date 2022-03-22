@@ -5,6 +5,7 @@ from flask import Flask, request
 from flask_cors import CORS
 from src.error import InputError
 from src import config
+from src.echo import echo
 
 from src.admin import *
 from src.auth import *
