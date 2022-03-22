@@ -787,3 +787,113 @@ def test_channel_message_remove_owner_remove_message(user_list, login_list, dm_l
                                         'dm_id': dm_list[0]['dm_id'],
                                         'start': 0}).json()
     assert response_3['messages'][0]['message'] == 'Hello world!'
+
+######################################## message/senddm/v1 ########################################
+
+def test_message_senddm_invalid_dm_id(user_list, dm_list, login_list):
+    '''
+    
+    Test for input a invalid dm_id
+    
+    Raises:
+        Inputerror
+        
+    '''
+    new_id = random.randint(-65535, 65535)
+    invalid_dm_id = []
+    while len(invalid_dm_id) < 1:
+        if not new_id in [dm_list[i]['dm_id'] for i in range(0,3)]:
+            invalid_dm_id.append(new_id)
+    response_1 = requests.post(url + 'message/senddm/v1',
+                               json = {'token': login_list[0]['token'],
+                                       'dm_id': invalid_dm_id[0],
+                                       'message': 'Hello world!'})
+    assert response_1.status_code == InputError.code
+    
+def test_message_senddm_empty_message(user_list, dm_list, login_list):
+    '''
+    
+    Test for input an empty message
+    
+    Raises:
+        InputError
+        
+    '''
+    response_1 = requests.post(url + 'message/senddm/v1',
+                               json = {'token': login_list[0]['token'],
+                                       'dm_id': dm_list[0]['dm_id'],
+                                       'message': ''})
+    assert response_1.status_code == InputError.code
+    
+def test_message_senddm_too_long_message(user_list, dm_list, login_list):
+    '''
+    
+    Test for input more than 1000 characters
+    
+    Raises:
+        InputError
+        
+    '''
+    too_long_message = ""
+    while(len(too_long_message) < 1001):
+        too_long_message += 'a'
+    
+    response_1 = requests.post(url + 'message/senddm/v1',
+                               json = {'token': login_list[0]['token'],
+                                       'dm_id': dm_list[0]['dm_id'],
+                                       'message': too_long_message})
+    assert response_1.status_code == InputError.code
+    
+def test_message_senddm_auth_user_out_of_dm(user_list, dm_list, login_list):
+    '''
+    
+    This test is test when authorised user is not amember of dm
+    
+    Raises:
+        AccessError
+        
+    '''
+    response_1 = requests.post(url + 'message/senddm/v1',
+                               json = {'token': login_list[3]['token'],
+                                       'dm_id': dm_list[0]['dm_id'],
+                                       'message': "Hello"})
+    assert response_1.status_code == AccessError.code
+    
+def test_message_senddm_invalid_token(user_list, dm_list, login_list):
+    '''
+    
+    This test is to test when toke is invalid
+    
+    Raises:
+        AccessError
+        
+    '''
+    # invalid dm id
+    new_id = random.randint(-65535, 65535)
+    invalid_dm_id = []
+    while len(invalid_dm_id) < 1:
+        if not new_id in [dm_list[i]['dm_id'] for i in range(0,3)]:
+            invalid_dm_id.append(new_id)
+    response_1 = requests.post(url + 'message/senddm/v1',
+                               json = {'token': -1,
+                                       'dm_id': invalid_dm_id[0],
+                                       'message': 'Hello world!'})
+    assert response_1.status_code == AccessError.code
+    
+    # invalid message
+    response_2 = requests.post(url + 'message/senddm/v1',
+                               json = {'token': -1,
+                                       'dm_id': dm_list[0]['dm_id'],
+                                       'message': ''})
+    assert response_2.status_code == AccessError.code
+    
+    too_long_message = ""
+    while(len(too_long_message) < 1001):
+        too_long_message += 'a'
+    
+    response_3 = requests.post(url + 'message/senddm/v1',
+                               json = {'token': -1,
+                                       'dm_id': dm_list[0]['dm_id'],
+                                       'message': too_long_message})
+    assert response_3.status_code == AccessError.code
+    
