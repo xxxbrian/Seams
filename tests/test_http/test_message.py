@@ -15,7 +15,7 @@ def create_user_list():
     user_list (dictionary), contains 4 pre-register users' information
     '''
     requests.delete(f"{url}clear/v1", json = {})    # clear all info in server
-    user_list = list()
+    user_list = []
     user_list.append(requests.post(f"{url}auth/register/v2",
                                    json = { 'email': 'z5374603@unsw.com',
                                             'password': '123456',
@@ -248,10 +248,10 @@ def test_channel_message_edit_normal(user_list, login_list, channel_list):
                                json = {'token': login_list[0]['token'],
                                        'channel_id': channel_list[0]['channel_id'],
                                        'message': 'Hello world!'}).json()
-    response_3 = requests.post(url + 'message/send/v1',
-                               json = {'token': login_list[0]['token'],
-                                       'channel_id': channel_list[0]['channel_id'],
-                                       'message': 'Hello world!'}).json()
+    requests.post(url + 'message/send/v1',
+                  json = {'token': login_list[0]['token'],
+                          'channel_id': channel_list[0]['channel_id'],
+                          'message': 'Hello world!'}).json()
     
     # change message[2]
     requests.put(url + 'message/edit/v1',
@@ -296,10 +296,10 @@ def test_dm_message_edit_normal(user_list, login_list, dm_list):
                                json = {'token': login_list[0]['token'],
                                        'dm_id': dm_list[0]['dm_id'],
                                        'message': 'Hello world!'}).json()
-    response_3 = requests.post(url + 'message/senddm/v1',
-                               json = {'token': login_list[0]['token'],
-                                       'dm_id': dm_list[0]['dm_id'],
-                                       'message': 'Hello world!'}).json()
+    requests.post(url + 'message/senddm/v1',
+                  json = {'token': login_list[0]['token'],
+                          'dm_id': dm_list[0]['dm_id'],
+                          'message': 'Hello world!'}).json()
     
     # change message[2]
     requests.put(url + 'message/edit/v1',
@@ -511,12 +511,12 @@ def test_channel_message_edit_owner_edit_message(user_list, login_list, channel_
                          'message_id': response_1['message_id'],
                          'message': "Hi hi"})
     response_3 = requests.get(url + 'channel/messages/v2',
-                              params = {'token': login_list[0]['token'],
+                              params = {'token': login_list[1]['token'],
                                         'channel_id': channel_list[0]['channel_id'],
                                         'start': 0}).json()
     assert response_3['messages'][0]['message'] == 'Hi hi'
     
-def test_channel_message_edit_owner_edit_message(user_list, login_list, dm_list):
+def test_dm_message_edit_owner_edit_message(user_list, login_list, dm_list):
     '''
     
     This test is to test dm owner edit message from other users successfully
@@ -595,18 +595,18 @@ def test_dm_message_remove_normal(user_list, login_list, dm_list):
     
     '''
     # send 3 messages in dm[0]
-    response_1 = requests.post(url + 'message/senddm/v1',
-                               json = {'token': login_list[0]['token'],
-                                       'dm_id': dm_list[0]['dm_id'],
-                                       'message': 'Hello'}).json()
+    requests.post(url + 'message/senddm/v1',
+                  json = {'token': login_list[0]['token'],
+                          'dm_id': dm_list[0]['dm_id'],
+                          'message': 'Hello'}).json()
     response_2 = requests.post(url + 'message/senddm/v1',
                                json = {'token': login_list[0]['token'],
                                        'dm_id': dm_list[0]['dm_id'],
                                        'message': 'Hello world!'}).json()
-    response_3 = requests.post(url + 'message/senddm/v1',
-                               json = {'token': login_list[0]['token'],
-                                       'dm_id': dm_list[0]['dm_id'],
-                                       'message': 'world!'}).json()
+    requests.post(url + 'message/senddm/v1',
+                  json = {'token': login_list[0]['token'],
+                          'dm_id': dm_list[0]['dm_id'],
+                          'message': 'world!'}).json()
     
     # remove the second message
     requests.delete(url + "message/remove/v1",
