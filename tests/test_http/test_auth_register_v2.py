@@ -13,7 +13,7 @@ def create_user_list():
     user_list (dictionary), contains 4 pre-register users' information
     '''
     requests.delete(f"{url}clear/v1", json = {})    # clear all info in server
-    user_list = list()
+    user_list = []
     user_list.append(requests.post(f"{url}auth/register/v2",
                                    json = { 'email': 'z5374603@unsw.com',
                                             'password': '123456',
@@ -61,7 +61,7 @@ def test_auth_register_unique_user_id(user_list):
     return:
         N/A
     '''
-    user_id_list = list()
+    user_id_list = []
     for user in user_list:
         user_id_list.append(user.json()['auth_user_id'])
     assert len(user_id_list) == len(set(user_id_list))  # user_id is unique
@@ -76,7 +76,7 @@ def test_auth_register_unique_token(user_list):
     return:
         N/A
     '''
-    user_token_list = list()
+    user_token_list = []
     for user in user_list:    
         user_token_list.append(user.json()['token'])
     assert len(user_token_list) == len(set(user_token_list))    # user_token is unique

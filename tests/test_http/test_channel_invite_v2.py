@@ -13,7 +13,7 @@ def create_user_list():
         user_list (dictionary), contains 4 pre-register users' information
     '''
     requests.delete(f"{url}clear/v1", json = {})    # clear all info in server
-    user_list = list()
+    user_list = []
     user_list.append(requests.post(f"{url}auth/register/v2",
                                    json = 
                                        {'email': 'z5374603@unsw.com',
@@ -31,7 +31,7 @@ def create_user_list():
 
 @pytest.fixture(name = 'login_list')
 def login_two_users():
-    login_list = list()
+    login_list = []
     login_list.append(requests.post(url + 'auth/login/v2',
                                     json = {'email': 'z5374603@unsw.com',
                                             'password': '123456'}))
@@ -51,7 +51,7 @@ def test_create_channel_normal(user_list, login_list):
 #         Returns:
 #             200
 #         """
-    channel_id_list = list()
+    channel_id_list = []
     for login_user in login_list:
         channel_id_list.append(requests.post(f"{url}channels/create/v2",
                                 json = {'token': login_user.json()['token'],
