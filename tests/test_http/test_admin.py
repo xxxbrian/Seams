@@ -261,9 +261,10 @@ def test_admin_user_remove_normal(user_list, login_list, channel_list, dm_list):
     }
     
     # assert user[1] is not in users all
-    assert set(users) == set(response_3['users'])
+    assert users == response_3['users']
     assert response_4['messages'][0]['message'] == 'Hello world!'
     assert response_5['messages'][0]['message'] == 'Hi hi'
+    print(response_6)
     assert response_6['user'] == remove_user
     assert response_7.status_code == 200
     assert response_8['user'] == {
