@@ -14,7 +14,7 @@ def create_user_list():
     user_list (dictionary), contains 4 pre-register users' information
     '''
     requests.delete(f"{url}clear/v1", json = {})    # clear all info in server
-    user_list = list()
+    user_list = []
     user_list.append(requests.post(f"{url}auth/register/v2",
                                    json = { 'email': 'z5374603@unsw.com',
                                             'password': '123456',
@@ -87,115 +87,117 @@ def create_dm(login_list):
     
     return dm_list
 
-
-def test_dm_remove_normal(user_list, login_list, dm_list):
+def test_dm_details_normal(user_list, login_list, dm_list):
     '''
     
-    Test remove successfully
+    This test is to test when everything is fine and return correct info
     
-    Parameters:
-        user_list, login_list, dm_list
-        
     Assumption:
-        dm/list/v1 is working well
-
+        dm/create/v1 is working well
     '''
+    dm_0 = 'bojinli, brianlee, steveyang'
     dm_1 = 'bojinli, cicyzhou, steveyang'
-    requests.delete(url + 'dm/remove/v1',
-                    json = {"token": login_list[0]["token"], 
-                            "dm_id": dm_list[0]['dm_id']})
-    response_1 = requests.get(url + "dm/list/v1",
-                              params = {'token': login_list[0]['token']}).json()
-    # remove dm[0]
+    dm_2 = 'bojinli, brianlee, cicyzhou'
+    response_1 = requests.get(url + 'dm/details/v1',
+                              params = {'token': login_list[0]['token'],
+                                        'dm_id': dm_list[0]['dm_id']}).json()
+    response_2 = requests.get(url + 'dm/details/v1',
+                              params = {'token': login_list[0]['token'],
+                                        'dm_id': dm_list[1]['dm_id']}).json()
+    response_3 = requests.get(url + 'dm/details/v1',
+                              params = {'token': login_list[1]['token'],
+                                        'dm_id': dm_list[2]['dm_id']}).json()
     assert response_1 == {
-        'dms':[
-        {
-            'dm_id': dm_list[1]['dm_id'],
-            'name': dm_1
-        },
-    ]}
-
-def test_dm_remove_invalid_dm_id(user_list, login_list, dm_list):
-    """
+        'name': dm_0,
+        'members':
+            [
+                {
+                    'u_id': login_list[1]['auth_user_id'],
+                    'email': "z5374602@unsw.com",
+                    'name_first': 'Brian',
+                    'name_last': 'Lee',
+                    'handle_str': 'brianlee'
+                },
+                {
+                    'u_id': login_list[2]['auth_user_id'],
+                    'email': "z5374601@unsw.com",
+                    'name_first': 'Bojin',
+                    'name_last': 'Li',
+                    'handle_str': 'bojinli'
+                },
+                {
+                    'u_id': login_list[0]['auth_user_id'],
+                    'email': "z5374603@unsw.com",
+                    'name_first': 'Steve',
+                    'name_last': 'Yang',
+                    'handle_str': 'steveyang'
+                },
+            ]
+    }
+    assert response_2 == {
+        'name': dm_1,
+        'members':
+            [
+                {
+                    'u_id': login_list[3]['auth_user_id'],
+                    'email': "z5374600@unsw.com",
+                    'name_first': 'Cicy',
+                    'name_last': 'Zhou',
+                    'handle_str': 'cicyzhou'
+                },
+                {
+                    'u_id': login_list[2]['auth_user_id'],
+                    'email': "z5374601@unsw.com",
+                    'name_first': 'Bojin',
+                    'name_last': 'Li',
+                    'handle_str': 'bojinli'
+                },
+                {
+                    'u_id': login_list[0]['auth_user_id'],
+                    'email': "z5374603@unsw.com",
+                    'name_first': 'Steve',
+                    'name_last': 'Yang',
+                    'handle_str': 'steveyang'
+                },
+            ]
+    }
+    assert response_3 == {
+        'name': dm_2,
+        'members':
+            [
+                {
+                    'u_id': login_list[2]['auth_user_id'],
+                    'email': "z5374601@unsw.com",
+                    'name_first': 'Bojin',
+                    'name_last': 'Li',
+                    'handle_str': 'bojinli'
+                },
+                {
+                    'u_id': login_list[3]['auth_user_id'],
+                    'email': "z5374600@unsw.com",
+                    'name_first': 'Cicy',
+                    'name_last': 'Zhou',
+                    'handle_str': 'cicyzhou'
+                },
+                {
+                    'u_id': login_list[1]['auth_user_id'],
+                    'email': "z5374602@unsw.com",
+                    'name_first': 'Brian',
+                    'name_last': 'Lee',
+                    'handle_str': 'brianlee'
+                },
+            ]
+    }
     
-    Test dm_remove_v1 input a invalid dm ID.
+def test_dm_details_invalid_dm_id(user_list, login_list, dm_list):
+    '''
     
-    Parameters:
-        user_list, login_list, dm_list
+    This test is to test when input a invalid dm_id
     
     Raises:
         InputError
         
-    """
-    new_id = random.randint(-65535, 65535)
-    invalid_dm_id = []
-    while len(invalid_dm_id) < 1:
-        if not new_id in [dm_list[i]['dm_id'] for i in range(0,3)]:
-            invalid_dm_id.append(new_id)
-    response_1 = requests.delete(url + 'dm/remove/v1',
-                                 json = {"token": login_list[0]["token"], 
-                                         "dm_id": invalid_dm_id[0]})
-    assert response_1.status_code == InputError.code
-
-def test_dm_remove_author_not_creator(user_list, login_list, dm_list):
-    """
-    
-    Test dm/remove/v1 when the user is not the original DM creator 
-    
-    Raise:
-        AccessError
-        
-    """
-
-    response_1 = requests.delete(url + 'dm/remove/v1',
-                                 json = {"token": login_list[3]["token"], 
-                                         "dm_id": dm_list[1]["dm_id"]})
-    assert response_1.status_code == AccessError.code
-
-def test_dm_remove_creater_no_longer_in_dm(user_list, login_list, dm_list):
     '''
     
-    Test when creater leave the dm
     
-    Raises:
-        AccessError
-        
-    Assumption:
-        dm/leave/v1 is working well
-        
-    '''
-    # user[1] leaves the dm[2]
-    requests.post(url + "dm/leave/v1",
-                  json = {'token': login_list[1]['token'],
-                          'dm_id': dm_list[2]['dm_id']})
-    response_1 = requests.delete(url + 'dm/remove/v1',
-                                 json = {"token": login_list[1]["token"], 
-                                         "dm_id": dm_list[2]["dm_id"]})
-    assert response_1.status_code == AccessError.code
-    
-def test_dm_remove_creater_invalid_token(user_list, login_list, dm_list):
-    '''
-    
-    This test is to test when token is invalid 
-    
-    Raises:
-        AccessError
-        
-    '''
-    # normal
-    response_1 = requests.delete(url + 'dm/remove/v1',
-                                 json = {"token": -1, 
-                                         "dm_id": dm_list[0]['dm_id']})
-    assert response_1.status_code == AccessError.code
-    
-    # Invalid dm ID
-    new_id = random.randint(-65535, 65535)
-    invalid_dm_id = []
-    while len(invalid_dm_id) < 1:
-        if not new_id in [dm_list[i]['dm_id'] for i in range(0,3)]:
-            invalid_dm_id.append(new_id)
-    response_2 = requests.delete(url + 'dm/remove/v1',
-                                 json = {"token": -1, 
-                                         "dm_id": invalid_dm_id[0]})
-    assert response_2.status_code == AccessError.code
     
