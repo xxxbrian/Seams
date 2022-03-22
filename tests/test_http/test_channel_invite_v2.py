@@ -26,6 +26,11 @@ def create_user_list():
                                         'password': '123456',
                                         'name_first': 'Brian',
                                         'name_last': 'Lee'}))
+    user_list.append(requests.post(f"{url}auth/register/v2",
+                                   json = { 'email': 'z5374601@unsw.com',
+                                            'password': '123456',
+                                            'name_first': 'Bojin',
+                                            'name_last': 'Li'}))
 
     return user_list
 
@@ -37,6 +42,9 @@ def login_two_users():
                                             'password': '123456'}))
     login_list.append(requests.post(url + 'auth/login/v2',
                                     json = {'email': 'z5374602@unsw.com',
+                                            'password': '123456'}))
+    login_list.append(requests.post(url + 'auth/login/v2',
+                                    json = {'email': 'z5374601@unsw.com',
                                             'password': '123456'}))
     return  login_list
 
@@ -56,7 +64,7 @@ def test_create_channel_normal(user_list, login_list):
         channel_id_list.append(requests.post(f"{url}channels/create/v2",
                                 json = {'token': login_user.json()['token'],
                                         'name': 'testname',
-                                        'is_public':'true'}))
+                                        'is_public':True}))
     return channel_id_list
 
 
@@ -179,4 +187,34 @@ def test_channels_invite_invalid_token(user_list, login_list, channel_id_list):
                                         'channel_id': channel_id_list[0].json()['channel_id'],
                                         'u_id':'999999999'})
     assert response_5.status_code == AccessError.code
+
+def test_channels_invite_auth_user_isnot_in_channel(user_list, login_list, channel_id_list):
+    '''
+    
+    This test is to test when auth_user isn't in channel
+    
+    Raises:
+        AccessError
+        
+    ''' 
+    response_1 = requests.post(f"{url}channel/invite/v2",
+                                json= {'token': login_list[1].json()['token'],
+                                        'channel_id': channel_id_list[0].json()['channel_id'],
+                                        'u_id': login_list[2].json()['auth_user_id']})
+    response_1.status_code == AccessError.code
+    
+def test_channels_invite_user_already_in_channel(user_list, login_list, channel_id_list):
+    '''
+    
+    This test is to test when user already in channel
+    
+    Raises:
+        InputError
+        
+    ''' 
+    response_1 = requests.post(f"{url}channel/invite/v2",
+                                json= {'token': login_list[0].json()['token'],
+                                        'channel_id': channel_id_list[0].json()['channel_id'],
+                                        'u_id': login_list[0].json()['auth_user_id']})
+    response_1.status_code == InputError.code
     

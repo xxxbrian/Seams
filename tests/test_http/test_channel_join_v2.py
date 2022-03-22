@@ -141,6 +141,24 @@ def test_channels_join_with_exist_user(user_list, login_list, channel_id_list):
                                         'channel_id': channel_id_list[0].json()['channel_id']})
         assert respon.status_code == InputError.code
         
+def test_channels_join_private_channel(user_list, login_list, channel_id_list):
+    '''
+    
+    This test is to test when user joins to a private channel
+    
+    Raises:
+        AccessError
+        
+    '''
+    response_1 = requests.post(url + 'channels/create/v2',
+                  json = {'token': login_list[0].json()['token'],
+                          'name': "Bojin's channel",
+                          'is_public': False}).json()
+    response_2 = requests.post(f"{url}channel/join/v2",
+                                json= {'token': login_list[1].json()['token'],
+                                        'channel_id': response_1['channel_id']})
+    assert response_2.status_code == AccessError.code
+        
 def test_channel_join_invalid_token(user_list, login_list, channel_id_list):
     '''
     
