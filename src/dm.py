@@ -57,7 +57,7 @@ def dm_details_v1(token, dm_id):
         raise InputError(description='DM not found')
     if not dm.has_user(user):
         raise AccessError(description='Permission denied: Not member')
-    return dm.todict({'name', 'member'})
+    return dm.todict({'name', 'members'})
 
 
 def dm_leave_v1(token, dm_id):
