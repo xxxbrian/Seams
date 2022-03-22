@@ -13,7 +13,7 @@ def user_profile_v1(token, u_id):
     auth_user = User.find_by_token(token)
     if auth_user is None:
         raise AccessError(description='Permission denied')
-    user = User.find_by_id(u_id)
+    user = User.find_by_id(u_id, False)
     if user is None:
         raise InputError(description='User not exist')
     return {'user': user.todict()}
