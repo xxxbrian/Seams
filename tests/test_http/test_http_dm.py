@@ -1,3 +1,4 @@
+from urllib import response
 import pytest
 import requests
 import json
@@ -86,6 +87,8 @@ def create_dm(login_list):
                                          'u_ids': [login_list[2]['auth_user_id'], login_list[3]['auth_user_id']]}).json())
     
     return dm_list
+
+######################################## Test_dm/details/v1 ########################################
 
 def test_dm_details_normal(user_list, login_list, dm_list):
     '''
@@ -198,6 +201,421 @@ def test_dm_details_invalid_dm_id(user_list, login_list, dm_list):
         InputError
         
     '''
+    new_id = random.randint(-65535, 65535)
+    invalid_dm_id = []
+    while len(invalid_dm_id) < 1:
+        if not new_id in [dm_list[i]['dm_id'] for i in range(0,3)]:
+            invalid_dm_id.append(new_id)
+    response_1 = requests.get(url + 'dm/details/v1',
+                              params = {'token': login_list[0]['token'],
+                                        'dm_id': invalid_dm_id[0]})
+    assert response_1.status_code == InputError.code
     
+def test_dm_details_invalid_auth_user(user_list, login_list, dm_list):
+    '''
     
+    This test is to test when dm_id is valid and the authorised user is 
+    not a member of the DM
+    
+    Raises:
+        AccessError    
+
+    '''
+    response_1 = requests.get(url + 'dm/details/v1',
+                              params = {'token': login_list[3]['token'],
+                                        'dm_id': dm_list[0]['dm_id']})
+    assert response_1.status_code == AccessError.code
+    
+######################################## Test_dm/leave/v1 ########################################
+    
+def test_dm_leave_normal(user_list, login_list, dm_list):
+    '''
+    
+    This test is to test when user leaves dm successfully
+    
+    Assumption:
+        dm/details/v1 is working well
+        
+    '''
+    # user[1] leaves dm[0]
+    dm_0 = 'bojinli, brianlee, steveyang'
+    requests.post(url + "dm/leave/v1",
+                  json = {'token': login_list[1]['token'],
+                          'dm_id': dm_list[0]['dm_id']})
+    response_1 = requests.get(url + 'dm/details/v1',
+                              params = {'token': login_list[0]['token'],
+                                        'dm_id': dm_list[0]['dm_id']})
+    assert response_1 == {
+        'name': dm_0,
+        'members':
+            [
+                {
+                    'u_id': login_list[2]['auth_user_id'],
+                    'email': "z5374601@unsw.com",
+                    'name_first': 'Bojin',
+                    'name_last': 'Li',
+                    'handle_str': 'bojinli'
+                },
+                {
+                    'u_id': login_list[0]['auth_user_id'],
+                    'email': "z5374603@unsw.com",
+                    'name_first': 'Steve',
+                    'name_last': 'Yang',
+                    'handle_str': 'steveyang'
+                },
+            ]
+    }
+    
+def test_dm_leave_normal(user_list, login_list, dm_list):
+    '''
+    
+    This test is to test when owner user leaves dm successfully
+    
+    Assumption:
+        dm/details/v1 is working well
+        
+    '''
+    # user[0] leaves dm[0]
+    dm_0 = 'bojinli, brianlee, steveyang'
+    requests.post(url + "dm/leave/v1",
+                  json = {'token': login_list[0]['token'],
+                          'dm_id': dm_list[0]['dm_id']})
+    response_1 = requests.get(url + 'dm/details/v1',
+                              params = {'token': login_list[1]['token'],
+                                        'dm_id': dm_list[0]['dm_id']}).json()
+    assert response_1 == {
+        'name': dm_0,
+        'members':
+            [
+                {
+                    'u_id': login_list[1]['auth_user_id'],
+                    'email': "z5374602@unsw.com",
+                    'name_first': 'Brian',
+                    'name_last': 'Lee',
+                    'handle_str': 'brianlee'
+                },
+                {
+                    'u_id': login_list[2]['auth_user_id'],
+                    'email': "z5374601@unsw.com",
+                    'name_first': 'Bojin',
+                    'name_last': 'Li',
+                    'handle_str': 'bojinli'
+                },
+            ]
+    }
+    
+def test_dm_leave_invalid_dm_id(user_list, login_list, dm_list):
+    '''
+    
+    This test is to test when input a invalid dm_id
+    
+    Raises:
+        InputError
+        
+    '''
+    new_id = random.randint(-65535, 65535)
+    invalid_dm_id = []
+    while len(invalid_dm_id) < 1:
+        if not new_id in [dm_list[i]['dm_id'] for i in range(0,3)]:
+            invalid_dm_id.append(new_id)
+    response_1 = requests.post(url + "dm/leave/v1",
+                               json = {'token': login_list[0]['token'],
+                                       'dm_id': invalid_dm_id[0]})
+    assert response_1.status_code == InputError.code
+    
+def test_dm_leave_invalid_auth_user(user_list, login_list, dm_list):
+    '''
+    
+    This test is to test when dm_id is valid and the authorised user is 
+    not a member of the DM
+    
+    Raises:
+        AccessError
+        
+    '''
+    response_1 = requests.post(url + "dm/leave/v1",
+                               json = {'token': login_list[3]['token'],
+                                       'dm_id': dm_list[0]['dm_id']})
+    assert response_1.status_code == AccessError.code
+    
+######################################## Test_dm/messages/v1 ########################################
+
+def test_dm_messages_normal(user_list, login_list, dm_list):
+    '''
+    
+    This tests is testing the normal situation of sending messages in 
+    DMs
+
+    Assumption:
+        message/senddm/v1 is working well
+        
+    '''
+    requests.post(url + 'message/senddm/v1',
+                  json = {'token': login_list[0]['token'],
+                          'dm_id': dm_list[0]['dm_id'],
+                          'message': 'message1'})
+    requests.post(url + 'message/senddm/v1',
+                  json = {'token': login_list[0]['token'],
+                          'dm_id': dm_list[0]['dm_id'],
+                          'message': 'message2'})
+    requests.post(url + 'message/senddm/v1',
+                  json = {'token': login_list[0]['token'],
+                          'dm_id': dm_list[0]['dm_id'],
+                          'message': 'message3'})
+    requests.post(url + 'message/senddm/v1',
+                  json = {'token': login_list[0]['token'],
+                          'dm_id': dm_list[0]['dm_id'],
+                          'message': 'message4'})
+    
+    requests.post(url + 'message/senddm/v1',
+                  json = {'token': login_list[1]['token'],
+                          'dm_id': dm_list[2]['dm_id'],
+                          'message': 'message1'})
+    requests.post(url + 'message/senddm/v1',
+                  json = {'token': login_list[1]['token'],
+                          'dm_id': dm_list[2]['dm_id'],
+                          'message': 'message2'})
+    requests.post(url + 'message/senddm/v1',
+                  json = {'token': login_list[1]['token'],
+                          'dm_id': dm_list[2]['dm_id'],
+                          'message': 'message3'})
+    requests.post(url + 'message/senddm/v1',
+                  json = {'token': login_list[1]['token'],
+                          'dm_id': dm_list[2]['dm_id'],
+                          'message': 'message4'})
+    
+    response_1 = requests.get(url + 'dm/messages/v1',
+                              params = {'token': login_list[0]['token'],
+                                        'dm_id': dm_list[0]['dm_id'],
+                                        'start': 0}).json()
+    response_2 = requests.get(url + 'dm/messages/v1',
+                              params = {'token': login_list[1]['token'],
+                                        'dm_id': dm_list[2]['dm_id'],
+                                        'start': 0}).json()
+
+    assert response_1['messages'][0]['message'] == "message4"
+    assert response_1['messages'][1]['message'] == "message3"
+    assert response_1['messages'][2]['message'] == "message2"
+    assert response_1['messages'][3]['message'] == "message1"
+    assert response_2['messages'][0]['message'] == "message4"
+    assert response_2['messages'][1]['message'] == "message3"
+    assert response_2['messages'][2]['message'] == "message2"
+    assert response_2['messages'][3]['message'] == "message1"
+    
+    assert response_1['start'] == 0
+    assert response_2['start'] == 0
+    assert response_1['end'] == -1
+    assert response_2['end'] == -1
+
+def test_dm_messages_more_messages(user_list, login_list, dm_list):
+    '''
+    
+    This tests is to test when sending more than 50 messages, the end value is start +50
+    
+    Assumption:
+        message/senddm/v1 is working well
+        
+    '''
+    for i in range(55):
+        # sending 55 messages in dm 0
+        requests.post(url + 'message/senddm/v1',
+                  json = {'token': login_list[0]['token'],
+                          'dm_id': dm_list[0]['dm_id'],
+                          'message': 'messages'})
+    
+    response_1 = requests.get(url + 'dm/messages/v1',
+                              params = {'token': login_list[0]['token'],
+                                        'dm_id': dm_list[0]['dm_id'],
+                                        'start': 0}).json()
+    
+    for i in range(50):
+        # test messages are correct
+        assert response_1['messages'][i]['message'] == 'messages'
+        
+    # test start and end
+    assert response_1['start'] == 0
+    assert response_1['end'] == 50
+
+def test_dm_messages_invalid_start(user_list, login_list, dm_list):
+    '''
+    
+    Test dm messages with invalid start
+    
+    Parameters:
+        user_list, login_list, dm_list
+        
+    Raises:
+        InputError
+        
+    Assumption:
+        message/senddm/v1
+        
+    '''
+    # no messages
+    response_1 = requests.get(url + 'dm/messages/v1',
+                              params = {'token': login_list[0]['token'],
+                                        'dm_id': dm_list[0]['dm_id'],
+                                        'start': 10})
+    assert response_1.status_code == InputError.code
+    
+    # 4 messages but start at 10
+    requests.post(url + 'message/senddm/v1',
+                  json = {'token': login_list[0]['token'],
+                          'dm_id': dm_list[0]['dm_id'],
+                          'message': 'message1'})
+    requests.post(url + 'message/senddm/v1',
+                  json = {'token': login_list[0]['token'],
+                          'dm_id': dm_list[0]['dm_id'],
+                          'message': 'message2'})
+    requests.post(url + 'message/senddm/v1',
+                  json = {'token': login_list[0]['token'],
+                          'dm_id': dm_list[0]['dm_id'],
+                          'message': 'message3'})
+    requests.post(url + 'message/senddm/v1',
+                  json = {'token': login_list[0]['token'],
+                          'dm_id': dm_list[0]['dm_id'],
+                          'message': 'message4'})
+    response_2 = requests.get(url + 'dm/messages/v1',
+                              params = {'token': login_list[0]['token'],
+                                        'dm_id': dm_list[0]['dm_id'],
+                                        'start': 10})
+    assert response_2.status_code == InputError.code
+
+def test_dm_messages_invalid_dm_id(user_list, login_list, dm_list):
+    '''
+    
+    This test is for testing input invalid dm_id
+    
+    Parameters:
+        user_list, login_list, dm_list
+        
+    Raises:
+        InputError
+        
+    Assumption:
+        message/senddm/v1
+        
+    '''
+    new_id = random.randint(-65535, 65535)
+    invalid_dm_id = []
+    while len(invalid_dm_id) < 1:
+        if not new_id in [dm_list[i]['dm_id'] for i in range(0,3)]:
+            invalid_dm_id.append(new_id)
+    requests.post(url + 'message/senddm/v1',
+                  json = {'token': login_list[0]['token'],
+                          'dm_id': dm_list[0]['dm_id'],
+                          'message': 'message1'})
+    requests.post(url + 'message/senddm/v1',
+                  json = {'token': login_list[0]['token'],
+                          'dm_id': dm_list[0]['dm_id'],
+                          'message': 'message2'})
+    requests.post(url + 'message/senddm/v1',
+                  json = {'token': login_list[0]['token'],
+                          'dm_id': dm_list[0]['dm_id'],
+                          'message': 'message3'})
+    requests.post(url + 'message/senddm/v1',
+                  json = {'token': login_list[0]['token'],
+                          'dm_id': dm_list[0]['dm_id'],
+                          'message': 'message4'})
+    response_1 = requests.get(url + 'dm/messages/v1',
+                              params = {'token': login_list[0]['token'],
+                                        'dm_id': invalid_dm_id[0],
+                                        'start': 0})
+    assert response_1.status_code == InputError.code
+
+def test_dm_messages_user_not_in_dm(user_list, login_list, dm_list):
+    '''
+    
+    This test is for testing input user isn't in dm
+    
+    Parameters:
+        user_list, login_list, dm_list
+        
+    Raises:
+        AccessError
+        
+    Assumption:
+        message/senddm/v1
+        
+    '''
+    # all normal
+    requests.post(url + 'message/senddm/v1',
+                  json = {'token': login_list[0]['token'],
+                          'dm_id': dm_list[0]['dm_id'],
+                          'message': 'message1'})
+    requests.post(url + 'message/senddm/v1',
+                  json = {'token': login_list[0]['token'],
+                          'dm_id': dm_list[0]['dm_id'],
+                          'message': 'message2'})
+    requests.post(url + 'message/senddm/v1',
+                  json = {'token': login_list[0]['token'],
+                          'dm_id': dm_list[0]['dm_id'],
+                          'message': 'message3'})
+    requests.post(url + 'message/senddm/v1',
+                  json = {'token': login_list[0]['token'],
+                          'dm_id': dm_list[0]['dm_id'],
+                          'message': 'message4'})
+    response_1 = requests.get(url + 'dm/messages/v1',
+                              params = {'token': login_list[3]['token'],
+                                        'dm_id': dm_list[0]['dm_id'],
+                                        'start': 0})
+    assert response_1.status_code == AccessError.code
+    
+def test_dm_messages_invalid_user_token(user_list, login_list, dm_list):
+    '''
+    
+    This test is for testing raises AccessError for invalid token
+    Even if there are some InputError, raises AccessError at first
+    
+    Parameters:
+        user_list, login_list, dm_list
+        
+    Raises:
+        AccessError
+        
+    Assumption:
+        message/senddm/v1
+        
+    '''
+    new_id = random.randint(-65535, 65535)
+    invalid_dm_id = []
+    while len(invalid_dm_id) < 1:
+        if not new_id in [dm_list[i]['dm_id'] for i in range(0,3)]:
+            invalid_dm_id.append(new_id)
+    # normal situation
+    requests.post(url + 'message/senddm/v1',
+                  json = {'token': login_list[0]['token'],
+                          'dm_id': dm_list[0]['dm_id'],
+                          'message': 'message1'})
+    requests.post(url + 'message/senddm/v1',
+                  json = {'token': login_list[0]['token'],
+                          'dm_id': dm_list[0]['dm_id'],
+                          'message': 'message2'})
+    requests.post(url + 'message/senddm/v1',
+                  json = {'token': login_list[0]['token'],
+                          'dm_id': dm_list[0]['dm_id'],
+                          'message': 'message3'})
+    requests.post(url + 'message/senddm/v1',
+                  json = {'token': login_list[0]['token'],
+                          'dm_id': dm_list[0]['dm_id'],
+                          'message': 'message4'})
+    response_1 = requests.get(url + 'dm/messages/v1',
+                              params = {'token': -1,
+                                        'dm_id': dm_list[0]['dm_id'],
+                                        'start': 0})
+    assert response_1.status_code == AccessError.code
+    
+    # invalid start
+    response_2 = requests.get(url + 'dm/messages/v1',
+                              params = {'token': -1,
+                                        'dm_id': dm_list[0]['dm_id'],
+                                        'start': 10})
+    assert response_2.status_code == AccessError.code
+    
+    # invalid dm_id
+    response_3 = requests.get(url + 'dm/messages/v1',
+                              params = {'token': -1,
+                                        'dm_id': invalid_dm_id[0],
+                                        'start': 0})
+    assert response_3.status_code == AccessError.code
     

@@ -1,4 +1,4 @@
-from distutils.command.config import config
+import random
 import pytest
 import requests
 import json
@@ -149,7 +149,7 @@ def test_normal_channel_messages(user_list, login_list, channel_list):
                               params = {'token': login_list[3]['token'],
                                         'channel_id': channel_list[3]['channel_id'],
                                         'start': 0}).json()
-    print(response_1)
+
     assert response_1['messages'][0]['message'] == "message4"
     assert response_1['messages'][1]['message'] == "message3"
     assert response_1['messages'][2]['message'] == "message2"
@@ -250,6 +250,11 @@ def test_channel_messages_invalid_channel_id(user_list, login_list, channel_list
         InputError
         
     '''
+    new_id = random.randint(-65535, 65535)
+    invalid_channel_id = []
+    while len(invalid_channel_id) < 1:
+        if not new_id in [channel_list[i]['channel_id'] for i in range(0,4)]:
+            invalid_channel_id.append(new_id)
     requests.post(url + 'message/send/v1',
                   json = {'token': login_list[0]['token'],
                           'channel_id': channel_list[0]['channel_id'],
@@ -268,7 +273,7 @@ def test_channel_messages_invalid_channel_id(user_list, login_list, channel_list
                           'message': 'message4'})
     response_1 = requests.get(url + 'channel/messages/v2',
                               params = {'token': login_list[0]['token'],
-                                        'channel_id': -1,
+                                        'channel_id': invalid_channel_id[0],
                                         'start': 0})
     assert response_1.status_code == InputError.code
     
@@ -320,6 +325,11 @@ def test_channel_messages_invalid_user_token(user_list, login_list, channel_list
         AccessError
         
     '''
+    new_id = random.randint(-65535, 65535)
+    invalid_channel_id = []
+    while len(invalid_channel_id) < 1:
+        if not new_id in [channel_list[i]['channel_id'] for i in range(0,4)]:
+            invalid_channel_id.append(new_id)
     # normal situation
     requests.post(url + 'message/send/v1',
                   json = {'token': login_list[0]['token'],
@@ -353,7 +363,7 @@ def test_channel_messages_invalid_user_token(user_list, login_list, channel_list
     # invalid channel_id
     response_3 = requests.get(url + 'channel/messages/v2',
                               params = {'token': -1,
-                                        'channel_id': -1,
+                                        'channel_id': invalid_channel_id[0],
                                         'start': 0})
     assert response_3.status_code == AccessError.code
     
