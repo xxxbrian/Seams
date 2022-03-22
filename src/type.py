@@ -361,6 +361,9 @@ class Channel():
     def add_message(self, msg):
         self.messages.insert(0, msg)
 
+    def has_owner(self, user: User):
+        return user in self.owners
+
 
 class DM():
 
@@ -443,6 +446,9 @@ class DM():
 
     def add_message(self, msg):
         self.messages.insert(0, msg)
+
+    def has_owner(self, user: User):
+        return user is self.owner
 
 
 class Message():
