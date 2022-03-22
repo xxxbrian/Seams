@@ -33,7 +33,8 @@ def message_edit_v1(token, message_id, message):
         raise InputError(description='Message not found')
     if not msg.sub.has_user(user):
         raise InputError(description='Message not found')
-    if user.u_id != msg.u_id and not user.is_admin():
+    if user.u_id != msg.u_id and not user.is_admin() and not msg.sub.has_owner(
+            user):
         raise AccessError(description='Permission denied: Not sender')
     if len(message) == 0:
         msg.remove()
