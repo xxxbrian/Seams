@@ -787,5 +787,3 @@ def test_channel_message_remove_owner_remove_message(user_list, login_list, dm_l
                                         'dm_id': dm_list[0]['dm_id'],
                                         'start': 0}).json()
     assert response_3['messages'][0]['message'] == 'Hello world!'
-
-    
