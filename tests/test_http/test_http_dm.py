@@ -244,7 +244,7 @@ def test_dm_leave_normal(user_list, login_list, dm_list):
                           'dm_id': dm_list[0]['dm_id']})
     response_1 = requests.get(url + 'dm/details/v1',
                               params = {'token': login_list[0]['token'],
-                                        'dm_id': dm_list[0]['dm_id']})
+                                        'dm_id': dm_list[0]['dm_id']}).json()
     assert response_1 == {
         'name': dm_0,
         'members':
@@ -266,7 +266,7 @@ def test_dm_leave_normal(user_list, login_list, dm_list):
             ]
     }
     
-def test_dm_leave_normal(user_list, login_list, dm_list):
+def test_dm_leave_owner_leaves(user_list, login_list, dm_list):
     '''
     
     This test is to test when owner user leaves dm successfully

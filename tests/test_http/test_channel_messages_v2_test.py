@@ -15,7 +15,7 @@ def create_user_list():
         user_list, contains 4 pre-register users' response
     '''
     requests.delete(f"{url}clear/v1", json = {})    # clear all info in server
-    user_list = list()
+    user_list = []
     user_list.append(requests.post(f"{url}auth/register/v2",
                                    json = 
                                        {'email': 'z5374603@unsw.com',

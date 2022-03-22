@@ -13,7 +13,7 @@ def create_user_list():
         user_list (dictionary), contains 4 pre-register users' information
     '''
     requests.delete(f"{url}clear/v1", json = {})    # clear all info in server
-    user_list = list()
+    user_list = []
     user_list.append(requests.post(f"{url}auth/register/v2",
                                    json = 
                                        {'email': 'z5374603@unsw.com',
@@ -50,7 +50,7 @@ def test_auth_login_return_type(user_list):
     return:
         N/A
     '''
-    login_list = list()
+    login_list = []
     login_list.append(requests.post(url + 'auth/login/v2',
                                     json = {'email': 'z5374603@unsw.com',
                                             'password': '123456'}))
@@ -77,7 +77,7 @@ def test_auth_login_correct_user_id(user_list):
     return:
         N/A
     '''
-    login_list = list()
+    login_list = []
     login_list.append(requests.post(url + 'auth/login/v2',
                                     json = {'email': 'z5374603@unsw.com',
                                             'password': '123456'}))
