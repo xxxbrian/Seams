@@ -13,7 +13,7 @@ def create_user_list():
         user_list (dictionary), contains 4 pre-register users' information
     '''
     requests.delete(f"{url}clear/v1", json = {})    # clear all info in server
-    user_list = list()
+    user_list = []
     user_list.append(requests.post(f"{url}auth/register/v2",
                                    json = 
                                        {'email': 'z5374603@unsw.com',
@@ -31,7 +31,7 @@ def create_user_list():
 
 @pytest.fixture(name = 'login_list')
 def login_two_users():
-    login_list = list()
+    login_list = []
     login_list.append(requests.post(url + 'auth/login/v2',
                                     json = {'email': 'z5374603@unsw.com',
                                             'password': '123456'}))
@@ -42,16 +42,16 @@ def login_two_users():
 
 @pytest.fixture(name = 'channel_id_list')
 def test_create_channel_normal(user_list, login_list):
-#         """
-#         Test cases for create channel normal
-#         Args:
-#             token: user token
-#             name:  normal
-#             is_public: true
-#         Returns:
-#             200
-#         """
-    channel_id_list = list()
+    """
+    Test cases for create channel normal
+    Args:
+        token: user token
+        name:  normal
+        is_public: true
+    Returns:
+        200
+    """
+    channel_id_list = []
     for login_user in login_list:
         channel_id_list.append(requests.post(f"{url}channels/create/v2",
                                 json = {'token': login_user.json()['token'],
@@ -61,15 +61,15 @@ def test_create_channel_normal(user_list, login_list):
 
 
 def test_channels_show_detail(user_list, login_list, channel_id_list):
-#         """
-#         Test cases for show channel detail normal
-#             token: user token
-#             channel_id:  
-#         Returns:
-#             200
-#         Returns:
-#             N/A
-#         """
+    """
+    Test cases for show channel detail normal
+        token: user token
+        channel_id:  
+    Returns:
+        200
+    Returns:
+        N/A
+    """
     for  idx, login_user in enumerate(login_list):
         respon = requests.get(f"{url}channel/details/v2",
                                 params= {'token': login_user.json()['token'],
@@ -77,34 +77,33 @@ def test_channels_show_detail(user_list, login_list, channel_id_list):
         assert respon.status_code == 200
 
 def test_channels_detail_with_invalid_channelid(user_list, login_list, channel_id_list):
-#         """
-#         Test cases for show channel detail with invalid channelid
-#             token: user token
-#             channel_id:  invalid id
-#         Returns:
-#             InputError.code
-#         Returns:
-#             N/A
-#         """
-    for  idx, login_user in enumerate(login_list):
+    """
+    Test cases for show channel detail with invalid channelid
+        token: user token
+        channel_id:  invalid id
+    Returns:
+        InputError.code
+    Returns:
+        N/A
+    """
+    for login_user in login_list:
         respon = requests.get(f"{url}channel/details/v2",
                                 params= {'token': login_user.json()['token'],
                                         'channel_id': '99999999999'})
         assert respon.status_code == InputError.code
-        # assert respon.status_code == 200
 
 def test_channels_detail_with_valid_channelid_and_unauthorised_user(user_list, login_list, channel_id_list):
-#         """
-#         Test cases for show channel detail with invalid channelid
-#             token: user token
-#             channel_id:  valid id, but unauthorised user
-#         Returns:
-#             AccessError.code
-#         Returns:
-#             N/A
-#         """
+        """
+        Test cases for show channel detail with invalid channelid
+            token: user token
+            channel_id:  valid id, but unauthorised user
+        Returns:
+            AccessError.code
+        Returns:
+            N/A
+        """
         respon = requests.get(f"{url}channel/details/v2",
                                 params= {'token': login_list[0].json()['token'],
                                         'channel_id': channel_id_list[1].json()['channel_id']})
         assert respon.status_code == AccessError.code
-        # assert respon.status_code == 200
+     
