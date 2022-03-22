@@ -3,8 +3,22 @@ from src.type import User, Channel
 
 
 def channel_invite_v2(token, channel_id, u_id):
-    """Invites a user with ID u_id to join a channel with ID channel_id.
-    Once invited, the user is added to the channel immediately."""
+    """Invites a user with ID u_id to join a channel with ID channel_id. Once invited, the user is added to the channel immediately. In both public and private channels, all members are able to invite users.
+
+    Args:
+        token (string): token of user
+        channel_id (integer): channel's id
+        u_id (integer): user's id
+
+    Raises:
+        AccessError: channel_id is valid and the authorised user is not a member of the channel
+        InputError: channel_id does not refer to a valid channel
+        AccessError: u_id does not refer to a valid user
+        InputError: u_id refers to a user who is already a member of the channel
+
+    Returns:
+        dictionary: {}
+    """
 
     auth_user = User.find_by_token(token)
     user = User.find_by_id(u_id)
@@ -25,8 +39,20 @@ def channel_invite_v2(token, channel_id, u_id):
 
 
 def channel_details_v2(token, channel_id):
-    """Given channel_id that the authorised user is a member of,
-    provide basic details about the channel."""
+    """Given a channel with ID channel_id that the authorised user is a member of, provide basic details about the channel.
+
+    Args:
+        token (string): token of user
+        channel_id (integer): channel's id
+
+    Raises:
+        AccessError: token invaild
+        InputError: channel_id does not refer to a valid channel
+        AccessError: channel_id is valid and the authorised user is not a member of the channel
+
+    Returns:
+        dictionary: { name, is_public, owner_members, all_members }
+    """
 
     user = User.find_by_token(token)
     channel = Channel.find_by_id(channel_id)
@@ -43,9 +69,22 @@ def channel_details_v2(token, channel_id):
 
 
 def channel_messages_v2(token, channel_id, start):
-    """given a channel that the user is a part of,
-        return up to 50 messages between index
-        start" and "start + 50"""
+    """Given a channel with ID channel_id that the authorised user is a member of, return up to 50 messages between index "start" and "start + 50". Message with index 0 is the most recent message in the channel. This function returns a new index "end" which is the value of "start + 50", or, if this function has returned the least recent messages in the channel, returns -1 in "end" to indicate there are no more messages to load after this return.
+
+    Args:
+        token (string): token of user
+        channel_id (integer): channel's id
+        start (integer): index of message
+
+    Raises:
+        AccessError: token invaild
+        InputError: channel_id does not refer to a valid channel
+        AccessError: channel_id is valid and the authorised user is not a member of the channel
+        InputError: start is greater than the total number of messages in the channel
+
+    Returns:
+        dictionary: {}
+    """
 
     user = User.find_by_token(token)
     channel = Channel.find_by_id(channel_id)
@@ -69,8 +108,21 @@ def channel_messages_v2(token, channel_id, start):
 
 
 def channel_join_v2(token, channel_id):
-    """Given a channel that the authorised user can join,
-    adds them to that channel."""
+    """Given a channel_id of a channel that the authorised user can join, adds them to that channel.
+
+    Args:
+        token (string): token of user
+        channel_id (integer): channel's id
+
+    Raises:
+        AccessError: token invaild
+        InputError: channel_id does not refer to a valid channel
+        InputError: the authorised user is already a member of the channel
+        AccessError: channel_id refers to a channel that is private and the authorised user is not already a channel member and is not a global owner
+
+    Returns:
+        dictionary: {}
+    """
 
     user = User.find_by_token(token)
     channel = Channel.find_by_id(channel_id)
@@ -90,6 +142,20 @@ def channel_join_v2(token, channel_id):
 
 
 def channel_leave_v1(token, channel_id):
+    """Given a channel with ID channel_id that the authorised user is a member of, remove them as a member of the channel. Their messages should remain in the channel. If the only channel owner leaves, the channel will remain.
+
+    Args:
+        token (string): token of user
+        channel_id (_type_): channel's id
+
+    Raises:
+        AccessError: token invaild
+        InputError: channel_id does not refer to a valid channel
+        AccessError: channel_id is valid and the authorised user is not a member of the channel
+
+    Returns:
+        dictionary: {}
+    """
     user = User.find_by_token(token)
     channel = Channel.find_by_id(channel_id)
     if user is None:
@@ -105,6 +171,24 @@ def channel_leave_v1(token, channel_id):
 
 
 def channel_addowner_v1(token, channel_id, u_id):
+    """Make user with user id u_id an owner of the channel.
+
+    Args:
+        token (string): token of user
+        channel_id (integer): channel's id
+        u_id (integer): user's id
+
+    Raises:
+        AccessError: token invaild
+        InputError: channel_id does not refer to a valid channel
+        AccessError: channel_id is valid and the authorised user does not have owner permissions in the channel
+        InputError: u_id does not refer to a valid user
+        InputError: u_id refers to a user who is not a member of the channel
+        InputError: u_id refers to a user who is already an owner of the channel
+
+    Returns:
+        dictionary: {}
+    """
     auth_user = User.find_by_token(token)
     channel = Channel.find_by_id(channel_id)
     user = User.find_by_id(u_id)
@@ -125,6 +209,24 @@ def channel_addowner_v1(token, channel_id, u_id):
 
 
 def channel_removeowner_v1(token, channel_id, u_id):
+    """Remove user with user id u_id as an owner of the channel.
+
+    Args:
+        token (string): token of user
+        channel_id (integer): channel's id
+        u_id (integer): user's id
+
+    Raises:
+        AccessError: token invaild
+        InputError: channel_id does not refer to a valid channel
+        AccessError: channel_id is valid and the authorised user does not have owner permissions in the channel
+        InputError: u_id does not refer to a valid user
+        InputError: u_id refers to a user who is not an owner of the channel
+        InputError: u_id refers to a user who is currently the only owner of the channel
+
+    Returns:
+        dictionary: {}
+    """
     auth_user = User.find_by_token(token)
     channel = Channel.find_by_id(channel_id)
     user = User.find_by_id(u_id)
