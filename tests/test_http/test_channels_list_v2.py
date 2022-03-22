@@ -102,3 +102,31 @@ def test_channels_list_with_un_associated_user(user_list, login_list):
         
         assert respon.status_code == 200
         assert len(respon.json()['channels']) == 0
+        
+def test_channels_list_with_invalid_token(user_list, login_list):
+    '''
+    
+    This test is to test when input invalid token
+    
+    Raises: 
+        AccessError
+        
+    '''
+    for login_user in login_list:
+        requests.post(f"{url}channels/create/v2",
+                                json = {'token': login_user.json()['token'],
+                                        'name': 'testname001',
+                                        'is_public':'true'})
+        requests.post(f"{url}channels/create/v2",
+                                json = {'token': login_user.json()['token'],
+                                        'name': 'testname002',
+                                        'is_public':'true'})
+        requests.post(f"{url}channels/create/v2",
+                                json = {'token': login_user.json()['token'],
+                                        'name': 'testname003',
+                                        'is_public':'false'})
+
+    respon = requests.get(f"{url}channels/list/v2",
+                            params= {'token': -1})
+    assert respon.status_code == AccessError.code
+    

@@ -73,4 +73,32 @@ def test_channels_listall(user_list, login_list):
         assert respon.status_code == 200
         assert len(respon.json()['channels']) == 6
 
+def test_channels_listall_invalid_token(user_list, login_list):
+    '''
+    
+    This test is to test when input invalid token
+    
+    Raises: 
+        AccessError
+        
+    '''
+    for login_user in login_list:
+        requests.post(f"{url}channels/create/v2",
+                                json = {'token': login_user.json()['token'],
+                                        'name': 'testname001',
+                                        'is_public':'true'})
+        requests.post(f"{url}channels/create/v2",
+                                json = {'token': login_user.json()['token'],
+                                        'name': 'testname002',
+                                        'is_public':'true'})
+        requests.post(f"{url}channels/create/v2",
+                                json = {'token': login_user.json()['token'],
+                                        'name': 'testname003',
+                                        'is_public':'false'})
 
+    
+    respon = requests.get(f"{url}channels/listall/v2",
+                            params= {'token': -1})
+        
+    assert respon.status_code == AccessError.code
+    

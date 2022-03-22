@@ -2,7 +2,7 @@ import pytest
 import requests
 import json
 from src.config import url
-from src.error import AccessError
+from src.error import AccessError, InputError
 
 @pytest.fixture(name = 'user_list')
 def create_user_list():
@@ -76,7 +76,20 @@ def test_logout(user_list, login_list):
             assert respon_1.status_code == 200
             assert respon_2.status_code == AccessError.code
 
+def test_logout_twice(user_list, login_list):
+    """
+        Test cases for user logout twice
 
+        Args:
+            user_list: 4 pre-register users, obtain their return value as a response
 
+        Returns:
+            N/A
 
+    """
+    requests.post(url + 'auth/logout/v1',
+                  json={'token': login_list[0].json()['token']})
+    respon = requests.post(url + 'auth/logout/v1',
+                           json={'token': login_list[0].json()['token']})
+    assert respon.status_code == InputError.code
 

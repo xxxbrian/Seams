@@ -408,6 +408,29 @@ def test_channel_message_edit_wrong_message_id(user_list, login_list, channel_li
                                       'message': "Hi hi"})
     assert response_2.status_code == InputError.code
       
+def test_channel_message_edit_user_not_in_channel(user_list, login_list, channel_list):
+    '''
+    
+    This test is to test message_id does not refer to a valid message within a channel
+    that the authorised user has joined
+    
+    Raises:
+        InputError
+       
+     Assumption:
+        message/send/v1 is working well
+         
+    '''
+    response_1 = requests.post(url + 'message/send/v1',
+                               json = {'token': login_list[0]['token'],
+                                       'channel_id': channel_list[0]['channel_id'],
+                                       'message': 'Hello world!'}).json()
+    response_2 = requests.put(url + 'message/edit/v1',
+                              json = {'token': login_list[3]['token'],
+                                      'message_id': response_1['message_id'],
+                                      'message': "Hi hi"})
+    assert response_2.status_code == InputError.code
+    
 def test_dm_message_edit_wrong_message_id(user_list, login_list, dm_list):
     '''
     
@@ -550,6 +573,25 @@ def test_dm_message_edit_owner_edit_message(user_list, login_list, dm_list):
                                         'start': 0}).json()
     assert response_3['messages'][0]['message'] == 'Yang'
     assert response_3['messages'][1]['message'] == 'Hi'
+    
+def test_dm_message_edit_invalid_token(user_list, login_list, channel_list):
+    '''
+    
+    This test is to test when input invalid token
+    
+    Raises: 
+        AccessError
+        
+    '''
+    response_1 = requests.post(url + 'message/send/v1',
+                               json = {'token': login_list[0]['token'],
+                                       'channel_id': channel_list[0]['channel_id'],
+                                       'message': 'Hello world!'}).json()
+    response_2 = requests.put(url + 'message/edit/v1',
+                 json = {'token': -1,
+                         'message_id': response_1['message_id'],
+                         'message':'Hello'})
+    assert response_2.status_code == AccessError.code
     
 ######################################## message/remove/v1 ########################################
 

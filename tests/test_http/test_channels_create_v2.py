@@ -93,3 +93,18 @@ def test_channels_create_name_too_long(user_list, login_list):
                                         'name': 'name_is_too_looooog_than_20',
                                         'is_public':'true'})
         assert respon.status_code == InputError.code
+        
+def test_channels_create_invalid_token(user_list, login_list):
+    '''
+    
+    This test is to test when input invalid token
+    
+    Raises: 
+        AccessError
+        
+    '''
+    respon = requests.post(f"{url}channels/create/v2",
+                           json = {'token': -1,
+                                   'name': 'testname',
+                                   'is_public':'true'})
+    assert respon.status_code == AccessError.code

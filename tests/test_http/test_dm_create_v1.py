@@ -113,6 +113,20 @@ def test_dm_create_duplicated_uid(user_list, login_list):
                                        'u_ids': [login_list[1]['auth_user_id'], login_list[1]['auth_user_id']]})
     assert response_1.status_code == InputError.code
     
+def test_dm_create_wrong_uid(user_list, login_list):
+    """
+    
+        Test wrong user id
+        
+        Raises:
+            InputError
+            
+    """
+    response_1 = requests.post(url + "dm/create/v1",
+                               json = {'token': login_list[0]['token'],
+                                       'u_ids': [-1, -2]})
+    assert response_1.status_code == InputError.code
+    
 def test_dm_create_invalid_token(user_list, login_list):
     """
     
