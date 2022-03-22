@@ -3,6 +3,20 @@ from src.error import AccessError, InputError
 
 
 def admin_user_remove_v1(token, u_id):
+    """Given a user by their u_id, remove them from the Seams.
+
+    Args:
+        token (string): token of auth user
+        u_id (integer): u_id of target user
+
+    Raises:
+        AccessError: the authorised user is not a global owner
+        InputError: u_id does not refer to a valid user
+        InputError: u_id refers to a user who is the only global owner
+
+    Returns:
+        dictionary: {}
+    """
     auth_user = User.find_by_token(token)
     user = User.find_by_id(u_id)
     if auth_user is None or not auth_user.is_admin():
@@ -18,6 +32,23 @@ def admin_user_remove_v1(token, u_id):
 
 
 def admin_userpermission_change_v1(token, u_id, permission_id):
+    """Given a user by their user ID, set their permissions to new permissions described by permission_id.
+
+    Args:
+        token (string): token of auth user
+        u_id (integer): u_id of target user
+        permission_id (integer): Owners (permission id 1), Members (permission id 2)
+
+    Raises:
+        AccessError: the authorised user is not a global owner
+        InputError: u_id does not refer to a valid user
+        InputError: u_id refers to a user who is the only global owner and they are being demoted to a user
+        InputError: permission_id is invalid
+        InputError: the user already has the permissions level of permission_id
+
+    Returns:
+        dictionary: {}
+    """
     auth_user = User.find_by_token(token)
     user = User.find_by_id(u_id)
     if auth_user is None or auth_user.group_id != 0:
