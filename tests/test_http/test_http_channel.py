@@ -136,7 +136,6 @@ def test_channel_leave_owner_leave(user_list, login_list, channel_list):
     This test is to test the owner leaves the channel but the channel remain
     
     Assumption: 
-        channel/join/v2 is working well
         channels/listall/v2 is working well
         
     '''
