@@ -235,9 +235,7 @@ class User():
     def match_email_password(email: str, password: str):
         """Check whether the input email and password are match"""
         user = User.find_by_email(email)
-        if user:
-            return user.password == User.encrypt(password)
-        return False
+        return user.password == User.encrypt(password)
 
     @staticmethod
     def encrypt(password: str):
