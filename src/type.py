@@ -3,12 +3,19 @@ import string
 import jwt
 import hashlib
 import time
+import pickle
+import os
 
 from src.data_store import data_store
 
 from src.config import SECRET
 
 store = data_store.get()
+
+
+def save():
+    with open('data_store.pickle', 'wb') as f:
+        pickle.dump(store, f)
 
 
 class User():
@@ -47,15 +54,20 @@ class User():
         self.handle_str = self.generat_handle()
         self.group_id = 500 if self.u_id else 0
 
-    def __str__(self):
-        info = 'User object:\n'+\
-            f' - u_id:       {self.u_id}\n' + \
-            f' - email:      {self.email}\n' + \
-            f' - password:   {self.password}\n' + \
-            f' - name:       {self.name_first} {self.name_last}\n' + \
-            f' - handle:     {self.handle_str}\n' + \
-            f' - group_id:   {self.group_id}'
-        return info
+    def __setattr__(self, key, value):
+        self.__dict__[key] = value
+        save()
+
+    # COVERAGE
+    # def __str__(self):
+    #     info = 'User object:\n'+\
+    #         f' - u_id:       {self.u_id}\n' + \
+    #         f' - email:      {self.email}\n' + \
+    #         f' - password:   {self.password}\n' + \
+    #         f' - name:       {self.name_first} {self.name_last}\n' + \
+    #         f' - handle:     {self.handle_str}\n' + \
+    #         f' - group_id:   {self.group_id}'
+    #     return info
 
     def todict(self,
                show={'u_id', 'email', 'name_first', 'name_last',
@@ -104,6 +116,7 @@ class User():
         """clear user"""
         store['users'].clear()
         store['login_token'].clear()
+        save()
 
     @staticmethod
     def get_last_id() -> int:
@@ -115,6 +128,7 @@ class User():
     def add_to_store(self) -> None:
         """add user"""
         store['users'].append(self)
+        save()
 
     @staticmethod
     def __generat_20fullname(name_first: str, name_last: str) -> str:
@@ -165,6 +179,7 @@ class User():
         }
         token = jwt.encode(payload=payload, key=SECRET, algorithm='HS256')
         store['login_token'].append(token)
+        save()
         return token
 
     @staticmethod
@@ -181,6 +196,7 @@ class User():
     @staticmethod
     def remove_token(token):
         store['login_token'].remove(token)
+        save()
 
     @staticmethod
     def find_all():
@@ -235,9 +251,7 @@ class User():
     def match_email_password(email: str, password: str):
         """Check whether the input email and password are match"""
         user = User.find_by_email(email)
-        if user:
-            return user.password == User.encrypt(password)
-        return False
+        return user.password == User.encrypt(password)
 
     @staticmethod
     def encrypt(password: str):
@@ -274,14 +288,19 @@ class Channel():
         self.is_public = is_public
         self.messages = []
 
-    def __str__(self):
-        channel_type = 'public' if self.is_public else 'privte'
-        info = 'Channel object:\n'+\
-            f' - name:        {self.name}\n'+\
-            f' - channel_id:  {self.channel_id}\n'+\
-            f' - type:        {channel_type}\n'+\
-            f' - members:     {len(self.members)} ({len(self.owners)}owners)'
-        return info
+    def __setattr__(self, key, value):
+        self.__dict__[key] = value
+        save()
+
+    # COVERAGE
+    # def __str__(self):
+    #     channel_type = 'public' if self.is_public else 'privte'
+    #     info = 'Channel object:\n'+\
+    #         f' - name:        {self.name}\n'+\
+    #         f' - channel_id:  {self.channel_id}\n'+\
+    #         f' - type:        {channel_type}\n'+\
+    #         f' - members:     {len(self.members)} ({len(self.owners)}owners)'
+    #     return info
 
     def todict(self, show={'channel_id', 'name', 'is_public'}):
         info_dict = {
@@ -325,9 +344,11 @@ class Channel():
     @staticmethod
     def clear() -> None:
         store['channels'].clear()
+        save()
 
     def add_to_store(self) -> None:
         store['channels'].append(self)
+        save()
 
     def has_user(self, user: User) -> bool:
         return user in self.members
@@ -376,13 +397,18 @@ class DM():
         self.dm_id = DM.get_last_id() + 1
         self.messages = []
 
-    def __str__(self):
-        info = 'DM object:\n'+\
-            f' - name:        {self.name}\n'+\
-            f' - DM_id:       {self.dm_id}\n'+\
-            f' - owner:       id({self.owner.u_id})\n'+\
-            f' - members:     {len(self.members)}'
-        return info
+    def __setattr__(self, key, value):
+        self.__dict__[key] = value
+        save()
+
+    # COVERAGE
+    # def __str__(self):
+    #     info = 'DM object:\n'+\
+    #         f' - name:        {self.name}\n'+\
+    #         f' - DM_id:       {self.dm_id}\n'+\
+    #         f' - owner:       id({self.owner.u_id})\n'+\
+    #         f' - members:     {len(self.members)}'
+    #     return info
 
     def todict(self, show={'dm_id', 'name'}):
         info_dict = {
@@ -428,9 +454,11 @@ class DM():
     @staticmethod
     def clear() -> None:
         store['dms'].clear()
+        save()
 
     def add_to_store(self) -> None:
         store['dms'].append(self)
+        save()
 
     def has_user(self, user: User) -> bool:
         return user in self.members
@@ -463,6 +491,10 @@ class Message():
         self.time_sent = time_sent
         self.is_active = True
         self.sub = sub
+
+    def __setattr__(self, key, value):
+        self.__dict__[key] = value
+        save()
 
     def todict(self, show={'message_id', 'u_id', 'message', 'time_sent'}):
         info_dict = {
@@ -498,10 +530,12 @@ class Message():
     @staticmethod
     def clear() -> None:
         store['messages'].clear()
+        save()
 
     def add_to_store(self) -> None:
         store['messages'].insert(0, self)
         self.sub.add_message(self)
+        save()
         # if type(self.sub) is Channel:
         #     self.add_to_channel(self.sub)
         # if type(self.sub) is DM:
@@ -519,3 +553,9 @@ class Message():
 
     def remove(self):
         self.is_active = False
+
+
+if os.path.exists('data_store.pickle'):
+    with open('data_store.pickle', 'rb') as f:
+        store = pickle.load(f)
+    print('Reload Cache...')
