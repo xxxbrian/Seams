@@ -3,12 +3,19 @@ import string
 import jwt
 import hashlib
 import time
+import pickle
+import os
 
 from src.data_store import data_store
 
 from src.config import SECRET
 
 store = data_store.get()
+
+
+def save():
+    with open('data_store.pickle', 'wb') as f:
+        pickle.dump(store, f)
 
 
 class User():
@@ -46,6 +53,10 @@ class User():
         self.name_last = name_last
         self.handle_str = self.generat_handle()
         self.group_id = 500 if self.u_id else 0
+
+    def __setattr__(self, key, value):
+        self.__dict__[key] = value
+        save()
 
     def __str__(self):
         info = 'User object:\n'+\
@@ -104,6 +115,7 @@ class User():
         """clear user"""
         store['users'].clear()
         store['login_token'].clear()
+        save()
 
     @staticmethod
     def get_last_id() -> int:
@@ -115,6 +127,7 @@ class User():
     def add_to_store(self) -> None:
         """add user"""
         store['users'].append(self)
+        save()
 
     @staticmethod
     def __generat_20fullname(name_first: str, name_last: str) -> str:
@@ -165,6 +178,7 @@ class User():
         }
         token = jwt.encode(payload=payload, key=SECRET, algorithm='HS256')
         store['login_token'].append(token)
+        save()
         return token
 
     @staticmethod
@@ -181,6 +195,7 @@ class User():
     @staticmethod
     def remove_token(token):
         store['login_token'].remove(token)
+        save()
 
     @staticmethod
     def find_all():
@@ -272,6 +287,10 @@ class Channel():
         self.is_public = is_public
         self.messages = []
 
+    def __setattr__(self, key, value):
+        self.__dict__[key] = value
+        save()
+
     def __str__(self):
         channel_type = 'public' if self.is_public else 'privte'
         info = 'Channel object:\n'+\
@@ -323,9 +342,11 @@ class Channel():
     @staticmethod
     def clear() -> None:
         store['channels'].clear()
+        save()
 
     def add_to_store(self) -> None:
         store['channels'].append(self)
+        save()
 
     def has_user(self, user: User) -> bool:
         return user in self.members
@@ -373,6 +394,10 @@ class DM():
         self.members = [User.find_by_id(u_id) for u_id in u_ids]
         self.dm_id = DM.get_last_id() + 1
         self.messages = []
+
+    def __setattr__(self, key, value):
+        self.__dict__[key] = value
+        save()
 
     def __str__(self):
         info = 'DM object:\n'+\
@@ -426,9 +451,11 @@ class DM():
     @staticmethod
     def clear() -> None:
         store['dms'].clear()
+        save()
 
     def add_to_store(self) -> None:
         store['dms'].append(self)
+        save()
 
     def has_user(self, user: User) -> bool:
         return user in self.members
@@ -461,6 +488,10 @@ class Message():
         self.time_sent = time_sent
         self.is_active = True
         self.sub = sub
+
+    def __setattr__(self, key, value):
+        self.__dict__[key] = value
+        save()
 
     def todict(self, show={'message_id', 'u_id', 'message', 'time_sent'}):
         info_dict = {
@@ -496,10 +527,12 @@ class Message():
     @staticmethod
     def clear() -> None:
         store['messages'].clear()
+        save()
 
     def add_to_store(self) -> None:
         store['messages'].insert(0, self)
         self.sub.add_message(self)
+        save()
         # if type(self.sub) is Channel:
         #     self.add_to_channel(self.sub)
         # if type(self.sub) is DM:
@@ -517,3 +550,9 @@ class Message():
 
     def remove(self):
         self.is_active = False
+
+
+if os.path.exists('data_store.pickle'):
+    with open('data_store.pickle', 'rb') as f:
+        store = pickle.load(f)
+    print('Reload Cache...')
