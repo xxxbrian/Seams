@@ -42,8 +42,7 @@ def dm_remove_v1(token, dm_id):
         raise AccessError(description='Permission denied: Not member')
     if not user is dm.owner:
         raise AccessError(description='Permission denied: Not owner')
-    for dm_user in dm.members:
-        dm.leave(dm_user)
+    dm.remove()
     return {}
 
 

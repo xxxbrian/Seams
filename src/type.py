@@ -396,6 +396,7 @@ class DM():
         self.members = [User.find_by_id(u_id) for u_id in u_ids]
         self.dm_id = DM.get_last_id() + 1
         self.messages = []
+        self.is_active = True
 
     def __setattr__(self, key, value):
         self.__dict__[key] = value
@@ -447,7 +448,7 @@ class DM():
         '''
 
         for dm in store['dms']:
-            if dm.dm_id == dm_id:
+            if dm.dm_id == dm_id and dm.is_active:
                 return dm
         return None
 
@@ -473,13 +474,16 @@ class DM():
 
     @staticmethod
     def get_all() -> list:
-        return store['dms']
+        return [dm for dm in store['dms'] if dm.is_active]
 
     def add_message(self, msg):
         self.messages.insert(0, msg)
 
     def has_owner(self, user: User):
         return user is self.owner
+
+    def remove(self):
+        self.is_active = False
 
 
 class Message():
