@@ -1,4 +1,4 @@
-from src.error import InputError
+from src.error import AccessError, InputError
 from src.type import User
 
 
@@ -78,8 +78,8 @@ def auth_logout_v1(token):
     Returns:
         dictionary: {}
     """
-    if User.token_in_store(token):
-        User.remove_token(token)
-    else:
-        raise InputError(description='Token invalid')
+    user = User.find_by_token(token)
+    if user is None:
+        raise AccessError(description='Token invalid')
+    User.remove_token(token)
     return {}
