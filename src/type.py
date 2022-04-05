@@ -59,15 +59,15 @@ class User():
         save()
 
     # COVERAGE
-    # def __str__(self):
-    #     info = 'User object:\n'+\
-    #         f' - u_id:       {self.u_id}\n' + \
-    #         f' - email:      {self.email}\n' + \
-    #         f' - password:   {self.password}\n' + \
-    #         f' - name:       {self.name_first} {self.name_last}\n' + \
-    #         f' - handle:     {self.handle_str}\n' + \
-    #         f' - group_id:   {self.group_id}'
-    #     return info
+    def __str__(self):
+        info = 'User object:\n'+\
+            f' - u_id:       {self.u_id}\n' + \
+            f' - email:      {self.email}\n' + \
+            f' - password:   {self.password}\n' + \
+            f' - name:       {self.name_first} {self.name_last}\n' + \
+            f' - handle:     {self.handle_str}\n' + \
+            f' - group_id:   {self.group_id}'
+        return info
 
     def todict(self,
                show={'u_id', 'email', 'name_first', 'name_last',
@@ -293,14 +293,14 @@ class Channel():
         save()
 
     # COVERAGE
-    # def __str__(self):
-    #     channel_type = 'public' if self.is_public else 'privte'
-    #     info = 'Channel object:\n'+\
-    #         f' - name:        {self.name}\n'+\
-    #         f' - channel_id:  {self.channel_id}\n'+\
-    #         f' - type:        {channel_type}\n'+\
-    #         f' - members:     {len(self.members)} ({len(self.owners)}owners)'
-    #     return info
+    def __str__(self):
+        channel_type = 'public' if self.is_public else 'privte'
+        info = 'Channel object:\n'+\
+            f' - name:        {self.name}\n'+\
+            f' - channel_id:  {self.channel_id}\n'+\
+            f' - type:        {channel_type}\n'+\
+            f' - members:     {len(self.members)} ({len(self.owners)}owners)'
+        return info
 
     def todict(self, show={'channel_id', 'name', 'is_public'}):
         info_dict = {
@@ -402,13 +402,13 @@ class DM():
         save()
 
     # COVERAGE
-    # def __str__(self):
-    #     info = 'DM object:\n'+\
-    #         f' - name:        {self.name}\n'+\
-    #         f' - DM_id:       {self.dm_id}\n'+\
-    #         f' - owner:       id({self.owner.u_id})\n'+\
-    #         f' - members:     {len(self.members)}'
-    #     return info
+    def __str__(self):
+        info = 'DM object:\n'+\
+            f' - name:        {self.name}\n'+\
+            f' - DM_id:       {self.dm_id}\n'+\
+            f' - owner:       id({self.owner.u_id})\n'+\
+            f' - members:     {len(self.members)}'
+        return info
 
     def todict(self, show={'dm_id', 'name'}):
         info_dict = {
