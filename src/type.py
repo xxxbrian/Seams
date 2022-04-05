@@ -385,7 +385,7 @@ class Channel():
         self.messages.insert(0, msg)
 
     def has_owner(self, user: User):
-        return user in self.owners
+        return user in self.owners or user.is_admin()
 
 
 class DM():
@@ -484,13 +484,13 @@ class DM():
 
 class Message():
 
-    def __init__(self, u_id: int, content: str, time_sent: int, sub) -> None:
+    def __init__(self, u_id: int, content: str, time_sent: int, sup) -> None:
         self.message_id = Message.get_last_id() + 1
         self.u_id = u_id
         self.content = content
         self.time_sent = time_sent
         self.is_active = True
-        self.sub = sub
+        self.sup = sup
 
     def __setattr__(self, key, value):
         self.__dict__[key] = value
@@ -534,12 +534,12 @@ class Message():
 
     def add_to_store(self) -> None:
         store['messages'].insert(0, self)
-        self.sub.add_message(self)
+        self.sup.add_message(self)
         save()
-        # if type(self.sub) is Channel:
-        #     self.add_to_channel(self.sub)
-        # if type(self.sub) is DM:
-        #     self.add_to_dm(self.sub)
+        # if type(self.sup) is Channel:
+        #     self.add_to_channel(self.sup)
+        # if type(self.sup) is DM:
+        #     self.add_to_dm(self.sup)
 
     # def add_to_channel(self, channel: Channel) -> None:
     #     channel.messages.insert(0, self)

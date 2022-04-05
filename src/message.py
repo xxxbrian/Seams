@@ -31,10 +31,9 @@ def message_edit_v1(token, message_id, message):
         raise AccessError(description='Permission denied')
     if msg is None:
         raise InputError(description='Message not found')
-    if not msg.sub.has_user(user):
+    if not msg.sup.has_user(user):
         raise InputError(description='Message not found')
-    if user.u_id != msg.u_id and not user.is_admin() and not msg.sub.has_owner(
-            user):
+    if user.u_id != msg.u_id and not msg.sup.has_owner(user):
         raise AccessError(description='Permission denied: Not sender')
     if len(message) == 0:
         msg.remove()
