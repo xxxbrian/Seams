@@ -587,9 +587,8 @@ class Notification:
         if 'channel_id' in show:
             info_dict['channel_id'] = self.sup.channel_id if type(
                 self.sup) is Channel else -1
-        if 'channel_id' in show:
-            info_dict['channel_id'] = self.sup.dm_id if type(
-                self.sup) is DM else -1
+        if 'dm_id' in show:
+            info_dict['dm_id'] = self.sup.dm_id if type(self.sup) is DM else -1
         if 'notification_message' in show:
             info_dict['notification_message'] = self.content
         return info_dict
