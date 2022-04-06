@@ -1,19 +1,23 @@
-from src.type import User, DM
+from src.type import User, DM, Notification
 from src.error import InputError, AccessError
 
 
 def dm_create_v1(token, u_ids):
-    user = User.find_by_token(token)
+    auth_user = User.find_by_token(token)
     users_list = [User.find_by_id(u_id) for u_id in u_ids]
-    users_list.append(user)
-    if user is None:
+    users_list.append(auth_user)
+    if auth_user is None:
         raise AccessError(description='Permission denied')
     if any(u is None for u in users_list):
         raise InputError(description='User not found')
     if len(users_list) != len(set(users_list)):
         raise InputError(description='Duplicate u_id')
-    new_dm = DM(user.u_id, [u.u_id for u in users_list])
+    new_dm = DM(auth_user.u_id, [u.u_id for u in users_list])
     new_dm.add_to_store()
+    for user in [User.find_by_id(u_id) for u_id in u_ids]:
+        new_nf = Notification(
+            new_dm, f'{auth_user.handle_str} added you to {new_dm.name}')
+        user.add_notification(new_nf)
     return {'dm_id': new_dm.dm_id}
 
 
