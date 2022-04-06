@@ -338,10 +338,10 @@ def test_admin_userpermission_change_to_1(user_list, login_list, channel_list):
                   json = {'token': login_list[0]['token'],
                           'u_id': login_list[1]['auth_user_id'],
                           'permission_id': 1})
-    # user[1] should able to remove user[2]
+    # user[1] should able to remove user[3]
     response_1  = requests.delete(url + 'admin/user/remove/v1',
                                   json = {'token': login_list[1]['token'],
-                                          'u_id': login_list[2]['auth_user_id']})
+                                          'u_id': login_list[3]['auth_user_id']})
     # user[1] join channel[2]
     requests.post(f"{url}channel/join/v2",
                     json= {'token': login_list[1]['token'],
