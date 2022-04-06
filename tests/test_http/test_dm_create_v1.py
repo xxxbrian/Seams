@@ -80,7 +80,11 @@ def test_dm_create_successfully(user_list, login_list):
     response_1 = requests.post(f'{url}dm/create/v1',
                                json = {'token': login_list[0]['token'],
                                        'u_ids': [login_list[1]['auth_user_id'], login_list[2]['auth_user_id']],})
+    response_2 = requests.post(f'{url}dm/create/v1',
+                               json = {'token': login_list[0]['token'],
+                                       'u_ids': [],})
     assert response_1.status_code == 200
+    assert response_2.status_code == 200
 
 def test_dm_create_invalid_uid(user_list, login_list):
     """
@@ -97,7 +101,11 @@ def test_dm_create_invalid_uid(user_list, login_list):
     response_1 = requests.post(url + "dm/create/v1",
                                json = {'token': login_list[0]['token'],
                                        'u_ids': invalid_u_ids})
+    response_2 = requests.post(url + "dm/create/v1",
+                               json = {'token': login_list[0]['token'],
+                                       'u_ids': [invalid_u_ids[0],login_list[1]['auth_user_id']]})
     assert response_1.status_code == InputError.code
+    assert response_2.status_code == InputError.code
 
 def test_dm_create_duplicated_uid(user_list, login_list):
     """

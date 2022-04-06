@@ -91,5 +91,5 @@ def test_logout_twice(user_list, login_list):
                   json={'token': login_list[0].json()['token']})
     respon = requests.post(url + 'auth/logout/v1',
                            json={'token': login_list[0].json()['token']})
-    assert respon.status_code == InputError.code
+    assert respon.status_code == AccessError.code
 

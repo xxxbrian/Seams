@@ -593,6 +593,33 @@ def test_dm_message_edit_invalid_token(user_list, login_list, channel_list):
                          'message':'Hello'})
     assert response_2.status_code == AccessError.code
     
+def test_dm_message_edit_global_owner_cant_edit(login_list, dm_list):
+    '''
+    
+    This test is to test when global owner want to edit members' messages in dm
+    
+    Assumption:
+        admin/userpermission/change/v1 is working well
+    
+    Raises: 
+        AccessError
+        
+    '''
+    # set user[2] as an owner
+    requests.post(url + 'admin/userpermission/change/v1',
+                  json = {'token': login_list[0]['token'],
+                          'u_id': login_list[2]['auth_user_id'],
+                          'permission_id': 1})
+    response_1 = requests.post(url + "message/senddm/v1",
+                  json = {'token': login_list[3]['token'],
+                          'dm_id': dm_list[2]['dm_id'],
+                          'message': 'Hello world!'}).json()
+    response_2 = requests.put(url + 'message/edit/v1',
+                              json = {'token': login_list[2]['token'],
+                                      'message_id': response_1['message_id'],
+                                      'message':'Hello'})
+    assert response_2.status_code == AccessError.code
+
 ######################################## message/remove/v1 ########################################
 
 def test_channel_message_remove_normal(user_list, login_list, channel_list):
@@ -831,6 +858,33 @@ def test_channel_message_remove_owner_remove_message(user_list, login_list, dm_l
                                         'dm_id': dm_list[0]['dm_id'],
                                         'start': 0}).json()
     assert response_3['messages'][0]['message'] == 'Hello world!'
+    
+def test_dm_message_remove_global_owner_cant_remove_message(login_list, dm_list):
+    '''
+    
+    This test is to test when global owner want to remove members' messages in dm
+    
+    Assumption:
+        admin/userpermission/change/v1 is working well
+        message/senddm/v1 is working well
+    
+    Raises: 
+        AccessError
+        
+    '''
+    # set user[2] as an owner
+    requests.post(url + 'admin/userpermission/change/v1',
+                  json = {'token': login_list[0]['token'],
+                          'u_id': login_list[2]['auth_user_id'],
+                          'permission_id': 1})
+    response_1 = requests.post(url + "message/senddm/v1",
+                  json = {'token': login_list[3]['token'],
+                          'dm_id': dm_list[2]['dm_id'],
+                          'message': 'Hello world!'}).json()
+    response_2 = requests.delete(url + 'message/remove/v1',
+                 json = {'token': login_list[2]['token'],
+                         'message_id': response_1['message_id']})
+    assert response_2.status_code == AccessError.code
 
 ######################################## message/senddm/v1 ########################################
 
