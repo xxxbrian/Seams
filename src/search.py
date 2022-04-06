@@ -15,6 +15,8 @@ def search_v1(token, query_str: str):
     ]
     all_msgs = reduce(lambda x, y: x + y, msg_lists)
     return {
-        'messages':
-        [msg.todict() for msg in all_msgs if query_str in msg.content]
+        'messages': [
+            msg.todict() for msg in all_msgs
+            if query_str.lower() in msg.content.lower()
+        ]
     }
