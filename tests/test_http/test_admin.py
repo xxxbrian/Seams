@@ -84,7 +84,7 @@ def channel_create(login_list):
     channel_list.append(requests.post(url + 'channels/create/v2',
                                       json = {'token': login_list[2]['token'],
                                               'name': "Bojin's channel",
-                                              'is_public': False}).json())
+                                              'is_public': True}).json())
     channel_list.append(requests.post(url + 'channels/create/v2',
                                       json = {'token': login_list[3]['token'],
                                               'name': "Cicy's channel",
@@ -218,6 +218,8 @@ def test_admin_user_remove_normal(user_list, login_list, channel_list, dm_list):
     response_8 = requests.get(url + "user/profile/v1", 
                               params = {'token': login_list[0]['token'],
                                         'u_id': response_7.json()['auth_user_id']}).json()
+    response_9 = requests.post(url + 'auth/logout/v1',
+                               json={'token': login_list[1]['token']})
     
     assert response_1 == {
         'name': "Brian's channel",
@@ -262,8 +264,8 @@ def test_admin_user_remove_normal(user_list, login_list, channel_list, dm_list):
     
     # assert user[1] is not in users all
     assert users == response_3['users']
-    assert response_4['messages'][0]['message'] == 'Hello world!'
-    assert response_5['messages'][0]['message'] == 'Hi hi'
+    assert response_4['messages'][0]['message'] == 'Removed user'
+    assert response_5['messages'][0]['message'] == 'Removed user'
     assert response_6['user'] == remove_user
     assert response_7.status_code == 200
     assert response_8['user'] == {
@@ -273,6 +275,7 @@ def test_admin_user_remove_normal(user_list, login_list, channel_list, dm_list):
             'name_last': 'Lee',
             'handle_str': 'brianlee'
         }
+    assert response_9.status_code == AccessError.code
     
 def test_admin_user_remove_invalid_u_id(user_list, login_list):
     '''
@@ -324,13 +327,13 @@ def test_admin_user_remove_not_global_owner(user_list, login_list):
     
 ######################################## Test_admin/userpermission/change/v1 ########################################
 
-def test_admin_userpermission_change_to_1(user_list, login_list):
+def test_admin_userpermission_change_to_1(user_list, login_list, channel_list):
     '''
     
     This test is to test change user's permission to 1 successfully
     
     '''
-    # set user[1] as a owner
+    # set user[1] as an owner
     requests.post(url + 'admin/userpermission/change/v1',
                   json = {'token': login_list[0]['token'],
                           'u_id': login_list[1]['auth_user_id'],
@@ -339,7 +342,29 @@ def test_admin_userpermission_change_to_1(user_list, login_list):
     response_1  = requests.delete(url + 'admin/user/remove/v1',
                                   json = {'token': login_list[1]['token'],
                                           'u_id': login_list[2]['auth_user_id']})
+    # user[1] join channel[2]
+    requests.post(f"{url}channel/join/v2",
+                    json= {'token': login_list[1]['token'],
+                           'channel_id': channel_list[2]['channel_id']})
+    # As a global owner, user[1] can add himself as an channel_owner
+    response_2 = requests.post(url + "channel/addowner/v1",
+                               json = {'token': login_list[1]['token'],
+                               'channel_id': channel_list[2]['channel_id'],
+                               'u_id': login_list[1]['auth_user_id']})
+    # As a global owner, user[1] can remove user[2] as a user in channel
+    response_3 = requests.post(url + "channel/removeowner/v1",
+                               json = {'token': login_list[1]['token'],
+                                       'channel_id': channel_list[2]['channel_id'],
+                                       'u_id': login_list[2]['auth_user_id']})
+    # As a global owner, user[1] cannot remove the last owner in channel
+    response_4 = requests.post(url + "channel/removeowner/v1",
+                               json = {'token': login_list[1]['token'],
+                                       'channel_id': channel_list[1]['channel_id'],
+                                       'u_id': login_list[1]['auth_user_id']})
     assert response_1.status_code == 200
+    assert response_2.status_code == 200
+    assert response_3.status_code == 200
+    assert response_3.status_code == AccessError.code
     
 def test_admin_userpermission_change_to_2(user_list, login_list):
     '''
@@ -453,4 +478,3 @@ def test_admin_userpermission_change_invalid_auth_user(user_list, login_list):
                                        'u_id': login_list[2]['auth_user_id'],
                                        'permission_id': 2})
     assert response_2.status_code == AccessError.code
-    

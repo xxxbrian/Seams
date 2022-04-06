@@ -100,20 +100,16 @@ def test_dm_remove_normal(user_list, login_list, dm_list):
         dm/list/v1 is working well
 
     '''
-    dm_1 = 'bojinli, cicyzhou, steveyang'
     requests.delete(url + 'dm/remove/v1',
                     json = {"token": login_list[0]["token"], 
                             "dm_id": dm_list[0]['dm_id']})
+    requests.delete(url + 'dm/remove/v1',
+                    json = {"token": login_list[0]["token"], 
+                            "dm_id": dm_list[1]['dm_id']})
     response_1 = requests.get(url + "dm/list/v1",
                               params = {'token': login_list[0]['token']}).json()
     # remove dm[0]
-    assert response_1 == {
-        'dms':[
-        {
-            'dm_id': dm_list[1]['dm_id'],
-            'name': dm_1
-        },
-    ]}
+    assert response_1['dms'] == []
 
 def test_dm_remove_invalid_dm_id(user_list, login_list, dm_list):
     """
@@ -135,7 +131,15 @@ def test_dm_remove_invalid_dm_id(user_list, login_list, dm_list):
     response_1 = requests.delete(url + 'dm/remove/v1',
                                  json = {"token": login_list[0]["token"], 
                                          "dm_id": invalid_dm_id[0]})
+    requests.delete(url + 'dm/remove/v1',
+                    json = {"token": login_list[0]["token"], 
+                            "dm_id": dm_list[0]['dm_id']})
+    # remove one dm twice
+    response_2 = requests.delete(url + 'dm/remove/v1',
+                                 json = {"token": login_list[0]["token"], 
+                                         "dm_id": dm_list[0]['dm_id']})
     assert response_1.status_code == InputError.code
+    assert response_2.status_code == InputError.code
 
 def test_dm_remove_author_not_creator(user_list, login_list, dm_list):
     """
