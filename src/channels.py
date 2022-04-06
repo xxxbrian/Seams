@@ -10,7 +10,7 @@ def channels_list_v2(token):
     if user is None:
         raise AccessError(description='Permission denied')
 
-    channels_list = Channel.get_allchannel()
+    channels_list = Channel.get_all()
     info = []
 
     for channel in channels_list:
@@ -28,7 +28,7 @@ def channels_listall_v2(token):
 
     if User.find_by_token(token) is None:
         raise AccessError(description='Permission denied')
-    channels_list = Channel.get_allchannel()
+    channels_list = Channel.get_all()
     info = []
     for channel in channels_list:
         info.append(channel.todict({'channel_id', 'name'}))
