@@ -364,7 +364,7 @@ def test_admin_userpermission_change_to_1(user_list, login_list, channel_list):
     assert response_1.status_code == 200
     assert response_2.status_code == 200
     assert response_3.status_code == 200
-    assert response_4.status_code == AccessError.code
+    assert response_4.status_code == InputError.code
     
 def test_admin_userpermission_change_to_2(user_list, login_list):
     '''
