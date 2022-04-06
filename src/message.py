@@ -61,7 +61,7 @@ def message_senddm_v1(token, dm_id, message):
     if not dm.has_user(user):
         raise AccessError(description='Permission denied: Not member')
     if Message.check_length_invalid(message):
-        raise InputError('Message lenght invalid')
+        raise InputError('Message length invalid')
     new_msg = Message(user.u_id, message, utc_timestamp, dm)
     new_msg.add_to_store()
     return {'message_id': new_msg.message_id}
