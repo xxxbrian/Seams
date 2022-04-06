@@ -1,3 +1,4 @@
+from email import message
 import re
 import string
 import jwt
@@ -206,6 +207,9 @@ class User():
         self.group_id = -1
         self.name_first = 'Removed'
         self.name_last = 'user'
+        for msg in store['messages']:
+            if msg.u_id == self.u_id:
+                msg.content = 'Removed user'
 
     def is_active(self):
         return self.group_id >= 0
