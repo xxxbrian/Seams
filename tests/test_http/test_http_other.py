@@ -286,7 +286,6 @@ def test_search_invalid_query_string(login_list, dm_list, channel_list):
                   json = {'token': login_list[2]['token'],
                           'dm_id': dm_list[0]['dm_id'],
                           'message': 'Hello world'})
-    
     # test for empty query_str
     response_1 = requests.post(url + 'message/send/v1',
                                json = {'token': login_list[0],
