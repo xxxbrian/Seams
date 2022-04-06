@@ -1,4 +1,3 @@
-from email import message
 import re
 import string
 import jwt

@@ -1,5 +1,3 @@
-from email import message
-from unittest import result
 from src.type import User, Channel, DM, Message
 from src.error import InputError, AccessError
 from functools import reduce
@@ -16,10 +14,6 @@ def search_v1(token, query_str: str):
         if sup.has_user(user)
     ]
     all_msgs = reduce(lambda x, y: x + y, msg_lists)
-    result = []
-    # for msg in all_msgs:
-    #     if query_str in msg.content:
-    #         result.append(msg.todict())
     return {
         'messages':
         [msg.todict() for msg in all_msgs if query_str in msg.content]

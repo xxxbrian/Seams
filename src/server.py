@@ -1,4 +1,3 @@
-from crypt import methods
 import sys
 import signal
 from json import dumps
