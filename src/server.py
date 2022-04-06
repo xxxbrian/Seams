@@ -1,3 +1,4 @@
+from crypt import methods
 import sys
 import signal
 from json import dumps
@@ -13,6 +14,7 @@ from src.channels import *
 from src.dm import *
 from src.error import *
 from src.message import *
+from src.notification import *
 from src.other import *
 from src.user import *
 
@@ -344,6 +346,13 @@ def admin_userpermission_change():
         data['u_id'],
         data['permission_id'],
     )
+    return dumps(resp)
+
+
+@APP.route('/notifications/get/v1', methods=['GET'])
+def get_notifications():
+    token = str(request.args.get('token'))
+    resp = notifications_get_v1(token)
     return dumps(resp)
 
 

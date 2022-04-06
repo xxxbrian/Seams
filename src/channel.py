@@ -1,5 +1,5 @@
 from src.error import InputError, AccessError
-from src.type import User, Channel
+from src.type import User, Channel, Notification
 
 
 def channel_invite_v2(token, channel_id, u_id):
@@ -35,6 +35,9 @@ def channel_invite_v2(token, channel_id, u_id):
         raise InputError(description='Already in channel')
 
     channel.join(user)
+    new_nf = Notification(
+        channel, f'{auth_user.handle_str} added you to {channel.name}')
+    user.add_notification(new_nf)
     return {}
 
 
