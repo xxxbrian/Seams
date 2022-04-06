@@ -1,4 +1,3 @@
-from crypt import methods
 import sys
 import signal
 from json import dumps
@@ -16,6 +15,7 @@ from src.error import *
 from src.message import *
 from src.notification import *
 from src.other import *
+from src.search import *
 from src.user import *
 
 
@@ -353,6 +353,14 @@ def admin_userpermission_change():
 def get_notifications():
     token = str(request.args.get('token'))
     resp = notifications_get_v1(token)
+    return dumps(resp)
+
+
+@APP.route('/search/v1', methods=['GET'])
+def search_msg():
+    token = str(request.args.get('token'))
+    query_str = str(request.args.get('query_str'))
+    resp = search_v1(token, query_str)
     return dumps(resp)
 
 

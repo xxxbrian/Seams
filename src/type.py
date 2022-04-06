@@ -1,4 +1,3 @@
-from email import message
 import re
 import string
 import jwt
@@ -384,7 +383,7 @@ class Channel():
         return len(name) < 1 or len(name) > 20
 
     @staticmethod
-    def get_allchannel() -> list:
+    def get_all() -> list:
         return store['channels']
 
     def get_messages(self, start: int, end: int) -> list:
@@ -568,6 +567,10 @@ class Message():
 
     def remove(self):
         self.is_active = False
+
+    @staticmethod
+    def check_query_str_invalid(query_str: str) -> bool:
+        return len(query_str) < 1 or len(query_str) > 1000
 
 
 class Notification:
