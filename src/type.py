@@ -1,3 +1,4 @@
+from email import message
 import re
 import string
 import jwt
@@ -59,15 +60,15 @@ class User():
         save()
 
     # COVERAGE
-    # def __str__(self):
-    #     info = 'User object:\n'+\
-    #         f' - u_id:       {self.u_id}\n' + \
-    #         f' - email:      {self.email}\n' + \
-    #         f' - password:   {self.password}\n' + \
-    #         f' - name:       {self.name_first} {self.name_last}\n' + \
-    #         f' - handle:     {self.handle_str}\n' + \
-    #         f' - group_id:   {self.group_id}'
-    #     return info
+    def __str__(self):
+        info = 'User object:\n'+\
+            f' - u_id:       {self.u_id}\n' + \
+            f' - email:      {self.email}\n' + \
+            f' - password:   {self.password}\n' + \
+            f' - name:       {self.name_first} {self.name_last}\n' + \
+            f' - handle:     {self.handle_str}\n' + \
+            f' - group_id:   {self.group_id}'
+        return info
 
     def todict(self,
                show={'u_id', 'email', 'name_first', 'name_last',
@@ -206,6 +207,9 @@ class User():
         self.group_id = -1
         self.name_first = 'Removed'
         self.name_last = 'user'
+        for msg in store['messages']:
+            if msg.u_id == self.u_id:
+                msg.content = 'Removed user'
 
     def is_active(self):
         return self.group_id >= 0
@@ -293,14 +297,14 @@ class Channel():
         save()
 
     # COVERAGE
-    # def __str__(self):
-    #     channel_type = 'public' if self.is_public else 'privte'
-    #     info = 'Channel object:\n'+\
-    #         f' - name:        {self.name}\n'+\
-    #         f' - channel_id:  {self.channel_id}\n'+\
-    #         f' - type:        {channel_type}\n'+\
-    #         f' - members:     {len(self.members)} ({len(self.owners)}owners)'
-    #     return info
+    def __str__(self):
+        channel_type = 'public' if self.is_public else 'privte'
+        info = 'Channel object:\n'+\
+            f' - name:        {self.name}\n'+\
+            f' - channel_id:  {self.channel_id}\n'+\
+            f' - type:        {channel_type}\n'+\
+            f' - members:     {len(self.members)} ({len(self.owners)}owners)'
+        return info
 
     def todict(self, show={'channel_id', 'name', 'is_public'}):
         info_dict = {
@@ -385,7 +389,7 @@ class Channel():
         self.messages.insert(0, msg)
 
     def has_owner(self, user: User):
-        return user in self.owners
+        return user in self.owners or user.is_admin()
 
 
 class DM():
@@ -396,19 +400,20 @@ class DM():
         self.members = [User.find_by_id(u_id) for u_id in u_ids]
         self.dm_id = DM.get_last_id() + 1
         self.messages = []
+        self.is_active = True
 
     def __setattr__(self, key, value):
         self.__dict__[key] = value
         save()
 
     # COVERAGE
-    # def __str__(self):
-    #     info = 'DM object:\n'+\
-    #         f' - name:        {self.name}\n'+\
-    #         f' - DM_id:       {self.dm_id}\n'+\
-    #         f' - owner:       id({self.owner.u_id})\n'+\
-    #         f' - members:     {len(self.members)}'
-    #     return info
+    def __str__(self):
+        info = 'DM object:\n'+\
+            f' - name:        {self.name}\n'+\
+            f' - DM_id:       {self.dm_id}\n'+\
+            f' - owner:       id({self.owner.u_id})\n'+\
+            f' - members:     {len(self.members)}'
+        return info
 
     def todict(self, show={'dm_id', 'name'}):
         info_dict = {
@@ -447,7 +452,7 @@ class DM():
         '''
 
         for dm in store['dms']:
-            if dm.dm_id == dm_id:
+            if dm.dm_id == dm_id and dm.is_active:
                 return dm
         return None
 
@@ -473,7 +478,7 @@ class DM():
 
     @staticmethod
     def get_all() -> list:
-        return store['dms']
+        return [dm for dm in store['dms'] if dm.is_active]
 
     def add_message(self, msg):
         self.messages.insert(0, msg)
@@ -481,16 +486,19 @@ class DM():
     def has_owner(self, user: User):
         return user is self.owner
 
+    def remove(self):
+        self.is_active = False
+
 
 class Message():
 
-    def __init__(self, u_id: int, content: str, time_sent: int, sub) -> None:
+    def __init__(self, u_id: int, content: str, time_sent: int, sup) -> None:
         self.message_id = Message.get_last_id() + 1
         self.u_id = u_id
         self.content = content
         self.time_sent = time_sent
         self.is_active = True
-        self.sub = sub
+        self.sup = sup
 
     def __setattr__(self, key, value):
         self.__dict__[key] = value
@@ -534,12 +542,12 @@ class Message():
 
     def add_to_store(self) -> None:
         store['messages'].insert(0, self)
-        self.sub.add_message(self)
+        self.sup.add_message(self)
         save()
-        # if type(self.sub) is Channel:
-        #     self.add_to_channel(self.sub)
-        # if type(self.sub) is DM:
-        #     self.add_to_dm(self.sub)
+        # if type(self.sup) is Channel:
+        #     self.add_to_channel(self.sup)
+        # if type(self.sup) is DM:
+        #     self.add_to_dm(self.sup)
 
     # def add_to_channel(self, channel: Channel) -> None:
     #     channel.messages.insert(0, self)

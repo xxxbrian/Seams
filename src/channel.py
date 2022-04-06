@@ -196,7 +196,7 @@ def channel_addowner_v1(token, channel_id, u_id):
         raise AccessError(description='Permission denied')
     if channel is None:
         raise InputError(description='Channel not found')
-    if not auth_user in channel.owners:
+    if not channel.has_owner(auth_user):
         raise AccessError(description='Permission denied: Not owner')
     if user is None:
         raise InputError(description='User not found')
@@ -234,7 +234,7 @@ def channel_removeowner_v1(token, channel_id, u_id):
         raise AccessError(description='Permission denied')
     if channel is None:
         raise InputError(description='Channel not found')
-    if not auth_user in channel.owners:
+    if not channel.has_owner(auth_user):
         raise AccessError(description='Permission denied: Not owner')
     if user is None:
         raise InputError(description='User not found')

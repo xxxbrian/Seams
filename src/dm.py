@@ -4,16 +4,15 @@ from src.error import InputError, AccessError
 
 def dm_create_v1(token, u_ids):
     user = User.find_by_token(token)
-    input_users = [User.find_by_id(u_id) for u_id in u_ids]
+    users_list = [User.find_by_id(u_id) for u_id in u_ids]
+    users_list.append(user)
     if user is None:
         raise AccessError(description='Permission denied')
-    if all(u is None for u in input_users):
-        raise InputError(description='All user not found')
-    users = [u for u in input_users if u is not None]
-    if len(users) != len(set(users)):
+    if any(u is None for u in users_list):
+        raise InputError(description='User not found')
+    if len(users_list) != len(set(users_list)):
         raise InputError(description='Duplicate u_id')
-    users.append(user)
-    new_dm = DM(user.u_id, [u.u_id for u in users])
+    new_dm = DM(user.u_id, [u.u_id for u in users_list])
     new_dm.add_to_store()
     return {'dm_id': new_dm.dm_id}
 
@@ -43,8 +42,7 @@ def dm_remove_v1(token, dm_id):
         raise AccessError(description='Permission denied: Not member')
     if not user is dm.owner:
         raise AccessError(description='Permission denied: Not owner')
-    for dm_user in dm.members:
-        dm.leave(dm_user)
+    dm.remove()
     return {}
 
 
