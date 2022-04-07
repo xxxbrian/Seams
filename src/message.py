@@ -111,14 +111,32 @@ def message_react_v1(token, message_id, react_id):
         raise InputError(description='Message not found')
     if not msg.sup.has_user(user):
         raise InputError(description='Message not found')
-    if not react_id in msg.react.keys():
+    if not react_id in msg.react_dict.keys():
         raise InputError(description='Invaild react type')
-    if user in msg.react[react_id]:
+    if user in msg.react_dict[react_id]:
         raise InputError(description='Already reacting')
-    msg.react[react_id].append(user)
+    msg.react_dict[react_id].append(user)
     if msg.sup.has_user(msg.sender):
         new_nf = Notification(
             msg.sup,
             f'{user.handle_str} reacted to your message in {msg.sup.name}')
         msg.sender.add_notification(new_nf)
+    return {}
+
+
+@pickelsave
+def message_unreact_v1(token, message_id, react_id):
+    user = User.find_by_token(token)
+    msg = Message.find_by_id(message_id)
+    if user is None:
+        raise AccessError(description='Permission denied')
+    if msg is None:
+        raise InputError(description='Message not found')
+    if not msg.sup.has_user(user):
+        raise InputError(description='Message not found')
+    if not react_id in msg.react_dict.keys():
+        raise InputError(description='Invaild react type')
+    if not user in msg.react_dict[react_id]:
+        raise InputError(description='No reacting')
+    msg.react_dict[react_id].remove(user)
     return {}

@@ -501,18 +501,28 @@ class Message():
         self.time_sent = time_sent
         self.is_active = True
         self.sup = sup
-        self.react = {1: []}
+        self.react_dict = {1: []}
 
     def __setattr__(self, key, value):
         self.__dict__[key] = value
 
-    def todict(self, show={'message_id', 'u_id', 'message', 'time_sent'}):
+    def todict(self,
+               show={'message_id', 'u_id', 'message', 'time_sent'},
+               auth_user=None):
         info_dict = {
             key: value
             for key, value in self.__dict__.items() if key in show
         }
         if 'message' in show:
             info_dict['message'] = self.content
+        if 'reacts' in show:
+            # for id, users in self.react_dict.values():
+            #     {'react_id':id,'u_ids':[user.u_id for user in users],'is_this_user_reacted':auth_user in users}
+            info_dict['reacts'] = [{
+                'react_id': id,
+                'u_ids': [user.u_id for user in users],
+                'is_this_user_reacted': auth_user in users
+            } for id, users in self.react_dict.items()]
         return info_dict
 
     @staticmethod
