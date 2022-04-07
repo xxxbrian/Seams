@@ -1,3 +1,4 @@
+from traceback import print_tb
 from src.type import User, Channel, DM, Message, Notification
 from src.error import AccessError, InputError
 from src.type import pickelsave
@@ -139,4 +140,40 @@ def message_unreact_v1(token, message_id, react_id):
     if not user in msg.react_dict[react_id]:
         raise InputError(description='No reacting')
     msg.react_dict[react_id].remove(user)
+    return {}
+
+
+@pickelsave
+def message_pin_v1(token, message_id):
+    user = User.find_by_token(token)
+    msg = Message.find_by_id(message_id)
+    if user is None:
+        raise AccessError(description='Permission denied')
+    if msg is None:
+        raise InputError(description='Message not found')
+    if not msg.sup.has_user(user):
+        raise InputError(description='Message not found')
+    if not msg.sup.has_owner(user):
+        raise AccessError(description='Permission denied')
+    if msg.is_pinned:
+        raise InputError(description='Already pinned')
+    msg.is_pinned = True
+    return {}
+
+
+@pickelsave
+def message_unpin_v1(token, message_id):
+    user = User.find_by_token(token)
+    msg = Message.find_by_id(message_id)
+    if user is None:
+        raise AccessError(description='Permission denied')
+    if msg is None:
+        raise InputError(description='Message not found')
+    if not msg.sup.has_user(user):
+        raise InputError(description='Message not found')
+    if not msg.sup.has_owner(user):
+        raise AccessError(description='Permission denied')
+    if not msg.is_pinned:
+        raise InputError(description='Not pinned')
+    msg.is_pinned = False
     return {}

@@ -92,8 +92,9 @@ def dm_messages_v1(token, dm_id, start):
         raise InputError(description='Message not found')
 
     end = start + 50 if start + 50 <= len(dm.messages) else -1
-    show = {'message_id', 'u_id', 'message', 'time_sent', 'reacts'}
-    msg_list = [msg.todict(show, user) for msg in dm.get_messages(start, end)]
+    msg_list = [
+        msg.todict(auth_user=user) for msg in dm.get_messages(start, end)
+    ]
     return {
         'messages': msg_list,
         'start': start,

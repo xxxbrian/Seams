@@ -104,9 +104,8 @@ def channel_messages_v2(token, channel_id, start):
 
     # Message with index 0 is the most recent message in the channel.
     end = start + 50 if start + 50 <= len(channel.messages) else -1
-    show = {'message_id', 'u_id', 'message', 'time_sent', 'reacts'}
     msg_list = [
-        msg.todict(show, user) for msg in channel.get_messages(start, end)
+        msg.todict(auth_user=user) for msg in channel.get_messages(start, end)
     ]
     return {
         'messages': msg_list,

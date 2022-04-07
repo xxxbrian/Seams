@@ -502,12 +502,16 @@ class Message():
         self.is_active = True
         self.sup = sup
         self.react_dict = {1: []}
+        self.is_pinned = False
 
     def __setattr__(self, key, value):
         self.__dict__[key] = value
 
     def todict(self,
-               show={'message_id', 'u_id', 'message', 'time_sent'},
+               show={
+                   'message_id', 'u_id', 'message', 'time_sent', 'reacts',
+                   'is_pinned'
+               },
                auth_user=None):
         info_dict = {
             key: value

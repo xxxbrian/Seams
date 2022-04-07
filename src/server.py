@@ -399,6 +399,26 @@ def message_unreact():
     return dumps(resp)
 
 
+@APP.route("/message/pin/v1", methods=['POST'])
+def message_pin():
+    data = request.get_json()
+    resp = message_pin_v1(
+        data['token'],
+        data['message_id'],
+    )
+    return dumps(resp)
+
+
+@APP.route("/message/unpin/v1", methods=['POST'])
+def message_unpin():
+    data = request.get_json()
+    resp = message_unpin_v1(
+        data['token'],
+        data['message_id'],
+    )
+    return dumps(resp)
+
+
 #### NO NEED TO MODIFY BELOW THIS POINT
 
 if __name__ == "__main__":
