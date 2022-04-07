@@ -13,9 +13,15 @@ from src.config import SECRET
 store = data_store.get()
 
 
-def save():
-    with open('data_store.pickle', 'wb') as f:
-        pickle.dump(store, f)
+def pickelsave(func):
+
+    def wrapper(*args, **kwargs):
+        result = func(*args, **kwargs)
+        with open('data_store.pickle', 'wb') as f:
+            pickle.dump(store, f)
+        return result
+
+    return wrapper
 
 
 class User():
@@ -55,9 +61,8 @@ class User():
         self.group_id = 500 if self.u_id else 0
         self.notification = []
 
-    def __setattr__(self, key, value):
-        self.__dict__[key] = value
-        save()
+    # def __setattr__(self, key, value):
+    #     self.__dict__[key] = value
 
     # COVERAGE
     def __str__(self):
@@ -117,7 +122,6 @@ class User():
         """clear user"""
         store['users'].clear()
         store['login_token'].clear()
-        save()
 
     @staticmethod
     def get_last_id() -> int:
@@ -129,7 +133,6 @@ class User():
     def add_to_store(self) -> None:
         """add user"""
         store['users'].append(self)
-        save()
 
     @staticmethod
     def __generat_20fullname(name_first: str, name_last: str) -> str:
@@ -180,7 +183,6 @@ class User():
         }
         token = jwt.encode(payload=payload, key=SECRET, algorithm='HS256')
         store['login_token'].append(token)
-        save()
         return token
 
     @staticmethod
@@ -197,7 +199,6 @@ class User():
     @staticmethod
     def remove_token(token):
         store['login_token'].remove(token)
-        save()
 
     @staticmethod
     def find_all():
@@ -298,9 +299,8 @@ class Channel():
         self.is_public = is_public
         self.messages = []
 
-    def __setattr__(self, key, value):
-        self.__dict__[key] = value
-        save()
+    # def __setattr__(self, key, value):
+    #     self.__dict__[key] = value
 
     # COVERAGE
     def __str__(self):
@@ -354,11 +354,9 @@ class Channel():
     @staticmethod
     def clear() -> None:
         store['channels'].clear()
-        save()
 
     def add_to_store(self) -> None:
         store['channels'].append(self)
-        save()
 
     def has_user(self, user: User) -> bool:
         return user in self.members
@@ -408,9 +406,8 @@ class DM():
         self.messages = []
         self.is_active = True
 
-    def __setattr__(self, key, value):
-        self.__dict__[key] = value
-        save()
+    # def __setattr__(self, key, value):
+    #     self.__dict__[key] = value
 
     # COVERAGE
     def __str__(self):
@@ -465,11 +462,9 @@ class DM():
     @staticmethod
     def clear() -> None:
         store['dms'].clear()
-        save()
 
     def add_to_store(self) -> None:
         store['dms'].append(self)
-        save()
 
     def has_user(self, user: User) -> bool:
         return user in self.members
@@ -508,7 +503,6 @@ class Message():
 
     def __setattr__(self, key, value):
         self.__dict__[key] = value
-        save()
 
     def todict(self, show={'message_id', 'u_id', 'message', 'time_sent'}):
         info_dict = {
@@ -544,12 +538,10 @@ class Message():
     @staticmethod
     def clear() -> None:
         store['messages'].clear()
-        save()
 
     def add_to_store(self) -> None:
         store['messages'].insert(0, self)
         self.sup.add_message(self)
-        save()
         # if type(self.sup) is Channel:
         #     self.add_to_channel(self.sup)
         # if type(self.sup) is DM:

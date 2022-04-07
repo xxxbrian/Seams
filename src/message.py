@@ -1,10 +1,12 @@
 from src.type import User, Channel, DM, Message
 from src.error import AccessError, InputError
+from src.type import pickelsave
 
 from datetime import timezone
 import datetime
 
 
+@pickelsave
 def message_send_v1(token, channel_id, message):
     dt = datetime.datetime.now(timezone.utc)
     utc_time = dt.replace(tzinfo=timezone.utc)
@@ -24,6 +26,7 @@ def message_send_v1(token, channel_id, message):
     return {'message_id': new_msg.message_id}
 
 
+@pickelsave
 def message_edit_v1(token, message_id, message):
     user = User.find_by_token(token)
     msg = Message.find_by_id(message_id)
@@ -44,10 +47,12 @@ def message_edit_v1(token, message_id, message):
     return {}
 
 
+@pickelsave
 def message_remove_v1(token, message_id):
     return message_edit_v1(token, message_id, '')
 
 
+@pickelsave
 def message_senddm_v1(token, dm_id, message):
     dt = datetime.datetime.now(timezone.utc)
     utc_time = dt.replace(tzinfo=timezone.utc)
