@@ -364,6 +364,19 @@ def search_msg():
     return dumps(resp)
 
 
+@APP.route("/message/share/v1", methods=['POST'])
+def message_share():
+    data = request.get_json()
+    resp = message_share_v1(
+        data['token'],
+        data['og_message_id'],
+        data['message'],
+        data['channel_id'],
+        data['dm_id'],
+    )
+    return dumps(resp)
+
+
 #### NO NEED TO MODIFY BELOW THIS POINT
 
 if __name__ == "__main__":
