@@ -5,6 +5,8 @@ import hashlib
 import time
 import pickle
 import os
+from datetime import timezone
+import datetime
 
 from src.data_store import data_store
 
@@ -384,10 +386,8 @@ class Channel():
     def get_all() -> list:
         return store['channels']
 
-    def get_messages(self, start: int, end: int) -> list:
-        all_message = [msg for msg in self.messages if msg.is_active]
-        end = len(all_message) if end < 0 else end
-        return all_message[start:end]
+    def get_messages(self, start=0, end=-1) -> list:
+        return Message.get_messages(self, start, end)
 
     def add_message(self, msg):
         self.messages.insert(0, msg)
@@ -472,10 +472,8 @@ class DM():
     def leave(self, user: User) -> None:
         self.members.remove(user)
 
-    def get_messages(self, start: int, end: int) -> list:
-        all_message = [msg for msg in self.messages if msg.is_active]
-        end = len(all_message) if end < 0 else end
-        return all_message[start:end]
+    def get_messages(self, start=0, end=-1) -> list:
+        return Message.get_messages(self, start, end)
 
     @staticmethod
     def get_all() -> list:
@@ -504,8 +502,11 @@ class Message():
         self.react_dict = {1: []}
         self.is_pinned = False
 
-    def __setattr__(self, key, value):
-        self.__dict__[key] = value
+    # def __setattr__(self, key, value):
+    #     self.__dict__[key] = value
+
+    def __lt__(self, other):
+        return self.time_sent > other.time_sent
 
     def todict(self,
                show={
@@ -579,6 +580,22 @@ class Message():
     @staticmethod
     def check_query_str_invalid(query_str: str) -> bool:
         return len(query_str) < 1 or len(query_str) > 1000
+
+    @staticmethod
+    def utc_timestamp() -> int:
+        dt = datetime.datetime.now(timezone.utc)
+        utc_time = dt.replace(tzinfo=timezone.utc)
+        return utc_time.timestamp()
+
+    def is_available(self) -> bool:
+        return self.is_active and self.time_sent < Message.utc_timestamp()
+
+    @staticmethod
+    def get_messages(sup, start: int, end: int) -> list:
+        all_message = sorted(
+            [msg for msg in sup.messages if msg.is_available()])
+        end = len(all_message) if end < 0 else end
+        return all_message[start:end]
 
 
 class Notification:

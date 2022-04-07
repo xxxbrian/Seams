@@ -9,9 +9,7 @@ import datetime
 
 @pickelsave
 def message_send_v1(token, channel_id, message):
-    dt = datetime.datetime.now(timezone.utc)
-    utc_time = dt.replace(tzinfo=timezone.utc)
-    utc_timestamp = utc_time.timestamp()
+    utc_timestamp = Message.utc_timestamp()
     user = User.find_by_token(token)
     channel = Channel.find_by_id(channel_id)
     if user is None:
@@ -55,9 +53,7 @@ def message_remove_v1(token, message_id):
 
 @pickelsave
 def message_senddm_v1(token, dm_id, message):
-    dt = datetime.datetime.now(timezone.utc)
-    utc_time = dt.replace(tzinfo=timezone.utc)
-    utc_timestamp = utc_time.timestamp()
+    utc_timestamp = Message.utc_timestamp()
     user = User.find_by_token(token)
     dm = DM.find_by_id(dm_id)
     if user is None:
