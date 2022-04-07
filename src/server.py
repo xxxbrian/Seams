@@ -436,7 +436,7 @@ def message_sendlaterdm():
     data = request.get_json()
     resp = message_sendlaterdm_v1(
         data['token'],
-        data['channel_id'],
+        data['dm_id'],
         data['message'],
         data['time_sent'],
     )

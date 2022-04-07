@@ -1,10 +1,6 @@
-from traceback import print_tb
 from src.type import User, Channel, DM, Message, Notification
 from src.error import AccessError, InputError
 from src.type import pickelsave
-
-from datetime import timezone
-import datetime
 
 
 @pickelsave
@@ -22,6 +18,14 @@ def message_send_v1(token, channel_id, message):
         raise InputError('Message lenght invalid')
     new_msg = Message(user.u_id, message, utc_timestamp, channel)
     new_msg.add_to_store()
+    tagged_user_list = Message.get_tagged_user(message)
+    for tagged_user in tagged_user_list:
+        if channel.has_user(tagged_user):
+            new_nf = Notification(
+                channel,
+                f'{user.handle_str} tagged you in {channel.name}: {message[0:20]}'
+            )
+            tagged_user.add_notification(new_nf)
     return {'message_id': new_msg.message_id}
 
 
@@ -66,14 +70,19 @@ def message_senddm_v1(token, dm_id, message):
         raise InputError(description='Message length invalid')
     new_msg = Message(user.u_id, message, utc_timestamp, dm)
     new_msg.add_to_store()
+    tagged_user_list = Message.get_tagged_user(message)
+    for tagged_user in tagged_user_list:
+        if dm.has_user(tagged_user):
+            new_nf = Notification(
+                dm,
+                f'{user.handle_str} tagged you in {dm.name}: {message[0:20]}')
+            tagged_user.add_notification(new_nf)
     return {'message_id': new_msg.message_id}
 
 
 @pickelsave
 def message_share_v1(token, og_message_id, message, channel_id, dm_id):
-    dt = datetime.datetime.now(timezone.utc)
-    utc_time = dt.replace(tzinfo=timezone.utc)
-    utc_timestamp = utc_time.timestamp()
+    utc_timestamp = Message.utc_timestamp()
     user = User.find_by_token(token)
     ogmsg = Message.find_by_id(og_message_id)
     if user is None:
@@ -95,6 +104,13 @@ def message_share_v1(token, og_message_id, message, channel_id, dm_id):
     content = f'{message}\n>>>{ogmsg.content}'
     new_msg = Message(user.u_id, content, utc_timestamp, sup)
     new_msg.add_to_store()
+    tagged_user_list = Message.get_tagged_user(message)
+    for tagged_user in tagged_user_list:
+        if sup.has_user(tagged_user):
+            new_nf = Notification(
+                channel,
+                f'{user.handle_str} tagged you in {sup.name}: {message[0:20]}')
+            tagged_user.add_notification(new_nf)
     return {'message_id': new_msg.message_id}
 
 
@@ -192,6 +208,7 @@ def message_sendlater_v1(token, channel_id, message, time_sent):
         raise InputError(description='Time in the past')
     new_msg = Message(user.u_id, message, time_sent, channel)
     new_msg.add_to_store()
+
     return {'message_id': new_msg.message_id}
 
 
@@ -212,4 +229,12 @@ def message_sendlaterdm_v1(token, dm_id, message, time_sent):
         raise InputError(description='Time in the past')
     new_msg = Message(user.u_id, message, time_sent, dm)
     new_msg.add_to_store()
+    tagged_user_list = Message.get_tagged_user(message)
+    for tagged_user in tagged_user_list:
+        if dm.has_user(tagged_user):
+            new_nf = Notification(
+                dm,
+                f'{user.handle_str} tagged you in {dm.name}: {message[0:20]}',
+                time_sent)
+            tagged_user.add_notification(new_nf)
     return {'message_id': new_msg.message_id}

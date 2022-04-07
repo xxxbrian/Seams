@@ -120,6 +120,24 @@ class User():
         return None
 
     @staticmethod
+    def find_by_handle(handle_str: str, only_active=True):
+        '''
+        Find user by user's handle_str
+
+        Args:
+            handle_str
+
+        Return:
+            User
+        '''
+
+        for user in store['users']:
+            if user.handle_str == handle_str and (not only_active
+                                                  or user.is_active()):
+                return user
+        return None
+
+    @staticmethod
     def clear() -> None:
         """clear user"""
         store['users'].clear()
@@ -268,7 +286,15 @@ class User():
         self.notification.insert(0, notification)
 
     def get_notification(self):
-        return self.notification
+        for ntf in self.notification:
+            if ntf.is_available():
+                print(ntf.content, ntf.time_sent)
+        print('#############')
+        for ntf in sorted(
+            [ntf for ntf in self.notification if ntf.is_available()]):
+            if ntf.is_available():
+                print(ntf.content, ntf.time_sent)
+        return sorted([ntf for ntf in self.notification if ntf.is_available()])
 
 
 class Channel():
@@ -585,6 +611,7 @@ class Message():
     def utc_timestamp() -> int:
         dt = datetime.datetime.now(timezone.utc)
         utc_time = dt.replace(tzinfo=timezone.utc)
+        print(utc_time.timestamp())
         return utc_time.timestamp()
 
     def is_available(self) -> bool:
@@ -597,12 +624,27 @@ class Message():
         end = len(all_message) if end < 0 else end
         return all_message[start:end]
 
+    @staticmethod
+    def get_tagged_user(msg: str):
+        pattern = re.compile(r'@\w+(?:^[a-z0-9]+$]\w+)*')
+        handles = pattern.findall(msg)
+        all_user = list(
+            set(
+                User.find_by_handle(handle.replace('@', ''))
+                for handle in handles))
+        return [user for user in all_user if not user is None]
+
 
 class Notification:
 
-    def __init__(self, sup, content: str) -> None:
+    def __init__(self, sup, content: str, time_sent=None) -> None:
         self.sup = sup
         self.content = content
+        self.time_sent = Message.utc_timestamp(
+        ) if time_sent is None else time_sent
+
+    def __lt__(self, other):
+        return self.time_sent > other.time_sent
 
     def todict(self, show={'channel_id', 'dm_id', 'notification_message'}):
         info_dict = {
@@ -617,6 +659,9 @@ class Notification:
         if 'notification_message' in show:
             info_dict['notification_message'] = self.content
         return info_dict
+
+    def is_available(self) -> bool:
+        return self.time_sent < Message.utc_timestamp()
 
 
 if os.path.exists('data_store.pickle'):

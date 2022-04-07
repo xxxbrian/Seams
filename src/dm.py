@@ -1,4 +1,3 @@
-from email import message
 from src.type import User, DM, Notification
 from src.error import InputError, AccessError
 from src.type import pickelsave
