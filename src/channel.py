@@ -100,7 +100,7 @@ def channel_messages_v2(token, channel_id, start):
         raise InputError(description='Channel not found')
     if not channel.has_user(user):
         raise AccessError(description='Permission denied: Join channel first')
-    message_amount = len(dm.get_messages())
+    message_amount = len(channel.get_messages())
     if start > message_amount:
         raise InputError(description='Message not found')
 

@@ -419,6 +419,30 @@ def message_unpin():
     return dumps(resp)
 
 
+@APP.route("/message/sendlater/v1", methods=['POST'])
+def message_sendlater():
+    data = request.get_json()
+    resp = message_sendlater_v1(
+        data['token'],
+        data['channel_id'],
+        data['message'],
+        data['time_sent'],
+    )
+    return dumps(resp)
+
+
+@APP.route("/message/sendlaterdm/v1", methods=['POST'])
+def message_sendlaterdm():
+    data = request.get_json()
+    resp = message_sendlaterdm_v1(
+        data['token'],
+        data['channel_id'],
+        data['message'],
+        data['time_sent'],
+    )
+    return dumps(resp)
+
+
 #### NO NEED TO MODIFY BELOW THIS POINT
 
 if __name__ == "__main__":

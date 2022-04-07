@@ -173,3 +173,43 @@ def message_unpin_v1(token, message_id):
         raise InputError(description='Not pinned')
     msg.is_pinned = False
     return {}
+
+
+@pickelsave
+def message_sendlater_v1(token, channel_id, message, time_sent):
+    utc_timestamp = Message.utc_timestamp()
+    user = User.find_by_token(token)
+    channel = Channel.find_by_id(channel_id)
+    if user is None:
+        raise AccessError(description='Permission denied')
+    if channel is None:
+        raise InputError(description='Channel not found')
+    if not channel.has_user(user):
+        raise AccessError(description='Permission denied: Not member')
+    if Message.check_length_invalid(message):
+        raise InputError('Message lenght invalid')
+    if time_sent < utc_timestamp:
+        raise InputError(description='Time in the past')
+    new_msg = Message(user.u_id, message, time_sent, channel)
+    new_msg.add_to_store()
+    return {'message_id': new_msg.message_id}
+
+
+@pickelsave
+def message_sendlaterdm_v1(token, dm_id, message, time_sent):
+    utc_timestamp = Message.utc_timestamp()
+    user = User.find_by_token(token)
+    dm = DM.find_by_id(dm_id)
+    if user is None:
+        raise AccessError(description='Permission denied')
+    if dm is None:
+        raise InputError(description='DM not found')
+    if not dm.has_user(user):
+        raise AccessError(description='Permission denied: Not member')
+    if Message.check_length_invalid(message):
+        raise InputError(description='Message length invalid')
+    if time_sent < utc_timestamp:
+        raise InputError(description='Time in the past')
+    new_msg = Message(user.u_id, message, time_sent, dm)
+    new_msg.add_to_store()
+    return {'message_id': new_msg.message_id}
