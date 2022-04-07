@@ -1,5 +1,4 @@
-from tkinter.messagebox import NO
-from src.type import User, Channel, DM, Message
+from src.type import User, Channel, DM, Message, Notification
 from src.error import AccessError, InputError
 from src.type import pickelsave
 
@@ -100,3 +99,26 @@ def message_share_v1(token, og_message_id, message, channel_id, dm_id):
     new_msg = Message(user.u_id, content, utc_timestamp, sup)
     new_msg.add_to_store()
     return {'message_id': new_msg.message_id}
+
+
+@pickelsave
+def message_react_v1(token, message_id, react_id):
+    user = User.find_by_token(token)
+    msg = Message.find_by_id(message_id)
+    if user is None:
+        raise AccessError(description='Permission denied')
+    if msg is None:
+        raise InputError(description='Message not found')
+    if not msg.sup.has_user(user):
+        raise InputError(description='Message not found')
+    if not react_id in msg.react.keys():
+        raise InputError(description='Invaild react type')
+    if user in msg.react[react_id]:
+        raise InputError(description='Already reacting')
+    msg.react[react_id].append(user)
+    if msg.sup.has_user(msg.sender):
+        new_nf = Notification(
+            msg.sup,
+            f'{user.handle_str} reacted to your message in {msg.sup.name}')
+        msg.sender.add_notification(new_nf)
+    return {}

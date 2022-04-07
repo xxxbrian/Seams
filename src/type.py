@@ -496,10 +496,12 @@ class Message():
     def __init__(self, u_id: int, content: str, time_sent: int, sup) -> None:
         self.message_id = Message.get_last_id() + 1
         self.u_id = u_id
+        self.sender = User.find_by_id(u_id)
         self.content = content
         self.time_sent = time_sent
         self.is_active = True
         self.sup = sup
+        self.react = {1: []}
 
     def __setattr__(self, key, value):
         self.__dict__[key] = value

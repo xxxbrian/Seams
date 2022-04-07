@@ -377,6 +377,17 @@ def message_share():
     return dumps(resp)
 
 
+@APP.route("/message/react/v1", methods=['POST'])
+def message_react():
+    data = request.get_json()
+    resp = message_react_v1(
+        data['token'],
+        data['message_id'],
+        data['react_id'],
+    )
+    return dumps(resp)
+
+
 #### NO NEED TO MODIFY BELOW THIS POINT
 
 if __name__ == "__main__":
