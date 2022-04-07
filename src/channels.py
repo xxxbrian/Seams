@@ -1,5 +1,6 @@
 from src.error import AccessError, InputError
 from src.type import User, Channel
+from src.type import pickelsave
 
 
 def channels_list_v2(token):
@@ -38,6 +39,7 @@ def channels_listall_v2(token):
     }
 
 
+@pickelsave
 def channels_create_v2(token, name, is_public):
     """Creates a new channel with 'name' (either public or private).
         The user who created it automatically joins the channel"""

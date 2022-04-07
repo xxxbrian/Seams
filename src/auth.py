@@ -1,7 +1,9 @@
 from src.error import AccessError, InputError
 from src.type import User
+from src.type import pickelsave
 
 
+@pickelsave
 def auth_login_v2(email, password):
     """Given a registered user's email and password, returns their `auth_user_id` value and a new `token`.
 
@@ -29,7 +31,7 @@ def auth_login_v2(email, password):
         'auth_user_id': user.u_id,
     }
 
-
+@pickelsave
 def auth_register_v2(email, password, name_first, name_last):
     """Given a user's first and last name, email address, and password, create a new account for them and return a new `auth_user_id` and `token`.
 
@@ -65,7 +67,7 @@ def auth_register_v2(email, password, name_first, name_last):
 
     return auth_login_v2(email, password)
 
-
+@pickelsave
 def auth_logout_v1(token):
     """Given an active token, invalidates the token to log the user out.
 

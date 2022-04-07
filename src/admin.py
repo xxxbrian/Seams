@@ -1,7 +1,9 @@
 from src.type import User
 from src.error import AccessError, InputError
+from src.type import pickelsave
 
 
+@pickelsave
 def admin_user_remove_v1(token, u_id):
     """Given a user by their u_id, remove them from the Seams.
 
@@ -31,6 +33,7 @@ def admin_user_remove_v1(token, u_id):
     return {}
 
 
+@pickelsave
 def admin_userpermission_change_v1(token, u_id, permission_id):
     """Given a user by their user ID, set their permissions to new permissions described by permission_id.
 

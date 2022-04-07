@@ -1,5 +1,6 @@
 from src.type import User
 from src.error import AccessError, InputError
+from src.type import pickelsave
 
 
 def users_all_v1(token):
@@ -19,6 +20,7 @@ def user_profile_v1(token, u_id):
     return {'user': user.todict()}
 
 
+@pickelsave
 def user_profile_setname_v1(token, name_first, name_last):
     user = User.find_by_token(token)
     if user is None:
@@ -32,6 +34,7 @@ def user_profile_setname_v1(token, name_first, name_last):
     return {}
 
 
+@pickelsave
 def user_profile_setemail_v1(token, email):
     user = User.find_by_token(token)
     if user is None:
@@ -44,6 +47,7 @@ def user_profile_setemail_v1(token, email):
     return {}
 
 
+@pickelsave
 def user_profile_sethandle_v1(token, handle_str):
     user = User.find_by_token(token)
     if user is None:

@@ -1,7 +1,9 @@
 from src.error import InputError, AccessError
 from src.type import User, Channel, Notification
+from src.type import pickelsave
 
 
+@pickelsave
 def channel_invite_v2(token, channel_id, u_id):
     """Invites a user with ID u_id to join a channel with ID channel_id. Once invited, the user is added to the channel immediately. In both public and private channels, all members are able to invite users.
 
@@ -110,6 +112,7 @@ def channel_messages_v2(token, channel_id, start):
     }
 
 
+@pickelsave
 def channel_join_v2(token, channel_id):
     """Given a channel_id of a channel that the authorised user can join, adds them to that channel.
 
@@ -144,6 +147,7 @@ def channel_join_v2(token, channel_id):
     return {}
 
 
+@pickelsave
 def channel_leave_v1(token, channel_id):
     """Given a channel with ID channel_id that the authorised user is a member of, remove them as a member of the channel. Their messages should remain in the channel. If the only channel owner leaves, the channel will remain.
 
@@ -173,6 +177,7 @@ def channel_leave_v1(token, channel_id):
     return {}
 
 
+@pickelsave
 def channel_addowner_v1(token, channel_id, u_id):
     """Make user with user id u_id an owner of the channel.
 
@@ -211,6 +216,7 @@ def channel_addowner_v1(token, channel_id, u_id):
     return {}
 
 
+@pickelsave
 def channel_removeowner_v1(token, channel_id, u_id):
     """Remove user with user id u_id as an owner of the channel.
 
