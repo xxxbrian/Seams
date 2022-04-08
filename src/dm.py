@@ -1,7 +1,9 @@
 from src.type import User, DM, Notification
 from src.error import InputError, AccessError
+from src.type import pickelsave
 
 
+@pickelsave
 def dm_create_v1(token, u_ids):
     auth_user = User.find_by_token(token)
     users_list = [User.find_by_id(u_id) for u_id in u_ids]
@@ -35,6 +37,7 @@ def dm_list_v1(token):
     }
 
 
+@pickelsave
 def dm_remove_v1(token, dm_id):
     user = User.find_by_token(token)
     dm = DM.find_by_id(dm_id)
@@ -62,6 +65,7 @@ def dm_details_v1(token, dm_id):
     return dm.todict({'name', 'members'})
 
 
+@pickelsave
 def dm_leave_v1(token, dm_id):
     user = User.find_by_token(token)
     dm = DM.find_by_id(dm_id)
@@ -84,11 +88,14 @@ def dm_messages_v1(token, dm_id, start):
         raise InputError(description='DM not found')
     if not dm.has_user(user):
         raise AccessError(description='Permission denied: Not member')
-    if start > len(dm.messages):
+    message_amount = len(dm.get_messages())
+    if start > message_amount:
         raise InputError(description='Message not found')
 
-    end = start + 50 if start + 50 <= len(dm.messages) else -1
-    msg_list = list(msg.todict() for msg in dm.get_messages(start, end))
+    end = start + 50 if start + 50 <= message_amount else -1
+    msg_list = [
+        msg.todict(auth_user=user) for msg in dm.get_messages(start, end)
+    ]
     return {
         'messages': msg_list,
         'start': start,

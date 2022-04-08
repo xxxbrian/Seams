@@ -7,4 +7,4 @@ def notifications_get_v1(token):
     if user is None:
         raise AccessError(description='Permission denied')
     nfs = user.get_notification()
-    return {'notifications': [nf.todict() for nf in nfs[0:10]]}
+    return {'notifications': [nf.todict() for nf in nfs[0:20]]}
