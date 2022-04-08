@@ -309,3 +309,4 @@ def test_search_invalid_token():
                               params = {'token': -1,
                                        'query_str': 'haha'})
     assert response_1.status_code == AccessError.code
+    
