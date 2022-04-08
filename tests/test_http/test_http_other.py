@@ -149,9 +149,9 @@ def test_notification_in_channel(login_list, channel_list):
                           'react_id': 1})
     response_3 = requests.get(url + 'notifications/get/v1',
                               params={'token': login_list[1]['token']}).json()
-    assert response_3['notifications'][1]['channel_id'] == channel_list[0]['channel_id']
-    assert response_3['notifications'][1]['dm-id'] == -1
-    assert response_3['notifications'][1]['notification_message'] == "steveyang reacted to your message in Steve's channel"
+    assert response_3['notifications'][0]['channel_id'] == channel_list[0]['channel_id']
+    assert response_3['notifications'][0]['dm_id'] == -1
+    assert response_3['notifications'][0]['notification_message'] == "steveyang reacted to your message in Steve's channel"
 
 def test_notification_in_DM(login_list, dm_list):
     '''
@@ -185,9 +185,10 @@ def test_notification_in_DM(login_list, dm_list):
                           'react_id': 1})
     response_3 = requests.get(url + 'notifications/get/v1',
                               params={'token': login_list[1]['token']}).json()
-    assert response_3['notifications'][1]['dm_id'] == -1
-    assert response_3['notifications'][1]['dm-id'] == dm_list[0]['dm_id']
-    assert response_3['notifications'][1]['notification_message'] == "steveyang reacted to your message in bojinli, brianlee, steveyang"
+    print(response_3)
+    assert response_3['notifications'][0]['channel_id'] == -1
+    assert response_3['notifications'][0]['dm_id'] == dm_list[0]['dm_id']
+    assert response_3['notifications'][0]['notification_message'] == "steveyang reacted to your message in bojinli, brianlee, steveyang"
     
 ########################################################### Test_notifications/get/v1 ########################################################### 
 
