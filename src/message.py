@@ -94,7 +94,7 @@ def message_share_v1(token, og_message_id, message, channel_id, dm_id):
     channel = Channel.find_by_id(channel_id)
     dm = DM.find_by_id(dm_id)
     if channel is None and dm is None:
-        raise InputError(description='Channel/DM id invaild')
+        raise InputError(description='Channel/DM id invalid')
     if Message.check_length_invalid(message):
         raise InputError(description='Message length invalid')
     sup = channel if dm is None else dm
@@ -125,7 +125,7 @@ def message_react_v1(token, message_id, react_id):
     if not msg.sup.has_user(user):
         raise InputError(description='Message not found')
     if not react_id in msg.react_dict.keys():
-        raise InputError(description='Invaild react type')
+        raise InputError(description='Invalid react type')
     if user in msg.react_dict[react_id]:
         raise InputError(description='Already reacting')
     msg.react_dict[react_id].append(user)
@@ -148,7 +148,7 @@ def message_unreact_v1(token, message_id, react_id):
     if not msg.sup.has_user(user):
         raise InputError(description='Message not found')
     if not react_id in msg.react_dict.keys():
-        raise InputError(description='Invaild react type')
+        raise InputError(description='Invalid react type')
     if not user in msg.react_dict[react_id]:
         raise InputError(description='No reacting')
     msg.react_dict[react_id].remove(user)

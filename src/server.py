@@ -16,6 +16,7 @@ from src.message import *
 from src.notification import *
 from src.other import *
 from src.search import *
+from src.standup import *
 from src.user import *
 
 
@@ -439,6 +440,36 @@ def message_sendlaterdm():
         data['dm_id'],
         data['message'],
         data['time_sent'],
+    )
+    return dumps(resp)
+
+
+@APP.route("/standup/start/v1", methods=['POST'])
+def standup_start():
+    data = request.get_json()
+    resp = standup_start_v1(
+        data['token'],
+        data['channel_id'],
+        data['length'],
+    )
+    return dumps(resp)
+
+
+@APP.route('/standup/active/v1', methods=['GET'])
+def standup_active():
+    token = str(request.args.get('token'))
+    channel_id = int(request.args.get('channel_id'))
+    resp = standup_active_v1(token, channel_id)
+    return dumps(resp)
+
+
+@APP.route("/standup/send/v1", methods=['POST'])
+def standup_send():
+    data = request.get_json()
+    resp = standup_send_v1(
+        data['token'],
+        data['channel_id'],
+        data['message'],
     )
     return dumps(resp)
 
