@@ -1,7 +1,8 @@
 from src.error import AccessError, InputError
 from src.type import User
 from src.type import pickelsave
-from src.email_server import email_send
+from flask_mail import Message as Flask_Message
+from src.config import MAIL_USERNAME
 
 
 @pickelsave
@@ -91,12 +92,16 @@ def auth_logout_v1(token):
 
 
 @pickelsave
-def auth_passwordreset_request_v1(email):
+def auth_passwordreset_request_v1(email, mailobj):
     user = User.find_by_email(email)
     if user is None:
         return {}
     code = user.generat_reset_code()
-    email_send(code, [email])
+    msg = Flask_Message('UNSW-COMP1531',
+                        sender=MAIL_USERNAME,
+                        recipients=[email])
+    msg.body = code
+    mailobj.send(msg)
     return {}
 
 
