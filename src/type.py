@@ -7,6 +7,7 @@ import pickle
 import os
 from datetime import timezone
 import datetime
+import secrets
 
 from src.data_store import data_store
 
@@ -76,6 +77,9 @@ class User():
             f' - handle:     {self.handle_str}\n' + \
             f' - group_id:   {self.group_id}'
         return info
+
+    def __hash__(self) -> int:
+        return hash(self.handle_str)
 
     def todict(self,
                show={'u_id', 'email', 'name_first', 'name_last',
@@ -287,6 +291,31 @@ class User():
 
     def get_notification(self):
         return sorted([ntf for ntf in self.notification if ntf.is_available()])
+
+    def generat_reset_code(self):
+        code = secrets.token_urlsafe()[0:8]
+        if code in store['reset_code'].values():
+            return self.generat_reset_code()
+        else:
+            store['reset_code'][self] = code
+            return code
+
+    @staticmethod
+    def find_by_reset_code(code):
+        user = None
+        for u, c in store['reset_code'].items():
+            if c == code:
+                user = u
+        return user
+
+    def remove_reset_code(self):
+        store['reset_code'].pop(self)
+
+    def password_set(self, pwd: str):
+        self.password = User.encrypt(pwd)
+        for token in store['login_token']:
+            if self == User.find_by_token(token):
+                User.remove_token(token)
 
 
 class Channel():

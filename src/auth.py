@@ -1,6 +1,7 @@
 from src.error import AccessError, InputError
 from src.type import User
 from src.type import pickelsave
+from src.email_server import email_send
 
 
 @pickelsave
@@ -30,6 +31,7 @@ def auth_login_v2(email, password):
         'token': token,
         'auth_user_id': user.u_id,
     }
+
 
 @pickelsave
 def auth_register_v2(email, password, name_first, name_last):
@@ -67,6 +69,7 @@ def auth_register_v2(email, password, name_first, name_last):
 
     return auth_login_v2(email, password)
 
+
 @pickelsave
 def auth_logout_v1(token):
     """Given an active token, invalidates the token to log the user out.
@@ -84,4 +87,26 @@ def auth_logout_v1(token):
     if user is None:
         raise AccessError(description='Token invalid')
     User.remove_token(token)
+    return {}
+
+
+@pickelsave
+def auth_passwordreset_request_v1(email):
+    user = User.find_by_email(email)
+    if user is None:
+        return {}
+    code = user.generat_reset_code()
+    email_send(code, [email])
+    return {}
+
+
+@pickelsave
+def auth_passwordreset_reset_v1(reset_code: str, new_password: str):
+    user = User.find_by_reset_code(reset_code)
+    if user is None:
+        raise InputError(description='Reset_code invalid')
+    if User.check_password_invalid(new_password):
+        raise InputError(description='Password length invalid')
+    user.password_set(new_password)
+    user.remove_reset_code()
     return {}

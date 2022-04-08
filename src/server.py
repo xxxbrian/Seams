@@ -474,6 +474,23 @@ def standup_send():
     return dumps(resp)
 
 
+@APP.route("/auth/passwordreset/request/v1", methods=['POST'])
+def auth_passwordreset_request():
+    data = request.get_json()
+    resp = auth_passwordreset_request_v1(data['email'], )
+    return dumps(resp)
+
+
+@APP.route("/auth/passwordreset/reset/v1", methods=['POST'])
+def auth_passwordreset_reset():
+    data = request.get_json()
+    resp = auth_passwordreset_reset_v1(
+        data['reset_code'],
+        data['new_password'],
+    )
+    return dumps(resp)
+
+
 #### NO NEED TO MODIFY BELOW THIS POINT
 
 if __name__ == "__main__":
