@@ -88,11 +88,14 @@ def dm_messages_v1(token, dm_id, start):
         raise InputError(description='DM not found')
     if not dm.has_user(user):
         raise AccessError(description='Permission denied: Not member')
-    if start > len(dm.messages):
+    message_amount = len(dm.get_messages())
+    if start > message_amount:
         raise InputError(description='Message not found')
 
-    end = start + 50 if start + 50 <= len(dm.messages) else -1
-    msg_list = list(msg.todict() for msg in dm.get_messages(start, end))
+    end = start + 50 if start + 50 <= message_amount else -1
+    msg_list = [
+        msg.todict(auth_user=user) for msg in dm.get_messages(start, end)
+    ]
     return {
         'messages': msg_list,
         'start': start,

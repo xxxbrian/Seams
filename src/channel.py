@@ -99,12 +99,15 @@ def channel_messages_v2(token, channel_id, start):
         raise InputError(description='Channel not found')
     if not channel.has_user(user):
         raise AccessError(description='Permission denied: Join channel first')
-    if start > len(channel.messages):
+    message_amount = len(channel.get_messages())
+    if start > message_amount:
         raise InputError(description='Message not found')
 
     # Message with index 0 is the most recent message in the channel.
-    end = start + 50 if start + 50 <= len(channel.messages) else -1
-    msg_list = list(msg.todict() for msg in channel.get_messages(start, end))
+    end = start + 50 if start + 50 <= message_amount else -1
+    msg_list = [
+        msg.todict(auth_user=user) for msg in channel.get_messages(start, end)
+    ]
     return {
         'messages': msg_list,
         'start': start,

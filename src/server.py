@@ -364,6 +364,85 @@ def search_msg():
     return dumps(resp)
 
 
+@APP.route("/message/share/v1", methods=['POST'])
+def message_share():
+    data = request.get_json()
+    resp = message_share_v1(
+        data['token'],
+        data['og_message_id'],
+        data['message'],
+        data['channel_id'],
+        data['dm_id'],
+    )
+    return dumps(resp)
+
+
+@APP.route("/message/react/v1", methods=['POST'])
+def message_react():
+    data = request.get_json()
+    resp = message_react_v1(
+        data['token'],
+        data['message_id'],
+        data['react_id'],
+    )
+    return dumps(resp)
+
+
+@APP.route("/message/unreact/v1", methods=['POST'])
+def message_unreact():
+    data = request.get_json()
+    resp = message_unreact_v1(
+        data['token'],
+        data['message_id'],
+        data['react_id'],
+    )
+    return dumps(resp)
+
+
+@APP.route("/message/pin/v1", methods=['POST'])
+def message_pin():
+    data = request.get_json()
+    resp = message_pin_v1(
+        data['token'],
+        data['message_id'],
+    )
+    return dumps(resp)
+
+
+@APP.route("/message/unpin/v1", methods=['POST'])
+def message_unpin():
+    data = request.get_json()
+    resp = message_unpin_v1(
+        data['token'],
+        data['message_id'],
+    )
+    return dumps(resp)
+
+
+@APP.route("/message/sendlater/v1", methods=['POST'])
+def message_sendlater():
+    data = request.get_json()
+    resp = message_sendlater_v1(
+        data['token'],
+        data['channel_id'],
+        data['message'],
+        data['time_sent'],
+    )
+    return dumps(resp)
+
+
+@APP.route("/message/sendlaterdm/v1", methods=['POST'])
+def message_sendlaterdm():
+    data = request.get_json()
+    resp = message_sendlaterdm_v1(
+        data['token'],
+        data['dm_id'],
+        data['message'],
+        data['time_sent'],
+    )
+    return dumps(resp)
+
+
 #### NO NEED TO MODIFY BELOW THIS POINT
 
 if __name__ == "__main__":
