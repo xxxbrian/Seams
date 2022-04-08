@@ -115,7 +115,7 @@ def create_dm(login_list):
 
 ######################################## Test_message_send_v1 ########################################
 
-def test_message_send_invalid_channel_id(user_list, channel_list, login_list):
+def test_message_send_invalid_channel_id(channel_list, login_list):
     '''
     
     Test for input a invalid channel_id
@@ -135,7 +135,7 @@ def test_message_send_invalid_channel_id(user_list, channel_list, login_list):
                                        'message': 'Hello world!'})
     assert response_1.status_code == InputError.code
     
-def test_message_send_empty_message(user_list, channel_list, login_list):
+def test_message_send_empty_message(channel_list, login_list):
     '''
     
     Test for input an empty message
@@ -150,7 +150,7 @@ def test_message_send_empty_message(user_list, channel_list, login_list):
                                        'message': ''})
     assert response_1.status_code == InputError.code
     
-def test_message_send_too_long_message(user_list, channel_list, login_list):
+def test_message_send_too_long_message(channel_list, login_list):
     '''
     
     Test for input more than 1000 characters
@@ -169,7 +169,7 @@ def test_message_send_too_long_message(user_list, channel_list, login_list):
                                        'message': too_long_message})
     assert response_1.status_code == InputError.code
     
-def test_message_send_auth_user_out_of_channel(user_list, channel_list, login_list):
+def test_message_send_auth_user_out_of_channel(channel_list, login_list):
     '''
     
     This test is test when authorised user is not amember of channel
@@ -184,7 +184,7 @@ def test_message_send_auth_user_out_of_channel(user_list, channel_list, login_li
                                        'message': "Hello"})
     assert response_1.status_code == AccessError.code
     
-def test_message_send_invalid_token(user_list, channel_list, login_list):
+def test_message_send_invalid_token(channel_list, login_list):
     '''
     
     This test is to test when toke is invalid
@@ -224,7 +224,7 @@ def test_message_send_invalid_token(user_list, channel_list, login_list):
     
 ######################################## Test_message_edit_v1 ########################################
 
-def test_channel_message_edit_normal(user_list, login_list, channel_list):
+def test_channel_message_edit_normal(login_list, channel_list):
     '''
     
     This test is to test edit message successfully in channel
@@ -272,7 +272,7 @@ def test_channel_message_edit_normal(user_list, login_list, channel_list):
     assert response_5['messages'][0]['message'] == 'Hello world!'
     assert response_5['messages'][1]['message'] == 'Hello'
     
-def test_dm_message_edit_normal(user_list, login_list, dm_list):
+def test_dm_message_edit_normal(login_list, dm_list):
     '''
     
     This test is to test edit message successfully in DM
@@ -320,7 +320,7 @@ def test_dm_message_edit_normal(user_list, login_list, dm_list):
     assert response_5['messages'][0]['message'] == 'Hello world!'
     assert response_5['messages'][1]['message'] == 'Hello'
     
-def test_channel_message_edit_too_long_message(user_list, login_list, channel_list):
+def test_channel_message_edit_too_long_message(login_list, channel_list):
     '''
     
     This test is to test the message which has been edit is more than 1000 characters
@@ -347,7 +347,7 @@ def test_channel_message_edit_too_long_message(user_list, login_list, channel_li
                                       'message': too_long_message})
     assert response_2.status_code == InputError.code
     
-def test_dm_message_edit_too_long_message(user_list, login_list, dm_list):
+def test_dm_message_edit_too_long_message(login_list, dm_list):
     '''
     
     This test is to test the message which has been edit is more than 1000 characters
@@ -373,7 +373,7 @@ def test_dm_message_edit_too_long_message(user_list, login_list, dm_list):
                                       'message': too_long_message})
     assert response_2.status_code == InputError.code
     
-def test_channel_message_edit_wrong_message_id(user_list, login_list, channel_list):
+def test_channel_message_edit_wrong_message_id(login_list, channel_list):
     '''
     
     This test is to test message_id does not refer to a valid message within a channel
@@ -401,7 +401,7 @@ def test_channel_message_edit_wrong_message_id(user_list, login_list, channel_li
                                       'message': "Hi hi"})
     assert response_2.status_code == InputError.code
       
-def test_channel_message_edit_user_not_in_channel(user_list, login_list, channel_list):
+def test_channel_message_edit_user_not_in_channel(login_list, channel_list):
     '''
     
     This test is to test message_id does not refer to a valid message within a channel
@@ -424,7 +424,7 @@ def test_channel_message_edit_user_not_in_channel(user_list, login_list, channel
                                       'message': "Hi hi"})
     assert response_2.status_code == InputError.code
     
-def test_dm_message_edit_wrong_message_id(user_list, login_list, dm_list):
+def test_dm_message_edit_wrong_message_id(login_list, dm_list):
     '''
     
     This test is to test message_id does not refer to a valid message within a DM
@@ -452,7 +452,7 @@ def test_dm_message_edit_wrong_message_id(user_list, login_list, dm_list):
                                       'message': "Hi hi"})
     assert response_2.status_code == InputError.code
     
-def test_message_edit_channel_invalid_user(user_list, login_list, channel_list):
+def test_message_edit_channel_invalid_user(login_list, channel_list):
     '''
     
     This test is to test when invalid user want to edit a valid message in valid channel
@@ -478,7 +478,7 @@ def test_message_edit_channel_invalid_user(user_list, login_list, channel_list):
                                       'message': "Hi hi"})
     assert response_2.status_code == AccessError.code
     
-def test_message_edit_dm_invalid_user(user_list, login_list, dm_list):
+def test_message_edit_dm_invalid_user(login_list, dm_list):
     '''
     
     This test is to test when invalid user want to edit a valid message in valid channel
@@ -500,7 +500,7 @@ def test_message_edit_dm_invalid_user(user_list, login_list, dm_list):
                                       'message': "Hi hi"})
     assert response_2.status_code == AccessError.code
     
-def test_channel_message_edit_owner_edit_message(user_list, login_list, channel_list):
+def test_channel_message_edit_owner_edit_message(login_list, channel_list):
     '''
     
     This test it to test owner edit message successfully
@@ -534,7 +534,7 @@ def test_channel_message_edit_owner_edit_message(user_list, login_list, channel_
                                         'start': 0}).json()
     assert response_3['messages'][0]['message'] == 'Hi hi'
     
-def test_dm_message_edit_owner_edit_message(user_list, login_list, dm_list):
+def test_dm_message_edit_owner_edit_message(login_list, dm_list):
     '''
     
     This test is to test dm owner edit message from other users successfully
@@ -567,7 +567,7 @@ def test_dm_message_edit_owner_edit_message(user_list, login_list, dm_list):
     assert response_3['messages'][0]['message'] == 'Yang'
     assert response_3['messages'][1]['message'] == 'Hi'
     
-def test_dm_message_edit_invalid_token(user_list, login_list, channel_list):
+def test_dm_message_edit_invalid_token(login_list, channel_list):
     '''
     
     This test is to test when input invalid token
@@ -615,7 +615,7 @@ def test_dm_message_edit_global_owner_cant_edit(login_list, dm_list):
 
 ######################################## message/remove/v1 ########################################
 
-def test_channel_message_remove_normal(user_list, login_list, channel_list):
+def test_channel_message_remove_normal(login_list, channel_list):
     '''
     
     This test is to test the normal situation of removing test from a channel
@@ -648,7 +648,7 @@ def test_channel_message_remove_normal(user_list, login_list, channel_list):
     assert response_2['messages'][0]['message'] == 'world'
     assert response_2['messages'][1]['message'] == 'Hello'
     
-def test_dm_message_remove_normal(user_list, login_list, dm_list):
+def test_dm_message_remove_normal(login_list, dm_list):
     '''
     
     This test is to test the normal situation of removing test from a DM
@@ -683,7 +683,7 @@ def test_dm_message_remove_normal(user_list, login_list, dm_list):
     assert response_4['messages'][0]['message'] == 'world!'
     assert response_4['messages'][1]['message'] == 'Hello'
     
-def test_channel_message_remove_invalid_message_id(user_list, login_list, channel_list):
+def test_channel_message_remove_invalid_message_id(login_list, channel_list):
     '''
     
     This test is to test when remove a message, which message_id is invalid in channel
@@ -709,7 +709,7 @@ def test_channel_message_remove_invalid_message_id(user_list, login_list, channe
                                          'message_id': invalid_message_id})
     assert response_2.status_code == InputError.code
     
-def test_dm_message_remove_invalid_message_id(user_list, login_list, dm_list):
+def test_dm_message_remove_invalid_message_id(login_list, dm_list):
     '''
     
     This test is to test when remove a message, which message_id is invalid in dm
@@ -735,7 +735,7 @@ def test_dm_message_remove_invalid_message_id(user_list, login_list, dm_list):
                                          'message_id': invalid_message_id})
     assert response_2.status_code == InputError.code
 
-def test_channel_message_remove_invalid_user(user_list, login_list, channel_list):
+def test_channel_message_remove_invalid_user(login_list, channel_list):
     '''
     
     This test is to test when invalid user remove message
@@ -760,7 +760,7 @@ def test_channel_message_remove_invalid_user(user_list, login_list, channel_list
                                       'message_id': response_1['message_id']})
     assert response_2.status_code == AccessError.code
     
-def test_message_remove_dm_invalid_user(user_list, login_list, dm_list):
+def test_message_remove_dm_invalid_user(login_list, dm_list):
     '''
     
     This test is to test when invalid user want to remove a valid message in valid channel
@@ -781,7 +781,7 @@ def test_message_remove_dm_invalid_user(user_list, login_list, dm_list):
                                       'message_id': response_1['message_id']})
     assert response_2.status_code == AccessError.code
     
-def test_message_remove_owner_remove_message(user_list, login_list, channel_list):
+def test_message_remove_owner_remove_message(login_list, channel_list):
     '''
     
     This test it to test owner remove message successfully
@@ -818,7 +818,7 @@ def test_message_remove_owner_remove_message(user_list, login_list, channel_list
                                         'start': 0}).json()
     assert response_3['messages'][0]['message'] == 'world!'
     
-def test_channel_message_remove_owner_remove_message(user_list, login_list, dm_list):
+def test_channel_message_remove_owner_remove_message(login_list, dm_list):
     '''
     
     This test is to test dm owner remove message from other users successfully
@@ -881,7 +881,7 @@ def test_dm_message_remove_global_owner_cant_remove_message(login_list, dm_list)
 
 ######################################## message/senddm/v1 ########################################
 
-def test_message_senddm_invalid_dm_id(user_list, dm_list, login_list):
+def test_message_senddm_invalid_dm_id(dm_list, login_list):
     '''
     
     Test for input a invalid dm_id
@@ -901,7 +901,7 @@ def test_message_senddm_invalid_dm_id(user_list, dm_list, login_list):
                                        'message': 'Hello world!'})
     assert response_1.status_code == InputError.code
     
-def test_message_senddm_empty_message(user_list, dm_list, login_list):
+def test_message_senddm_empty_message(dm_list, login_list):
     '''
     
     Test for input an empty message
@@ -916,7 +916,7 @@ def test_message_senddm_empty_message(user_list, dm_list, login_list):
                                        'message': ''})
     assert response_1.status_code == InputError.code
     
-def test_message_senddm_too_long_message(user_list, dm_list, login_list):
+def test_message_senddm_too_long_message(dm_list, login_list):
     '''
     
     Test for input more than 1000 characters
@@ -935,7 +935,7 @@ def test_message_senddm_too_long_message(user_list, dm_list, login_list):
                                        'message': too_long_message})
     assert response_1.status_code == InputError.code
     
-def test_message_senddm_auth_user_out_of_dm(user_list, dm_list, login_list):
+def test_message_senddm_auth_user_out_of_dm(dm_list, login_list):
     '''
     
     This test is test when authorised user is not amember of dm
@@ -950,7 +950,7 @@ def test_message_senddm_auth_user_out_of_dm(user_list, dm_list, login_list):
                                        'message': "Hello"})
     assert response_1.status_code == AccessError.code
     
-def test_message_senddm_invalid_token(user_list, dm_list, login_list):
+def test_message_senddm_invalid_token(dm_list, login_list):
     '''
     
     This test is to test when toke is invalid
@@ -1163,13 +1163,13 @@ def test_message_share_no_dm_and_channel_id_is_minus_1(login_list, dm_list, chan
                                   'og_message_id': res_1['message_id'],
                                   'message': '',
                                   'channel_id': channel_list[1]['channel_id'],
-                                  'dm_id': dm_list[1]['dm_list']})
+                                  'dm_id': dm_list[1]['dm_id']})
     res_3 = requests.post(url + "message/share/v1",
                           json = {'token': login_list[0]['token'],
                                   'og_message_id': res_1['message_id'],
                                   'message': 'This is Steve',
                                   'channel_id': channel_list[2]['channel_id'],
-                                  'dm_id': dm_list[2]['dm_list']})
+                                  'dm_id': dm_list[2]['dm_id']})
     
     # user[1] add user[0] to channel[1]
     requests.post(f"{url}channel/invite/v2",
@@ -1186,13 +1186,13 @@ def test_message_share_no_dm_and_channel_id_is_minus_1(login_list, dm_list, chan
                                   'og_message_id': res_4['message_id'],
                                   'message': '',
                                   'channel_id': channel_list[2]['channel_id'],
-                                  'dm_id': dm_list[2]['dm_list']})
+                                  'dm_id': dm_list[2]['dm_id']})
     res_6 = requests.post(url + "message/share/v1",
                           json = {'token': login_list[0]['token'],
                                   'og_message_id': res_4['message_id'],
                                   'message': 'This is Steve',
                                   'channel_id': channel_list[3]['channel_id'],
-                                  'dm_id': dm_list[1]['dm_list']})
+                                  'dm_id': dm_list[1]['dm_id']})
     assert res_2.status_code == InputError.code
     assert res_3.status_code == InputError.code
     assert res_5.status_code == InputError.code
@@ -1217,8 +1217,8 @@ def test_message_share_wrong_message_id(login_list, dm_list, channel_list):
                   json = {'token': login_list[1]['token'],
                           'channel_id': channel_list[1]['channel_id'],
                           'message': 'Hello guys'}).json()
-    # user[0] shares a msg to channel[0] without a new msg, but user[0] has not joined
-    # channel[1]
+    # user[0] shares a msg in channel[1] to channel[0] without a new msg, but user[0] 
+    # has not joined channel[1]
     res_2 = requests.post(url + "message/share/v1",
                           json = {'token': login_list[0]['token'],
                                   'og_message_id': res_1['message_id'],
@@ -1226,8 +1226,8 @@ def test_message_share_wrong_message_id(login_list, dm_list, channel_list):
                                   'channel_id': channel_list[0]['channel_id'],
                                   'dm_id': -1})
     assert res_2.status_code == InputError.code
-    # user[0] shares a msg to channel[0] with a new msg,but user[0] has not joined
-    # channel[1]
+    # user[0] shares a msg in channel[1] to channel[0] with a new msg, but user[0] 
+    # has not joined channel[1]
     res_3 = requests.post(url + "message/share/v1",
                           json = {'token': login_list[0]['token'],
                                   'og_message_id': res_1['message_id'],
