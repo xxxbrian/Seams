@@ -30,7 +30,8 @@ initial_object = {
     'channels': [],
     'dms': [],
     'messages': [],
-    'login_token': []
+    'login_token': [],
+    'reset_code': {},
 }
 
 ## YOU SHOULD MODIFY THIS OBJECT ABOVE
