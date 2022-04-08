@@ -1568,4 +1568,179 @@ def test_message_react_invalid_token(login_list, channel_list, dm_list):
                                   'message_id': res_2['message_id'],
                                   'react_id': 0})
     assert res_3.status_code == res_4.status_code == AccessError.code
+
+######################################## message/react/v1 ########################################
+def test_message_unreact_normal(login_list, channel_list, dm_list):
+    '''
     
+    This test is to test when user unreact a message successfully
+    
+    Args:
+        login_list, channel_list, dm_list
+        
+    '''
+    # user[0] send a msg in channel[0]
+    res_1 = requests.post(url + 'message/send/v1',
+                        json = {'token': login_list[0]['token'],
+                                'channel_id': channel_list[0]['channel_id'],
+                                'message': 'Hello guys'}).json()
+    # user[0] send a msg in dm[0]
+    res_2 = requests.post(url + 'message/senddm/v1',
+                        json = {'token': login_list[0]['token'],
+                                'dm_id': dm_list[0]['dm_id'],
+                                'message': 'Hello guys'}).json()
+    requests.post(url + 'message/react/v1',
+                          json = {'token': login_list[0]['token'],
+                                  'message_id': res_1['message_id'],
+                                  'react_id': 1})
+    res_3 = requests.post(url + 'message/unreact/v1',
+                          json = {'token': login_list[0]['token'],
+                                  'message_id': res_1['message_id'],
+                                  'react_id': 1})
+    requests.post(url + 'message/react/v1',
+                          json = {'token': login_list[1]['token'],
+                                  'message_id': res_2['message_id'],
+                                  'react_id': 1})
+    res_4 = requests.post(url + 'message/unreact/v1',
+                          json = {'token': login_list[1]['token'],
+                                  'message_id': res_2['message_id'],
+                                  'react_id': 1})
+    assert res_3.status_code == 200
+    assert res_4.status_code == 200
+    
+def test_message_unreact_invalid_message_id(login_list, channel_list, dm_list):
+    '''
+    
+    This test is to test when message_id is not a valid message within a channel 
+    or DM that the authorised user has joined
+    
+    Args:
+        login_list, channel_list, dm_list
+        
+    '''
+    # user[1] send a msg in channel[1]
+    res_1 = requests.post(url + 'message/send/v1',
+                        json = {'token': login_list[1]['token'],
+                                'channel_id': channel_list[1]['channel_id'],
+                                'message': 'Hello guys'}).json()
+    # user[2] send a msg in dm[2]
+    res_2 = requests.post(url + 'message/senddm/v1',
+                        json = {'token': login_list[2]['token'],
+                                'dm_id': dm_list[2]['dm_id'],
+                                'message': 'Hello guys'}).json()
+    res_3 = requests.post(url + 'message/unreact/v1',
+                          json = {'token': login_list[0]['token'],
+                                  'message_id': res_1['message_id'],
+                                  'react_id': 1})
+    res_4 = requests.post(url + 'message/unreact/v1',
+                          json = {'token': login_list[0]['token'],
+                                  'message_id': res_2['message_id'],
+                                  'react_id': 1})
+    assert res_3.status_code == InputError.code
+    assert res_4.status_code == InputError.code
+    
+def test_message_unreact_invalid_react_id(login_list, channel_list, dm_list):
+    '''
+    
+    This test is to test when react_id is not a valid react ID
+    
+    Args:
+        login_list, channel_list, dm_list
+        
+    '''
+    # user[0] send a msg in channel[0]
+    res_1 = requests.post(url + 'message/send/v1',
+                        json = {'token': login_list[0]['token'],
+                                'channel_id': channel_list[0]['channel_id'],
+                                'message': 'Hello guys'}).json()
+    # user[0] send a msg in dm[0]
+    res_2 = requests.post(url + 'message/senddm/v1',
+                        json = {'token': login_list[0]['token'],
+                                'dm_id': dm_list[0]['dm_id'],
+                                'message': 'Hello guys'}).json()
+    requests.post(url + 'message/react/v1',
+                          json = {'token': login_list[0]['token'],
+                                  'message_id': res_1['message_id'],
+                                  'react_id': 1})
+    res_3 = requests.post(url + 'message/unreact/v1',
+                          json = {'token': login_list[0]['token'],
+                                  'message_id': res_1['message_id'],
+                                  'react_id': 2})
+    requests.post(url + 'message/react/v1',
+                          json = {'token': login_list[1]['token'],
+                                  'message_id': res_2['message_id'],
+                                  'react_id': 1})
+    res_4 = requests.post(url + 'message/unreact/v1',
+                          json = {'token': login_list[1]['token'],
+                                  'message_id': res_2['message_id'],
+                                  'react_id': -1})
+    assert res_3.status_code == res_4.status_code == InputError.code
+    
+def test_message_unreact_no_react_message(login_list, channel_list, dm_list):
+    '''
+    
+    This test is to test when the message does not contain a react with ID 
+    react_id from the authorised use
+    
+    Args:
+        login_list, channel_list, dm_list
+        
+    '''
+    # user[0] send a msg in channel[0]
+    res_1 = requests.post(url + 'message/send/v1',
+                        json = {'token': login_list[0]['token'],
+                                'channel_id': channel_list[0]['channel_id'],
+                                'message': 'Hello guys'}).json()
+    # user[0] send a msg in dm[0]
+    res_2 = requests.post(url + 'message/senddm/v1',
+                        json = {'token': login_list[0]['token'],
+                                'dm_id': dm_list[0]['dm_id'],
+                                'message': 'Hello guys'}).json()
+    res_3 = requests.post(url + 'message/unreact/v1',
+                          json = {'token': login_list[0]['token'],
+                                  'message_id': res_1['message_id'],
+                                  'react_id': 1})
+    res_4 = requests.post(url + 'message/unreact/v1',
+                          json = {'token': login_list[1]['token'],
+                                  'message_id': res_2['message_id'],
+                                  'react_id': 1})
+    assert res_3.status_code == InputError.code
+    assert res_4.status_code == InputError.code
+
+def test_message_unreact_invalid_token(login_list, channel_list, dm_list):
+    '''
+    
+    This test is to test when user unreact a message successfully
+    
+    Args:
+        login_list, channel_list, dm_list
+        
+    '''
+    # user[0] send a msg in channel[0]
+    res_1 = requests.post(url + 'message/send/v1',
+                        json = {'token': login_list[0]['token'],
+                                'channel_id': channel_list[0]['channel_id'],
+                                'message': 'Hello guys'}).json()
+    # user[0] send a msg in dm[0]
+    res_2 = requests.post(url + 'message/senddm/v1',
+                        json = {'token': login_list[0]['token'],
+                                'dm_id': dm_list[0]['dm_id'],
+                                'message': 'Hello guys'}).json()
+    requests.post(url + 'message/react/v1',
+                          json = {'token': login_list[0]['token'],
+                                  'message_id': res_1['message_id'],
+                                  'react_id': 1})
+    res_3 = requests.post(url + 'message/unreact/v1',
+                          json = {'token': -1,
+                                  'message_id': res_1['message_id'],
+                                  'react_id': 1})
+    requests.post(url + 'message/react/v1',
+                          json = {'token': login_list[1]['token'],
+                                  'message_id': res_2['message_id'],
+                                  'react_id': 1})
+    res_4 = requests.post(url + 'message/unreact/v1',
+                          json = {'token': -1,
+                                  'message_id': res_2['message_id'],
+                                  'react_id': 1})
+    assert res_3.status_code == AccessError.code
+    assert res_4.status_code == AccessError.code
