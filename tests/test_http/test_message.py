@@ -1428,4 +1428,144 @@ def test_message_share_invalid_token(login_list, dm_list, channel_list):
                                   'channel_id': -1,
                                   'dm_id': dm_list[1]['dm_id']})
     assert res_6.status_code == AccessError.code
+
+######################################## message/react/v1 ########################################
+def test_message_react_invalid_message_id(login_list, channel_list, dm_list):
+    '''
+    
+    This test is to test when message_id is not a valid message within a channel 
+    or DM that the authorised user has joined
+    
+    Args:
+        login_list, channel_list, dm_list
+        
+    Raises:
+        InputError
+        
+    '''
+    # user[0] send a msg in channel[0]
+    res_1 = requests.post(url + 'message/send/v1',
+                        json = {'token': login_list[0]['token'],
+                                'channel_id': channel_list[0]['channel_id'],
+                                'message': 'Hello guys'}).json()
+    # user[0] send a msg in dm[0]
+    res_2 = requests.post(url + 'message/senddm/v1',
+                        json = {'token': login_list[0]['token'],
+                                'dm_id': dm_list[0]['dm_id'],
+                                'message': 'Hello guys'}).json()
+    res_3 = requests.post(url + 'message/react/v1',
+                          json = {'token': login_list[3]['token'],
+                                  'message_id': res_1['message_id'],
+                                  'react_id': 1})
+    res_4 = requests.post(url + 'message/react/v1',
+                          json = {'token': login_list[3]['token'],
+                                  'message_id': res_2['message_id'],
+                                  'react_id': 1})
+    assert res_3.status_code == res_4.status_code == InputError.code    
+
+def test_message_react_invalid_react_id(login_list, channel_list, dm_list):
+    '''
+        
+    This test is to test when react_id is not a valid react ID-currently,
+    the only valid react ID the frontend has is 1
+    
+    Args:
+        login_list, channel_list, dm_list
+        
+    Raises:
+        InputError
+        
+    '''   
+    # user[0] send a msg in channel[0]
+    res_1 = requests.post(url + 'message/send/v1',
+                        json = {'token': login_list[0]['token'],
+                                'channel_id': channel_list[0]['channel_id'],
+                                'message': 'Hello guys'}).json()
+    # user[0] send a msg in dm[0]
+    res_2 = requests.post(url + 'message/senddm/v1',
+                        json = {'token': login_list[0]['token'],
+                                'dm_id': dm_list[0]['dm_id'],
+                                'message': 'Hello guys'}).json()
+    res_3 = requests.post(url + 'message/react/v1',
+                          json = {'token': login_list[0]['token'],
+                                  'message_id': res_1['message_id'],
+                                  'react_id': 3})
+    res_4 = requests.post(url + 'message/react/v1',
+                          json = {'token': login_list[1]['token'],
+                                  'message_id': res_2['message_id'],
+                                  'react_id': 0})
+    assert res_3.status_code == res_4.status_code == InputError.code  
+    
+def test_message_react_twice(login_list, channel_list, dm_list):
+    '''
+        
+    This test is to test when the message already contains a react 
+    with ID react_id from the authorised user
+    
+    Args:
+        login_list, channel_list, dm_list
+        
+    Raises:
+        InputError
+        
+    '''    
+    # user[0] send a msg in channel[0]
+    res_1 = requests.post(url + 'message/send/v1',
+                        json = {'token': login_list[0]['token'],
+                                'channel_id': channel_list[0]['channel_id'],
+                                'message': 'Hello guys'}).json()
+    # user[0] send a msg in dm[0]
+    res_2 = requests.post(url + 'message/senddm/v1',
+                        json = {'token': login_list[0]['token'],
+                                'dm_id': dm_list[0]['dm_id'],
+                                'message': 'Hello guys'}).json()
+    requests.post(url + 'message/react/v1',
+                          json = {'token': login_list[0]['token'],
+                                  'message_id': res_1['message_id'],
+                                  'react_id': 1})
+    res_3 = requests.post(url + 'message/react/v1',
+                          json = {'token': login_list[0]['token'],
+                                  'message_id': res_1['message_id'],
+                                  'react_id': 1})
+    requests.post(url + 'message/react/v1',
+                          json = {'token': login_list[1]['token'],
+                                  'message_id': res_2['message_id'],
+                                  'react_id': 1})
+    res_4 = requests.post(url + 'message/react/v1',
+                          json = {'token': login_list[1]['token'],
+                                  'message_id': res_2['message_id'],
+                                  'react_id': 1})
+    assert res_3.status_code == res_4.status_code == InputError.code  
+    
+def test_message_react_invalid_token(login_list, channel_list, dm_list):
+    '''
+        
+    This test is to test when token is invalid
+    
+    Args:
+        login_list, channel_list, dm_list
+        
+    Raises:
+        InputError
+        
+    '''    
+    # user[0] send a msg in channel[0]
+    res_1 = requests.post(url + 'message/send/v1',
+                        json = {'token': login_list[0]['token'],
+                                'channel_id': channel_list[0]['channel_id'],
+                                'message': 'Hello guys'}).json()
+    # user[0] send a msg in dm[0]
+    res_2 = requests.post(url + 'message/senddm/v1',
+                        json = {'token': login_list[0]['token'],
+                                'dm_id': dm_list[0]['dm_id'],
+                                'message': 'Hello guys'}).json()
+    res_3 = requests.post(url + 'message/react/v1',
+                          json = {'token': -1,
+                                  'message_id': res_1['message_id'],
+                                  'react_id': 1})
+    res_4 = requests.post(url + 'message/react/v1',
+                          json = {'token': -1,
+                                  'message_id': res_2['message_id'],
+                                  'react_id': 0})
+    assert res_3.status_code == res_4.status_code == AccessError.code
     
