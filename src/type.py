@@ -286,14 +286,6 @@ class User():
         self.notification.insert(0, notification)
 
     def get_notification(self):
-        for ntf in self.notification:
-            if ntf.is_available():
-                print(ntf.content, ntf.time_sent)
-        print('#############')
-        for ntf in sorted(
-            [ntf for ntf in self.notification if ntf.is_available()]):
-            if ntf.is_available():
-                print(ntf.content, ntf.time_sent)
         return sorted([ntf for ntf in self.notification if ntf.is_available()])
 
 
@@ -326,6 +318,12 @@ class Channel():
         self.channel_id = Channel.get_last_id() + 1
         self.is_public = is_public
         self.messages = []
+        self.standup = {
+            'is_active': False,
+            'auth_user': None,
+            'time_finish': None,
+            'message_buffer': [],
+        }
 
     # def __setattr__(self, key, value):
     #     self.__dict__[key] = value
@@ -420,6 +418,27 @@ class Channel():
 
     def has_owner(self, user: User):
         return user in self.owners or user.is_admin()
+
+    def standup_set(self, auth_user: User, time_finish):
+        self.standup['is_active'] = True
+        self.standup['auth_user'] = auth_user
+        self.standup['time_finish'] = time_finish
+
+    def standup_add(self, sender, message):
+        self.standup['message_buffer'].append(
+            f'{sender.handle_str}: {message}')
+
+    def standup_do(self):
+        self.standup['is_active'] = False
+        utc_time = Message.utc_timestamp()
+        auth_user = self.standup['auth_user']
+        if len(self.standup['message_buffer']) > 0:
+            message = '\n'.join(self.standup['message_buffer'])
+            new_msg = Message(auth_user.u_id, message, utc_time, self)
+            new_msg.add_to_store()
+        self.standup['auth_user'] = None
+        self.standup['time_finish'] = None
+        self.standup['message_buffer'].clear()
 
 
 class DM():
@@ -611,7 +630,6 @@ class Message():
     def utc_timestamp() -> int:
         dt = datetime.datetime.now(timezone.utc)
         utc_time = dt.replace(tzinfo=timezone.utc)
-        print(utc_time.timestamp())
         return utc_time.timestamp()
 
     def is_available(self) -> bool:
