@@ -11,7 +11,7 @@ import secrets
 
 from src.data_store import data_store
 
-from src.config import SECRET
+from src.config import url, SECRET
 
 store = data_store.get()
 
@@ -63,6 +63,7 @@ class User():
         self.handle_str = self.generat_handle()
         self.group_id = 500 if self.u_id else 0
         self.notification = []
+        self.profile_img = 'default.jpg'
 
     # def __setattr__(self, key, value):
     #     self.__dict__[key] = value
@@ -81,13 +82,19 @@ class User():
     def __hash__(self) -> int:
         return hash(self.handle_str)
 
-    def todict(self,
-               show={'u_id', 'email', 'name_first', 'name_last',
-                     'handle_str'}):
-        return {
+    def todict(
+        self,
+        show={
+            'u_id', 'email', 'name_first', 'name_last', 'handle_str',
+            'profile_img_url'
+        }):
+        info_dict = {
             key: value
             for key, value in self.__dict__.items() if key in show
         }
+        if 'profile_img_url' in show:
+            info_dict['pro_img_url'] = f'{url}profile_img/{self.profile_img}'
+        return info_dict
 
     @staticmethod
     def find_by_id(u_id: int, only_active=True):
@@ -316,6 +323,9 @@ class User():
         for token in store['login_token']:
             if self == User.find_by_token(token):
                 User.remove_token(token)
+
+    def set_profile_img(self, img_name):
+        self.profile_img = img_name
 
 
 class Channel():

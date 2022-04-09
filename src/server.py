@@ -1,7 +1,8 @@
+import os
 import sys
 import signal
 from json import dumps
-from flask import Flask, request
+from flask import Flask, request, send_from_directory
 from flask_mail import Mail
 from flask_cors import CORS
 from src.error import InputError
@@ -497,6 +498,26 @@ def auth_passwordreset_reset():
     resp = auth_passwordreset_reset_v1(
         data['reset_code'],
         data['new_password'],
+    )
+    return dumps(resp)
+
+
+@APP.route("/profile_img/<path:name>")
+def get_profile_img(name):
+    print(name, os.getcwd())
+    return send_from_directory(f'{os.getcwd()}/static/profile_img', name)
+
+
+@APP.route("/user/profile/uploadphoto/v1", methods=['POST'])
+def profile_uploadphoto():
+    data = request.get_json()
+    resp = user_profile_uploadphoto_v1(
+        data['token'],
+        data['img_url'],
+        data['x_start'],
+        data['y_start'],
+        data['x_end'],
+        data['y_end'],
     )
     return dumps(resp)
 
