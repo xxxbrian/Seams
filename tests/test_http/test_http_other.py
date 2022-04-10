@@ -1,3 +1,4 @@
+from os import access
 import pytest
 import requests
 from src.config import url
@@ -111,7 +112,7 @@ def create_dm(login_list):
                                                    login_list[3]['auth_user_id']]}).json())
     return dm_list
 
-########################################################### Test_notifications/get/v1 ########################################################### 
+########################################################### Test notifications/get/v1 ########################################################### 
 
 def test_notification_in_channel(login_list, channel_list):
     '''
@@ -263,7 +264,117 @@ def test_notification_in_DM(login_list, dm_list):
     assert response_6['notifications'][0]['notification_message'] == "brianlee tagged you in bojinli, brianlee, steveyang: @steveyang Hi @steve"
     assert response_6['notifications'][1]['notification_message'] == "brianlee tagged you in bojinli, brianlee, steveyang: @steveyang Hi"
     
-########################################################### Test_notifications/get/v1 ########################################################### 
+def test_notification_invalid_token(login_list, channel_list, dm_list):
+    '''
+    
+    This test is to test when token is invalid
+    
+    Args:
+        login_list, channel_list, dm_list
+        
+    Raises:
+        AccessError
+        
+    '''
+    ### invite ###
+    # user[0] add user[1] to channel[0]
+    requests.post(f"{url}channel/invite/v2",
+                  json= {'token': login_list[0]['token'],
+                         'channel_id': channel_list[0]['channel_id'],
+                         'u_id': login_list[1]['auth_user_id']})
+    response_1 = requests.get(url + 'notifications/get/v1',
+                              params={'token': -1})
+    assert response_1.status_code == AccessError.code
+    
+    ### react ###
+    # user[1] send a message in channel[0]
+    response_2 = requests.post(url + 'message/send/v1',
+                               json = {'token': login_list[1]['token'],
+                                       'channel_id': channel_list[0]['channel_id'],
+                                       'message': 'Hello guys'}).json()
+    requests.post(url + "message/react/v1",
+                  json = {'token': login_list[0]['token'],
+                          'message_id': response_2['message_id'],
+                          'react_id': 1})
+    response_3 = requests.get(url + 'notifications/get/v1',
+                              params={'token': -1})
+    assert response_3.status_code == AccessError.code
+    ### tag ###
+    # user[1] send an @message in channel[0], more than 20 characters
+    requests.post(url + 'message/send/v1',
+                  json = {'token': login_list[1]['token'],
+                          'channel_id': channel_list[0]['channel_id'],
+                          'message': "@steveyang what's up, bro"})
+    response_4 = requests.get(url + 'notifications/get/v1',
+                              params={'token': -1})
+    assert response_4.status_code == AccessError.code
+    # user[1] send an @message in channel[0], less than 20 characters
+    requests.post(url + 'message/send/v1',
+                  json = {'token': login_list[1]['token'],
+                          'channel_id': channel_list[0]['channel_id'],
+                          'message': "@steveyang Hi"})
+    response_5 = requests.get(url + 'notifications/get/v1',
+                              params={'token': -1})
+    assert response_5.status_code == AccessError.code
+    # user[1] send an @message in channel[0], at twice but only notice onece
+    requests.post(url + 'message/send/v1',
+                  json = {'token': login_list[1]['token'],
+                          'channel_id': channel_list[0]['channel_id'],
+                          'message': "@steveyang Hi @steveyang"})
+    response_6 = requests.get(url + 'notifications/get/v1',
+                              params={'token': -1})
+    assert response_6.status_code == AccessError.code
+    
+    ### add ###
+    # in fixture, user[1] has been added to DM[0]
+    response_1 = requests.get(url + 'notifications/get/v1',
+                              params={'token': -1})
+    assert response_1.status_code == AccessError.code
+    
+    ### react ###
+    # user[1] sends a message in dm[0]
+    response_2 = requests.post(url + 'message/senddm/v1',
+                               json = {'token': login_list[1]['token'],
+                                       'dm_id': dm_list[0]['dm_id'],
+                                       'message': 'Hello guys'}).json()
+    # user[0] reacts to this message
+    requests.post(url + "message/react/v1",
+                  json = {'token': login_list[0]['token'],
+                          'message_id': response_2['message_id'],
+                          'react_id': 1})
+    response_3 = requests.get(url + 'notifications/get/v1',
+                              params={'token': -1})
+    assert response_3.status_code == AccessError.code
+    
+    ### tag ###
+    # user[1] send an @message in dm[0], more than 20 characters
+    requests.post(url + 'message/senddm/v1',
+                  json = {'token': login_list[1]['token'],
+                          'dm_id': dm_list[0]['dm_id'],
+                          'message': "@steveyang what's up, bro"})
+    response_4 = requests.get(url + 'notifications/get/v1',
+                              params={'token': -1})
+    assert response_4.status_code == AccessError.code
+    
+    # user[1] send an @message in dm[0], less than 20 characters
+    requests.post(url + 'message/senddm/v1',
+                  json = {'token': login_list[1]['token'],
+                          'dm_id': dm_list[0]['dm_id'],
+                          'message': "@steveyang Hi"})
+    response_5 = requests.get(url + 'notifications/get/v1',
+                              params={'token': -1})
+    assert response_5.status_code == AccessError.code
+    
+    # user[1] send an @message in dm[0], at twice but only notice onece
+    requests.post(url + 'message/senddm/v1',
+                  json = {'token': login_list[1]['token'],
+                          'dm_id': dm_list[0]['dm_id'],
+                          'message': "@steveyang Hi @steveyang"})
+    response_6 = requests.get(url + 'notifications/get/v1',
+                              params={'token': -1})
+    assert response_6.status_code == AccessError.code
+    
+########################################################### Test message/send/v1 ########################################################### 
 
 def test_search_normal(login_list, dm_list, channel_list):
     '''
