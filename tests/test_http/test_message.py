@@ -115,6 +115,37 @@ def create_dm(login_list):
     return dm_list
 
 ######################################## Test_message_send_v1 ########################################
+def test_mesage_send_with_tag(channel_list, login_list):
+    '''
+    
+    Test is to test when user sends a message with @
+    
+    '''
+    requests.post(url + 'message/send/v1',
+                  json = {'token': login_list[0]['token'],
+                          'channel_id': channel_list[0]['channel_id'],
+                          'message': 'I am SuperBoy @steveyang'})
+    response_1 = requests.get(url + 'notifications/get/v1',
+                              params={'token': login_list[0]['token']}).json()
+    assert response_1['notifications'][0]['channel_id'] == channel_list[0]['channel_id']
+    assert response_1['notifications'][0]['dm_id'] == -1
+    assert response_1['notifications'][0]['notification_message'] == "steveyang tagged you in Steve's channel: I am SuperBoy @steve"
+    
+def test_mesage_senddm_with_tag(dm_list, login_list):
+    '''
+    
+    Test is to test when user sends a message with @
+    
+    '''
+    requests.post(url + 'message/senddm/v1',
+                  json = {'token': login_list[0]['token'],
+                          'dm_id': dm_list[0]['dm_id'],
+                          'message': 'I am SuperBoy @steveyang'})
+    response_1 = requests.get(url + 'notifications/get/v1',
+                              params={'token': login_list[0]['token']}).json()
+    assert response_1['notifications'][0]['dm_id'] == dm_list[0]['dm_id']
+    assert response_1['notifications'][0]['channel_id'] == -1
+    assert response_1['notifications'][0]['notification_message'] == "steveyang tagged you in bojinli, brianlee, steveyang: I am SuperBoy @steve"
 
 def test_message_send_invalid_channel_id(channel_list, login_list):
     '''
