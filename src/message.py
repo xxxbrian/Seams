@@ -91,12 +91,12 @@ def message_share_v1(token, og_message_id, message, channel_id, dm_id):
         raise InputError(description='Message not found')
     if not ogmsg.sup.has_user(user):
         raise InputError(description='Message not found')
-    if channel_id != -1 and dm_id != -1:
-        raise InputError(description='Takes exactly one target (2 given)')
     channel = Channel.find_by_id(channel_id)
     dm = DM.find_by_id(dm_id)
     if channel is None and dm is None:
         raise InputError(description='Channel/DM id invaild')
+    if channel_id != -1 and dm_id != -1:
+        raise InputError(description='Takes exactly one target (2 given)')
     if len(message) > 1000:
         raise InputError(description='Message length invalid')
     sup = channel if dm is None else dm
