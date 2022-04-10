@@ -374,7 +374,44 @@ def test_notification_invalid_token(login_list, channel_list, dm_list):
                               params={'token': -1})
     assert response_6.status_code == AccessError.code
     
-########################################################### Test message/send/v1 ########################################################### 
+def test_react_notification_in_channel_sender_leave(login_list, channel_list):
+    '''
+    
+    This test is to test when user react a message sent from an already leaved user
+    
+    Args:
+        login_list, channel_list
+        
+    '''
+    requests.post(f"{url}channel/invite/v2",
+                  json= {'token': login_list[0]['token'],
+                         'channel_id': channel_list[0]['channel_id'],
+                         'u_id': login_list[1]['auth_user_id']})
+    response_1 = requests.get(url + 'notifications/get/v1',
+                              params={'token': login_list[1]['token']}).json()
+    assert response_1['notifications'][0]['channel_id'] == channel_list[0]['channel_id']
+    assert response_1['notifications'][0]['dm_id'] == -1
+    assert response_1['notifications'][0]['notification_message'] == "steveyang added you to Steve's channel"
+    ### react ###
+    # user[1] send a message in channel[0]
+    response_2 = requests.post(url + 'message/send/v1',
+                               json = {'token': login_list[1]['token'],
+                                       'channel_id': channel_list[0]['channel_id'],
+                                       'message': 'Hello guys'}).json()
+    requests.post(url + 'channel/leave/v1',
+                  json = {'token': login_list[1]['token'],
+                          'channel_id': channel_list[0]['channel_id']})
+    requests.post(url + "message/react/v1",
+                  json = {'token': login_list[0]['token'],
+                          'message_id': response_2['message_id'],
+                          'react_id': 1})
+    response_3 = requests.get(url + 'notifications/get/v1',
+                              params={'token': login_list[1]['token']}).json()
+    assert response_3['notifications'][0]['channel_id'] == channel_list[0]['channel_id']
+    assert response_3['notifications'][0]['dm_id'] == -1
+    assert response_3['notifications'][0]['notification_message'] == "steveyang added you to Steve's channel"
+    
+########################################################### Test search/v1 ########################################################### 
 
 def test_search_normal(login_list, dm_list, channel_list):
     '''
