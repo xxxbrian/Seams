@@ -4,6 +4,7 @@ import json
 import random
 from src.config import url
 from src.error import InputError, AccessError
+import time
 
 @pytest.fixture(name = 'login_list')
 def login_users():
@@ -2108,3 +2109,294 @@ def test_message_unpin_invalid_token(login_list, channel_list, dm_list):
                                   'message_id': res_2['message_id']})
     assert res_3.status_code == AccessError.code
     assert res_4.status_code == AccessError.code
+
+######################################## message/sendlater/v1 ########################################
+def timestamp():
+    '''
+    
+    This is a helper function
+    
+    '''
+    # today = date.today()
+    # dt = datetime(today.year, today.month, today.day)
+    # timestamp = dt.replace(tzinfo=timezone.utc).timestamp()
+    timestamp = int(time.time())
+    return timestamp
+
+def test_message_sendlater_normal(login_list, channel_list):
+    '''
+    
+    This test is to test when user sends a later message successfully
+    
+    Args:
+        login_list, channel_list
+        
+    '''
+    # user[0] sends a later message in channel[0], 1s later
+    requests.post(url + 'message/sendlater/v1', 
+                  json={'token': login_list[0]['token'],
+                        'channel_id': channel_list[0]['channel_id'],
+                        'message': 'I am SuperBoy',
+                        'time_sent': timestamp()+1})
+    res_1 = requests.get(url + 'channel/messages/v2', 
+                         params = {'token': login_list[0]['token'],
+                                   'channel_id': channel_list[0]['channel_id'],
+                                   'start': 0}).json()
+    assert len(res_1['messages']) == 0
+    time.sleep(1.1)
+    res_2 = requests.get(url + 'channel/messages/v2', 
+                         params = {'token': login_list[0]['token'],
+                                   'channel_id': channel_list[0]['channel_id'],
+                                   'start': 0}).json()
+    assert len(res_2['messages']) == 1
+    
+def test_message_sendlater_invalid_channel_id(login_list, channel_list):
+    '''
+    
+    This test is to test when channel_id does not refer to a valid channel
+    
+    Args:
+        login_list, channel_list
+        
+    Raises:
+        InputError
+        
+    '''
+    new_id = random.randint(-65535, 65535)
+    invalid_channel_id = []
+    while len(invalid_channel_id) < 1:
+        if not new_id in [channel_list[i]['channel_id'] for i in range(0,4)]:
+            invalid_channel_id.append(new_id)
+    res_1 = requests.post(url + 'message/sendlater/v1', 
+                          json={'token': login_list[0]['token'],
+                                'channel_id': invalid_channel_id[0],
+                                'message': 'I am SuperBoy',
+                                'time_sent': timestamp()+1})
+    assert res_1.status_code == InputError.code
+    
+def test_message_sendlater_invalid_message(login_list, channel_list):
+    '''
+    
+    This test is to test when length of message is less than 1 or over 1000
+    characters
+    
+    Args:
+        login_list, channel_list
+        
+    Raises:
+        InputError
+        
+    '''
+    empty_message = ''
+    too_long_message = ''
+    while len(too_long_message) <= 1000:
+        too_long_message += 'a'
+    res_1 = requests.post(url + 'message/sendlater/v1', 
+                          json={'token': login_list[0]['token'],
+                                'channel_id': channel_list[0]['channel_id'],
+                                'message': empty_message,
+                                'time_sent': timestamp()+1})
+    res_2 = requests.post(url + 'message/sendlater/v1', 
+                          json={'token': login_list[0]['token'],
+                                'channel_id': channel_list[0]['channel_id'],
+                                'message': too_long_message,
+                                'time_sent': timestamp()+1})
+    assert res_1.status_code == res_2.status_code == InputError.code
+    
+def test_message_sendlater_send_past(login_list, channel_list):
+    '''
+    
+    This test is to test when time_sent is a time in the past
+    
+    Args:
+        login_list, channel_list
+        
+    Raises:
+        InputError
+        
+    '''
+    res_1 = requests.post(url + 'message/sendlater/v1', 
+                          json={'token': login_list[0]['token'],
+                                'channel_id': channel_list[0]['channel_id'],
+                                'message': "Hello world",
+                                'time_sent': timestamp()-1})
+    assert res_1.status_code == InputError.code
+    
+def test_message_sendlater_invalid_auth_user(login_list, channel_list):
+    '''
+    
+    This test is to test when channel_id is valid and the authorised user 
+    is not a member of the channel they are trying to post to
+    
+    Args:
+        login_list, channel_list
+        
+    Raises:
+        AccessError
+        
+    '''
+    res_1 = requests.post(url + 'message/sendlater/v1', 
+                          json={'token': login_list[1]['token'],
+                                'channel_id': channel_list[0]['channel_id'],
+                                'message': "Hello world",
+                                'time_sent': timestamp()+1})
+    assert res_1.status_code == AccessError.code
+    
+def test_message_sendlater_invalid_token(login_list, channel_list):
+    '''
+    
+    This test is to test when token is invalid
+    
+    Args:
+        login_list, channel_list
+        
+    Raises:
+        AccessError
+        
+    '''
+    res_1 = requests.post(url + 'message/sendlater/v1', 
+                          json={'token': -1,
+                                'channel_id': channel_list[0]['channel_id'],
+                                'message': "Hello world",
+                                'time_sent': timestamp()+1})
+    assert res_1.status_code == AccessError.code
+    
+######################################## message/sendlaterdm/v1 ########################################
+def test_message_sendlaterdm_normal(login_list, dm_list):
+    '''
+    
+    This test is to test when user sends a later message successfully
+    
+    Args:
+        login_list, dm_list
+        
+    '''
+    # user[0] sends a later message in dm[0], 1s later
+    requests.post(url + 'message/sendlaterdm/v1', 
+                  json={'token': login_list[0]['token'],
+                        'dm_id': dm_list[0]['dm_id'],
+                        'message': 'I am SuperBoy',
+                        'time_sent': timestamp()+10})
+    res_1 = requests.get(url + 'dm/messages/v1', 
+                         params = {'token': login_list[0]['token'],
+                                   'dm_id': dm_list[0]['dm_id'],
+                                   'start': 0}).json()
+    assert len(res_1['messages']) == 0
+    time.sleep(10.1)
+    res_2 = requests.get(url + 'dm/messages/v1', 
+                         params = {'token': login_list[0]['token'],
+                                   'dm_id': dm_list[0]['dm_id'],
+                                   'start': 0}).json()
+    assert len(res_2['messages']) == 1
+    
+def test_message_sendlaterdm_invalid_dm_id(login_list, dm_list):
+    '''
+    
+    This test is to test when dm_id does not refer to a valid dm
+    
+    Args:
+        login_list, dm_list
+        
+    Raises:
+        InputError
+        
+    '''
+    new_id = random.randint(-65535, 65535)
+    invalid_dm_id = []
+    while len(invalid_dm_id) < 1:
+        if not new_id in [dm_list[i]['dm_id'] for i in range(0,3)]:
+            invalid_dm_id.append(new_id)
+    res_1 = requests.post(url + 'message/sendlaterdm/v1', 
+                          json={'token': login_list[0]['token'],
+                                'dm_id': invalid_dm_id[0],
+                                'message': 'I am SuperBoy',
+                                'time_sent': timestamp()+1})
+    assert res_1.status_code == InputError.code
+    
+def test_message_sendlaterdm_invalid_message(login_list, dm_list):
+    '''
+    
+    This test is to test when length of message is less than 1 or over 1000
+    characters
+    
+    Args:
+        login_list, dm_list
+        
+    Raises:
+        InputError
+        
+    '''
+    empty_message = ''
+    too_long_message = ''
+    while len(too_long_message) <= 1000:
+        too_long_message += 'a'
+    res_1 = requests.post(url + 'message/sendlaterdm/v1', 
+                          json={'token': login_list[0]['token'],
+                                'dm_id': dm_list[0]['dm_id'],
+                                'message': empty_message,
+                                'time_sent': timestamp()+1})
+    res_2 = requests.post(url + 'message/sendlaterdm/v1', 
+                          json={'token': login_list[0]['token'],
+                                'dm_id': dm_list[0]['dm_id'],
+                                'message': too_long_message,
+                                'time_sent': timestamp()+1})
+    assert res_1.status_code == res_2.status_code == InputError.code
+    
+def test_message_sendlaterdm_send_past(login_list, dm_list):
+    '''
+    
+    This test is to test when time_sent is a time in the past
+    
+    Args:
+        login_list, dm_list
+        
+    Raises:
+        InputError
+        
+    '''
+    res_1 = requests.post(url + 'message/sendlaterdm/v1', 
+                          json={'token': login_list[0]['token'],
+                                'dm_id': dm_list[0]['dm_id'],
+                                'message': "Hello world",
+                                'time_sent': timestamp()-1})
+    assert res_1.status_code == InputError.code
+    
+def test_message_sendlaterdm_invalid_auth_user(login_list, dm_list):
+    '''
+    
+    This test is to test when dm_id is valid and the authorised user 
+    is not a member of the dm they are trying to post to
+    
+    Args:
+        login_list, dm_list
+        
+    Raises:
+        AccessError
+        
+    '''
+    res_1 = requests.post(url + 'message/sendlaterdm/v1', 
+                          json={'token': login_list[3]['token'],
+                                'dm_id': dm_list[0]['dm_id'],
+                                'message': "Hello world",
+                                'time_sent': timestamp()+1})
+    assert res_1.status_code == AccessError.code
+    
+def test_message_sendlaterdm_invalid_token(login_list, dm_list):
+    '''
+    
+    This test is to test when token is invalid
+    
+    Args:
+        login_list, dm_list
+        
+    Raises:
+        AccessError
+        
+    '''
+    res_1 = requests.post(url + 'message/sendlaterdm/v1', 
+                          json={'token': -1,
+                                'dm_id': dm_list[0]['dm_id'],
+                                'message': "Hello world",
+                                'time_sent': timestamp()+1})
+    assert res_1.status_code == AccessError.code
+    
