@@ -7,6 +7,7 @@ import pickle
 import os
 from datetime import timezone
 import datetime
+import secrets
 
 from src.data_store import data_store
 
@@ -76,6 +77,9 @@ class User():
             f' - handle:     {self.handle_str}\n' + \
             f' - group_id:   {self.group_id}'
         return info
+
+    def __hash__(self) -> int:
+        return hash(self.handle_str)
 
     def todict(self,
                show={'u_id', 'email', 'name_first', 'name_last',
@@ -286,15 +290,32 @@ class User():
         self.notification.insert(0, notification)
 
     def get_notification(self):
-        for ntf in self.notification:
-            if ntf.is_available():
-                print(ntf.content, ntf.time_sent)
-        print('#############')
-        for ntf in sorted(
-            [ntf for ntf in self.notification if ntf.is_available()]):
-            if ntf.is_available():
-                print(ntf.content, ntf.time_sent)
         return sorted([ntf for ntf in self.notification if ntf.is_available()])
+
+    def generat_reset_code(self):
+        code = secrets.token_urlsafe()[0:8]
+        if code in store['reset_code'].values():
+            return self.generat_reset_code()
+        else:
+            store['reset_code'][self] = code
+            return code
+
+    @staticmethod
+    def find_by_reset_code(code):
+        user = None
+        for u, c in store['reset_code'].items():
+            if c == code:
+                user = u
+        return user
+
+    def remove_reset_code(self):
+        store['reset_code'].pop(self)
+
+    def password_set(self, pwd: str):
+        self.password = User.encrypt(pwd)
+        for token in store['login_token']:
+            if self == User.find_by_token(token):
+                User.remove_token(token)
 
 
 class Channel():
@@ -326,6 +347,12 @@ class Channel():
         self.channel_id = Channel.get_last_id() + 1
         self.is_public = is_public
         self.messages = []
+        self.standup = {
+            'is_active': False,
+            'auth_user': None,
+            'time_finish': None,
+            'message_buffer': [],
+        }
 
     # def __setattr__(self, key, value):
     #     self.__dict__[key] = value
@@ -420,6 +447,27 @@ class Channel():
 
     def has_owner(self, user: User):
         return user in self.owners or user.is_admin()
+
+    def standup_set(self, auth_user: User, time_finish):
+        self.standup['is_active'] = True
+        self.standup['auth_user'] = auth_user
+        self.standup['time_finish'] = time_finish
+
+    def standup_add(self, sender, message):
+        self.standup['message_buffer'].append(
+            f'{sender.handle_str}: {message}')
+
+    def standup_do(self):
+        self.standup['is_active'] = False
+        utc_time = Message.utc_timestamp()
+        auth_user = self.standup['auth_user']
+        if len(self.standup['message_buffer']) > 0:
+            message = '\n'.join(self.standup['message_buffer'])
+            new_msg = Message(auth_user.u_id, message, utc_time, self)
+            new_msg.add_to_store()
+        self.standup['auth_user'] = None
+        self.standup['time_finish'] = None
+        self.standup['message_buffer'].clear()
 
 
 class DM():
@@ -611,7 +659,6 @@ class Message():
     def utc_timestamp() -> int:
         dt = datetime.datetime.now(timezone.utc)
         utc_time = dt.replace(tzinfo=timezone.utc)
-        print(utc_time.timestamp())
         return utc_time.timestamp()
 
     def is_available(self) -> bool:

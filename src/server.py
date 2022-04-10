@@ -2,6 +2,7 @@ import sys
 import signal
 from json import dumps
 from flask import Flask, request
+from flask_mail import Mail
 from flask_cors import CORS
 from src.error import InputError
 from src import config
@@ -16,6 +17,7 @@ from src.message import *
 from src.notification import *
 from src.other import *
 from src.search import *
+from src.standup import *
 from src.user import *
 
 
@@ -39,8 +41,17 @@ def default_handler(err):
 APP = Flask(__name__)
 CORS(APP)
 
+APP.config['MAIL_SERVER'] = config.MAIL_SERVER
+APP.config['MAIL_PORT'] = config.MAIL_PORT
+APP.config['MAIL_USERNAME'] = config.MAIL_USERNAME
+APP.config['MAIL_PASSWORD'] = config.MAIL_PASSWORD
+APP.config['MAIL_USE_TLS'] = config.MAIL_USE_TLS
+APP.config['MAIL_USE_SSL'] = config.MAIL_USE_SSL
+
 APP.config['TRAP_HTTP_EXCEPTIONS'] = True
 APP.register_error_handler(Exception, default_handler)
+
+mailobj = Mail(APP)
 
 #### NO NEED TO MODIFY ABOVE THIS POINT, EXCEPT IMPORTS
 
@@ -439,6 +450,53 @@ def message_sendlaterdm():
         data['dm_id'],
         data['message'],
         data['time_sent'],
+    )
+    return dumps(resp)
+
+
+@APP.route("/standup/start/v1", methods=['POST'])
+def standup_start():
+    data = request.get_json()
+    resp = standup_start_v1(
+        data['token'],
+        data['channel_id'],
+        data['length'],
+    )
+    return dumps(resp)
+
+
+@APP.route('/standup/active/v1', methods=['GET'])
+def standup_active():
+    token = str(request.args.get('token'))
+    channel_id = int(request.args.get('channel_id'))
+    resp = standup_active_v1(token, channel_id)
+    return dumps(resp)
+
+
+@APP.route("/standup/send/v1", methods=['POST'])
+def standup_send():
+    data = request.get_json()
+    resp = standup_send_v1(
+        data['token'],
+        data['channel_id'],
+        data['message'],
+    )
+    return dumps(resp)
+
+
+@APP.route("/auth/passwordreset/request/v1", methods=['POST'])
+def auth_passwordreset_request():
+    data = request.get_json()
+    resp = auth_passwordreset_request_v1(data['email'], mailobj)
+    return dumps(resp)
+
+
+@APP.route("/auth/passwordreset/reset/v1", methods=['POST'])
+def auth_passwordreset_reset():
+    data = request.get_json()
+    resp = auth_passwordreset_reset_v1(
+        data['reset_code'],
+        data['new_password'],
     )
     return dumps(resp)
 

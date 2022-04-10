@@ -51,7 +51,7 @@ def channel_details_v2(token, channel_id):
         channel_id (integer): channel's id
 
     Raises:
-        AccessError: token invaild
+        AccessError: token invalid
         InputError: channel_id does not refer to a valid channel
         AccessError: channel_id is valid and the authorised user is not a member of the channel
 
@@ -82,7 +82,7 @@ def channel_messages_v2(token, channel_id, start):
         start (integer): index of message
 
     Raises:
-        AccessError: token invaild
+        AccessError: token invalid
         InputError: channel_id does not refer to a valid channel
         AccessError: channel_id is valid and the authorised user is not a member of the channel
         InputError: start is greater than the total number of messages in the channel
@@ -124,7 +124,7 @@ def channel_join_v2(token, channel_id):
         channel_id (integer): channel's id
 
     Raises:
-        AccessError: token invaild
+        AccessError: token invalid
         InputError: channel_id does not refer to a valid channel
         InputError: the authorised user is already a member of the channel
         AccessError: channel_id refers to a channel that is private and the authorised user is not already a channel member and is not a global owner
@@ -159,7 +159,7 @@ def channel_leave_v1(token, channel_id):
         channel_id (_type_): channel's id
 
     Raises:
-        AccessError: token invaild
+        AccessError: token invalid
         InputError: channel_id does not refer to a valid channel
         AccessError: channel_id is valid and the authorised user is not a member of the channel
 
@@ -174,6 +174,8 @@ def channel_leave_v1(token, channel_id):
         raise InputError(description='Channel not found')
     if not channel.has_user(user):
         raise AccessError(description='Permission denied: Not member')
+    if user is channel.standup['auth_user']:
+        raise InputError(description='Standup starter can not leave')
     if user in channel.owners:
         channel.removeowner(user)
     channel.leave(user)
@@ -190,7 +192,7 @@ def channel_addowner_v1(token, channel_id, u_id):
         u_id (integer): user's id
 
     Raises:
-        AccessError: token invaild
+        AccessError: token invalid
         InputError: channel_id does not refer to a valid channel
         AccessError: channel_id is valid and the authorised user does not have owner permissions in the channel
         InputError: u_id does not refer to a valid user
@@ -229,7 +231,7 @@ def channel_removeowner_v1(token, channel_id, u_id):
         u_id (integer): user's id
 
     Raises:
-        AccessError: token invaild
+        AccessError: token invalid
         InputError: channel_id does not refer to a valid channel
         AccessError: channel_id is valid and the authorised user does not have owner permissions in the channel
         InputError: u_id does not refer to a valid user

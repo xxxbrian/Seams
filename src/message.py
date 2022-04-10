@@ -127,7 +127,7 @@ def message_react_v1(token, message_id, react_id):
     if not msg.sup.has_user(user):
         raise InputError(description='Message not found')
     if not react_id in msg.react_dict.keys():
-        raise InputError(description='Invaild react type')
+        raise InputError(description='Invalid react type')
     if user in msg.react_dict[react_id]:
         raise InputError(description='Already reacting')
     msg.react_dict[react_id].append(user)
@@ -150,7 +150,7 @@ def message_unreact_v1(token, message_id, react_id):
     if not msg.sup.has_user(user):
         raise InputError(description='Message not found')
     if not react_id in msg.react_dict.keys():
-        raise InputError(description='Invaild react type')
+        raise InputError(description='Invalid react type')
     if not user in msg.react_dict[react_id]:
         raise InputError(description='No reacting')
     msg.react_dict[react_id].remove(user)
