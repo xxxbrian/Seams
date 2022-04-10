@@ -92,3 +92,10 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end,
     new_img.save(f'static/profile_img/{img_name}')
     user.set_profile_img(img_name)
     return {}
+
+
+def user_stats_v1(token):
+    user = User.find_by_token(token)
+    if user is None:
+        raise AccessError(description='Permission denied')
+    return {'user_stats': user.get_analytics()}

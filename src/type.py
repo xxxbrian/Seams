@@ -27,6 +27,10 @@ def pickelsave(func):
     return wrapper
 
 
+def int_now():
+    return int(time.time())
+
+
 class User():
     '''
     Every user will be store in data_store:[(object) Datastore] as an User object
@@ -64,6 +68,21 @@ class User():
         self.group_id = 500 if self.u_id else 0
         self.notification = []
         self.profile_img = 'default.jpg'
+        time_now = int_now()
+        self.analytics = {
+            'channels_joined': [{
+                'num_channels_joined': 0,
+                'time_stamp': time_now
+            }],
+            'dms_joined': [{
+                'num_dms_joined': 0,
+                'time_stamp': time_now
+            }],
+            'messages_sent': [{
+                'num_messages_sent': 0,
+                'time_stamp': time_now
+            }],
+        }
 
     # def __setattr__(self, key, value):
     #     self.__dict__[key] = value
@@ -327,6 +346,38 @@ class User():
     def set_profile_img(self, img_name):
         self.profile_img = img_name
 
+    def set_analytics(self, key, offset, time):
+        num_key = f'num_{key}'
+        last_num_value = self.analytics[key][-1][num_key]
+        self.analytics[key].append({
+            num_key: last_num_value + offset,
+            'time_stamp': time
+        })
+
+    def __analytics_filter(self, key, time):
+        return [i for i in self.analytics[key] if i['time_stamp'] < time]
+
+    def get_analytics(self) -> dict:
+        now = int_now()
+        info_dict = {}
+        for key in self.analytics.keys():
+            info_dict[key] = self.__analytics_filter(key, now)
+
+        num_channels_joined = info_dict['channels_joined'][-1][
+            'num_channels_joined']
+        num_dms_joined = info_dict['dms_joined'][-1]['num_dms_joined']
+        num_messages_sent = info_dict['messages_sent'][-1]['num_messages_sent']
+        num_channels = len(Channel.get_all())
+        num_dms = len(DM.get_all())
+        num_messages = len(Message.get_all())
+        sum_num = num_channels + num_dms + num_messages
+        involvement_rate = (
+            (num_channels_joined + num_dms_joined + num_messages_sent) /
+            sum_num) if sum_num != 0 else 0
+        info_dict[
+            'involvement_rate'] = involvement_rate if involvement_rate < 1 else 1
+        return info_dict
+
 
 class Channel():
     '''
@@ -422,6 +473,7 @@ class Channel():
 
     def add_to_store(self) -> None:
         store['channels'].append(self)
+        self.owners[0].set_analytics('channels_joined', 1, int_now())
 
     def has_user(self, user: User) -> bool:
         return user in self.members
@@ -434,9 +486,11 @@ class Channel():
 
     def leave(self, user: User) -> None:
         self.members.remove(user)
+        user.set_analytics('channels_joined', -1, int_now())
 
     def join(self, user: User) -> None:
         self.members.append(user)
+        user.set_analytics('channels_joined', 1, int_now())
 
     @staticmethod
     def check_name_invalid(name: str) -> bool:
@@ -549,12 +603,15 @@ class DM():
 
     def add_to_store(self) -> None:
         store['dms'].append(self)
+        for user in self.members:
+            user.set_analytics('dms_joined', 1, int_now())
 
     def has_user(self, user: User) -> bool:
         return user in self.members
 
     def leave(self, user: User) -> None:
         self.members.remove(user)
+        user.set_analytics('dms_joined', -1, int_now())
 
     def get_messages(self, start=0, end=-1) -> list:
         return Message.get_messages(self, start, end)
@@ -571,6 +628,8 @@ class DM():
 
     def remove(self):
         self.is_active = False
+        for user in self.members:
+            user.set_analytics('dms_joined', -1, int_now())
 
 
 class Message():
@@ -643,16 +702,8 @@ class Message():
     def add_to_store(self) -> None:
         store['messages'].insert(0, self)
         self.sup.add_message(self)
-        # if type(self.sup) is Channel:
-        #     self.add_to_channel(self.sup)
-        # if type(self.sup) is DM:
-        #     self.add_to_dm(self.sup)
-
-    # def add_to_channel(self, channel: Channel) -> None:
-    #     channel.messages.insert(0, self)
-
-    # def add_to_dm(self, dm: DM) -> None:
-    #     dm.messages.insert(0, self)
+        user = User.find_by_id(self.u_id)
+        user.set_analytics('messages_sent', 1, int(self.time_sent))
 
     @staticmethod
     def check_length_invalid(msg: str) -> bool:
@@ -680,6 +731,10 @@ class Message():
             [msg for msg in sup.messages if msg.is_available()])
         end = len(all_message) if end < 0 else end
         return all_message[start:end]
+
+    @staticmethod
+    def get_all() -> list:
+        return [msg for msg in store['messages'] if msg.is_available()]
 
     @staticmethod
     def get_tagged_user(msg: str):

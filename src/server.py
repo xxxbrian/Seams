@@ -522,6 +522,13 @@ def profile_uploadphoto():
     return dumps(resp)
 
 
+@APP.route('/user/stats/v1', methods=['GET'])
+def user_stats():
+    token = str(request.args.get('token'))
+    resp = user_stats_v1(token)
+    return dumps(resp)
+
+
 #### NO NEED TO MODIFY BELOW THIS POINT
 
 if __name__ == "__main__":
