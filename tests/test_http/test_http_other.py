@@ -203,6 +203,7 @@ def test_notification_in_DM(login_list, dm_list):
         dm/create/v1 is working well
         
     '''
+    ### add ###
     # in fixture, user[1] has been added to DM[0]
     response_1 = requests.get(url + 'notifications/get/v1',
                               params={'token': login_list[1]['token']}).json()
@@ -210,6 +211,7 @@ def test_notification_in_DM(login_list, dm_list):
     assert response_1['notifications'][0]['dm_id'] == dm_list[0]['dm_id']
     assert response_1['notifications'][0]['notification_message'] == "steveyang added you to bojinli, brianlee, steveyang"
     
+    ### react ###
     # user[1] sends a message in dm[0]
     response_2 = requests.post(url + 'message/senddm/v1',
                                json = {'token': login_list[1]['token'],
@@ -222,10 +224,44 @@ def test_notification_in_DM(login_list, dm_list):
                           'react_id': 1})
     response_3 = requests.get(url + 'notifications/get/v1',
                               params={'token': login_list[1]['token']}).json()
-    print(response_3)
     assert response_3['notifications'][0]['channel_id'] == -1
     assert response_3['notifications'][0]['dm_id'] == dm_list[0]['dm_id']
     assert response_3['notifications'][0]['notification_message'] == "steveyang reacted to your message in bojinli, brianlee, steveyang"
+    
+    ### tag ###
+    # user[1] send an @message in dm[0], more than 20 characters
+    requests.post(url + 'message/senddm/v1',
+                  json = {'token': login_list[1]['token'],
+                          'dm_id': dm_list[0]['dm_id'],
+                          'message': "@steveyang what's up, bro"})
+    response_4 = requests.get(url + 'notifications/get/v1',
+                              params={'token': login_list[0]['token']}).json()
+    assert response_4['notifications'][0]['dm_id'] == dm_list[0]['dm_id']
+    assert response_4['notifications'][0]['channel_id'] == -1
+    assert response_4['notifications'][0]['notification_message'] == "brianlee tagged you in bojinli, brianlee, steveyang: @steveyang what's up"
+    
+    # user[1] send an @message in dm[0], less than 20 characters
+    requests.post(url + 'message/senddm/v1',
+                  json = {'token': login_list[1]['token'],
+                          'dm_id': dm_list[0]['dm_id'],
+                          'message': "@steveyang Hi"})
+    response_5 = requests.get(url + 'notifications/get/v1',
+                              params={'token': login_list[0]['token']}).json()
+    assert response_5['notifications'][0]['dm_id'] == dm_list[0]['dm_id']
+    assert response_5['notifications'][0]['channel_id'] == -1
+    assert response_5['notifications'][0]['notification_message'] == "brianlee tagged you in bojinli, brianlee, steveyang: @steveyang Hi"
+    
+    # user[1] send an @message in dm[0], at twice but only notice onece
+    requests.post(url + 'message/senddm/v1',
+                  json = {'token': login_list[1]['token'],
+                          'dm_id': dm_list[0]['dm_id'],
+                          'message': "@steveyang Hi @steveyang"})
+    response_6 = requests.get(url + 'notifications/get/v1',
+                              params={'token': login_list[0]['token']}).json()
+    assert response_6['notifications'][0]['dm_id'] == dm_list[0]['dm_id']
+    assert response_6['notifications'][0]['channel_id'] == -1
+    assert response_6['notifications'][0]['notification_message'] == "brianlee tagged you in bojinli, brianlee, steveyang: @steveyang Hi @steve"
+    assert response_6['notifications'][1]['notification_message'] == "brianlee tagged you in bojinli, brianlee, steveyang: @steveyang Hi"
     
 ########################################################### Test_notifications/get/v1 ########################################################### 
 
