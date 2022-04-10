@@ -23,7 +23,7 @@ Example usage:
     print(store) # Prints { 'names': ['Emily', 'Hayden', 'Jake', 'Nick'] }
     data_store.set(store)
 '''
-
+import time
 ## YOU SHOULD MODIFY THIS OBJECT BELOW
 initial_object = {
     'users': [],
@@ -32,6 +32,20 @@ initial_object = {
     'messages': [],
     'login_token': [],
     'reset_code': {},
+    'workspace_stats': {
+        'channels_exist': [{
+            'num_channels_exist': 0,
+            'time_stamp': int(time.time())
+        }],
+        'dms_exist': [{
+            'num_dms_exist': 0,
+            'time_stamp': int(time.time())
+        }],
+        'messages_exist': [{
+            'num_messages_exist': 0,
+            'time_stamp': int(time.time())
+        }],
+    },
 }
 
 ## YOU SHOULD MODIFY THIS OBJECT ABOVE

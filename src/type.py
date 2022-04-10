@@ -31,6 +31,39 @@ def int_now():
     return int(time.time())
 
 
+class Seams():
+
+    @staticmethod
+    def set_workspace_stats(key, offset, time):
+        num_key = f'num_{key}'
+        last_num_value = store['workspace_stats'][key][-1][num_key]
+        store['workspace_stats'][key].append({
+            num_key: last_num_value + offset,
+            'time_stamp': time
+        })
+
+    @staticmethod
+    def analytics_filter(data, key, time):
+        return [i for i in data[key] if i['time_stamp'] < time]
+
+    @staticmethod
+    def get_workspace_stats() -> dict:
+        now = int_now()
+        info_dict = {}
+        for key in store['workspace_stats'].keys():
+            info_dict[key] = Seams.analytics_filter(store['workspace_stats'],
+                                                    key, now)
+        user_in_cord = 0
+        all_users = User.find_all()
+        for user in all_users:
+            if user.analytics['channels_joined'][-1][
+                    'num_channels_joined'] or user.analytics['dms_joined'][-1][
+                        'num_dms_joined']:
+                user_in_cord += 1
+        info_dict['utilization_rate'] = user_in_cord / len(all_users)
+        return info_dict
+
+
 class User():
     '''
     Every user will be store in data_store:[(object) Datastore] as an User object
@@ -354,14 +387,14 @@ class User():
             'time_stamp': time
         })
 
-    def __analytics_filter(self, key, time):
-        return [i for i in self.analytics[key] if i['time_stamp'] < time]
+    # def analytics_filter(data, key, time):
+    #     return [i for i in data[key] if i['time_stamp'] < time]
 
     def get_analytics(self) -> dict:
         now = int_now()
         info_dict = {}
         for key in self.analytics.keys():
-            info_dict[key] = self.__analytics_filter(key, now)
+            info_dict[key] = Seams.analytics_filter(self.analytics, key, now)
 
         num_channels_joined = info_dict['channels_joined'][-1][
             'num_channels_joined']
@@ -474,6 +507,7 @@ class Channel():
     def add_to_store(self) -> None:
         store['channels'].append(self)
         self.owners[0].set_analytics('channels_joined', 1, int_now())
+        Seams.set_workspace_stats('channels_exist', 1, int_now())
 
     def has_user(self, user: User) -> bool:
         return user in self.members
@@ -605,6 +639,7 @@ class DM():
         store['dms'].append(self)
         for user in self.members:
             user.set_analytics('dms_joined', 1, int_now())
+        Seams.set_workspace_stats('dms_exist', 1, int_now())
 
     def has_user(self, user: User) -> bool:
         return user in self.members
@@ -628,8 +663,11 @@ class DM():
 
     def remove(self):
         self.is_active = False
+        for msg in self.messages:
+            msg.remove()
         for user in self.members:
             user.set_analytics('dms_joined', -1, int_now())
+        Seams.set_workspace_stats('dms_exist', -1, int_now())
 
 
 class Message():
@@ -704,6 +742,7 @@ class Message():
         self.sup.add_message(self)
         user = User.find_by_id(self.u_id)
         user.set_analytics('messages_sent', 1, int(self.time_sent))
+        Seams.set_workspace_stats('messages_exist', 1, int(self.time_sent))
 
     @staticmethod
     def check_length_invalid(msg: str) -> bool:
@@ -711,6 +750,7 @@ class Message():
 
     def remove(self):
         self.is_active = False
+        Seams.set_workspace_stats('messages_exist', -1, int_now())
 
     @staticmethod
     def check_query_str_invalid(query_str: str) -> bool:

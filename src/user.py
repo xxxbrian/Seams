@@ -1,4 +1,4 @@
-from src.type import User
+from src.type import User, Seams
 from src.error import AccessError, InputError
 from src.type import pickelsave
 
@@ -99,3 +99,10 @@ def user_stats_v1(token):
     if user is None:
         raise AccessError(description='Permission denied')
     return {'user_stats': user.get_analytics()}
+
+
+def users_stats_v1(token):
+    user = User.find_by_token(token)
+    if user is None:
+        raise AccessError(description='Permission denied')
+    return {'workspace_stats': Seams.get_workspace_stats()}

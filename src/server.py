@@ -529,6 +529,13 @@ def user_stats():
     return dumps(resp)
 
 
+@APP.route('/users/stats/v1', methods=['GET'])
+def users_stats():
+    token = str(request.args.get('token'))
+    resp = users_stats_v1(token)
+    return dumps(resp)
+
+
 #### NO NEED TO MODIFY BELOW THIS POINT
 
 if __name__ == "__main__":
