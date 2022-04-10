@@ -127,6 +127,7 @@ def test_notification_in_channel(login_list, channel_list):
         message/react/v1
         
     '''
+    ### invite ###
     # user[0] add user[1] to channel[0]
     requests.post(f"{url}channel/invite/v2",
                   json= {'token': login_list[0]['token'],
@@ -138,6 +139,7 @@ def test_notification_in_channel(login_list, channel_list):
     assert response_1['notifications'][0]['dm_id'] == -1
     assert response_1['notifications'][0]['notification_message'] == "steveyang added you to Steve's channel"
     
+    ### react ###
     # user[1] send a message in channel[0]
     response_2 = requests.post(url + 'message/send/v1',
                                json = {'token': login_list[1]['token'],
@@ -152,6 +154,41 @@ def test_notification_in_channel(login_list, channel_list):
     assert response_3['notifications'][0]['channel_id'] == channel_list[0]['channel_id']
     assert response_3['notifications'][0]['dm_id'] == -1
     assert response_3['notifications'][0]['notification_message'] == "steveyang reacted to your message in Steve's channel"
+    
+    ### tag ###
+    # user[1] send an @message in channel[0], more than 20 characters
+    requests.post(url + 'message/send/v1',
+                  json = {'token': login_list[1]['token'],
+                          'channel_id': channel_list[0]['channel_id'],
+                          'message': "@steveyang what's up, bro"})
+    response_4 = requests.get(url + 'notifications/get/v1',
+                              params={'token': login_list[0]['token']}).json()
+    assert response_4['notifications'][0]['channel_id'] == channel_list[0]['channel_id']
+    assert response_4['notifications'][0]['dm_id'] == -1
+    assert response_4['notifications'][0]['notification_message'] == "brianlee tagged you in Steve's channel: @steveyang what's up"
+    
+    # user[1] send an @message in channel[0], less than 20 characters
+    requests.post(url + 'message/send/v1',
+                  json = {'token': login_list[1]['token'],
+                          'channel_id': channel_list[0]['channel_id'],
+                          'message': "@steveyang Hi"})
+    response_5 = requests.get(url + 'notifications/get/v1',
+                              params={'token': login_list[0]['token']}).json()
+    assert response_5['notifications'][0]['channel_id'] == channel_list[0]['channel_id']
+    assert response_5['notifications'][0]['dm_id'] == -1
+    assert response_5['notifications'][0]['notification_message'] == "brianlee tagged you in Steve's channel: @steveyang Hi"
+    
+    # user[1] send an @message in channel[0], at twice but only notice onece
+    requests.post(url + 'message/send/v1',
+                  json = {'token': login_list[1]['token'],
+                          'channel_id': channel_list[0]['channel_id'],
+                          'message': "@steveyang Hi @steveyang"})
+    response_6 = requests.get(url + 'notifications/get/v1',
+                              params={'token': login_list[0]['token']}).json()
+    assert response_6['notifications'][0]['channel_id'] == channel_list[0]['channel_id']
+    assert response_6['notifications'][0]['dm_id'] == -1
+    assert response_6['notifications'][0]['notification_message'] == "brianlee tagged you in Steve's channel: @steveyang Hi @steve"
+    assert response_6['notifications'][1]['notification_message'] == "brianlee tagged you in Steve's channel: @steveyang Hi"
 
 def test_notification_in_DM(login_list, dm_list):
     '''
