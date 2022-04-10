@@ -1569,7 +1569,7 @@ def test_message_react_invalid_token(login_list, channel_list, dm_list):
                                   'react_id': 0})
     assert res_3.status_code == res_4.status_code == AccessError.code
 
-######################################## message/react/v1 ########################################
+######################################## message/unreact/v1 ########################################
 def test_message_unreact_normal(login_list, channel_list, dm_list):
     '''
     
@@ -1742,5 +1742,369 @@ def test_message_unreact_invalid_token(login_list, channel_list, dm_list):
                           json = {'token': -1,
                                   'message_id': res_2['message_id'],
                                   'react_id': 1})
+    assert res_3.status_code == AccessError.code
+    assert res_4.status_code == AccessError.code
+
+######################################## message/pin/v1 ########################################
+def test_message_pin_normal(login_list, channel_list, dm_list):
+    '''
+    
+    This test is to test when user pin a message successfully
+    
+    Args:
+        login_list, channel_list, dm_list
+        
+    '''
+    # user[0] send a msg in channel[0]
+    res_1 = requests.post(url + 'message/send/v1',
+                        json = {'token': login_list[0]['token'],
+                                'channel_id': channel_list[0]['channel_id'],
+                                'message': 'Hello guys'}).json()
+    # user[0] send a msg in dm[0]
+    res_2 = requests.post(url + 'message/senddm/v1',
+                        json = {'token': login_list[0]['token'],
+                                'dm_id': dm_list[0]['dm_id'],
+                                'message': 'Hello guys'}).json()
+    res_3 = requests.post(url + 'message/pin/v1',
+                          json = {'token': login_list[0]['token'],
+                                  'message_id': res_1['message_id']})
+    res_4 = requests.post(url + 'message/pin/v1',
+                          json = {'token': login_list[0]['token'],
+                                  'message_id': res_2['message_id']})
+    assert res_3.status_code == res_4.status_code == 200
+    res_5 = requests.get(url + 'channel/messages/v2',
+                         params = {'token': login_list[0]['token'],
+                                  'channel_id': channel_list[0]['channel_id'],
+                                  'start': 0}).json()
+    res_6 = requests.get(url + 'dm/messages/v1',
+                         params = {'token': login_list[0]['token'],
+                                   'dm_id': dm_list[0]['dm_id'],
+                                   'start': 0}).json()
+    assert res_5['messages'][0]['is_pinned'] == True
+    assert res_6['messages'][0]['is_pinned'] == True
+
+def test_message_pin_invalid_message_id(login_list, channel_list, dm_list):
+    '''
+    
+    This test is to test when message_id is not a valid message within a 
+    channel or DM that the authorised user has joined
+    
+    Args:
+        login_list, channel_list, dm_list
+        
+    Raises:
+        InputError
+        
+    '''
+    # user[0] send a msg in channel[0]
+    res_1 = requests.post(url + 'message/send/v1',
+                        json = {'token': login_list[0]['token'],
+                                'channel_id': channel_list[0]['channel_id'],
+                                'message': 'Hello guys'}).json()
+    # user[0] send a msg in dm[0]
+    res_2 = requests.post(url + 'message/senddm/v1',
+                        json = {'token': login_list[0]['token'],
+                                'dm_id': dm_list[0]['dm_id'],
+                                'message': 'Hello guys'}).json()
+    res_3 = requests.post(url + 'message/pin/v1',
+                          json = {'token': login_list[1]['token'],
+                                  'message_id': res_1['message_id']})
+    res_4 = requests.post(url + 'message/pin/v1',
+                          json = {'token': login_list[3]['token'],
+                                  'message_id': res_2['message_id']})
+    assert res_3.status_code == res_4.status_code == InputError.code
+    
+def test_message_pin_twice(login_list, channel_list, dm_list):
+    '''
+    
+    This test is to test when the message is already pinned
+    
+    Args:
+        login_list, channel_list, dm_list
+        
+    Raises:
+        InputError
+        
+    '''
+    # user[0] send a msg in channel[0]
+    res_1 = requests.post(url + 'message/send/v1',
+                        json = {'token': login_list[0]['token'],
+                                'channel_id': channel_list[0]['channel_id'],
+                                'message': 'Hello guys'}).json()
+    # user[0] send a msg in dm[0]
+    res_2 = requests.post(url + 'message/senddm/v1',
+                        json = {'token': login_list[0]['token'],
+                                'dm_id': dm_list[0]['dm_id'],
+                                'message': 'Hello guys'}).json()
+    requests.post(url + 'message/pin/v1',
+                          json = {'token': login_list[0]['token'],
+                                  'message_id': res_1['message_id']})
+    res_3 = requests.post(url + 'message/pin/v1',
+                          json = {'token': login_list[0]['token'],
+                                  'message_id': res_1['message_id']})
+    requests.post(url + 'message/pin/v1',
+                          json = {'token': login_list[0]['token'],
+                                  'message_id': res_2['message_id']})
+    res_4 = requests.post(url + 'message/pin/v1',
+                          json = {'token': login_list[0]['token'],
+                                  'message_id': res_2['message_id']})
+    assert res_3.status_code == res_4.status_code == InputError.code
+    
+def test_message_pin_no_permission(login_list, channel_list, dm_list):
+    '''
+    
+    This test is to test when message_id refers to a valid message in a 
+    joined channel/DM and the authorised user does not have owner permissions 
+    in the channel/DM
+    
+    Args:
+        login_list, channel_list, dm_list
+        
+    Raises:
+        AccessError
+        
+    '''
+    # user[0] add user[1] to channel[0]
+    requests.post(f"{url}channel/invite/v2",
+                  json= {'token': login_list[0]['token'],
+                         'channel_id': channel_list[0]['channel_id'],
+                         'u_id': login_list[1]['auth_user_id']})
+    # user[1] send a msg in channel[0]
+    res_1 = requests.post(url + 'message/send/v1',
+                        json = {'token': login_list[1]['token'],
+                                'channel_id': channel_list[0]['channel_id'],
+                                'message': 'Hello guys'}).json()
+    # user[1] send a msg in dm[0]
+    res_2 = requests.post(url + 'message/senddm/v1',
+                        json = {'token': login_list[1]['token'],
+                                'dm_id': dm_list[0]['dm_id'],
+                                'message': 'Hello guys'}).json()
+    res_3 = requests.post(url + 'message/pin/v1',
+                          json = {'token': login_list[1]['token'],
+                                  'message_id': res_1['message_id']})
+    res_4 = requests.post(url + 'message/pin/v1',
+                          json = {'token': login_list[1]['token'],
+                                  'message_id': res_2['message_id']})
+    assert res_3.status_code == res_4.status_code == AccessError.code
+    
+def test_message_pin_invalid_token(login_list, channel_list, dm_list):
+    '''
+    
+    This test is to test when token is invalid
+    
+    Args:
+        login_list, channel_list, dm_list
+        
+    Raises:
+        AccessError
+        
+    '''
+    # user[0] send a msg in channel[0]
+    res_1 = requests.post(url + 'message/send/v1',
+                        json = {'token': login_list[0]['token'],
+                                'channel_id': channel_list[0]['channel_id'],
+                                'message': 'Hello guys'}).json()
+    # user[0] send a msg in dm[0]
+    res_2 = requests.post(url + 'message/senddm/v1',
+                        json = {'token': login_list[0]['token'],
+                                'dm_id': dm_list[0]['dm_id'],
+                                'message': 'Hello guys'}).json()
+    res_3 = requests.post(url + 'message/pin/v1',
+                          json = {'token': -1,
+                                  'message_id': res_1['message_id']})
+    res_4 = requests.post(url + 'message/pin/v1',
+                          json = {'token': -1,
+                                  'message_id': res_2['message_id']})
+    assert res_3.status_code == AccessError.code
+    assert res_4.status_code == AccessError.code
+
+######################################## message/pin/v1 ########################################
+def test_message_unpin_normal(login_list, channel_list, dm_list):
+    '''
+    
+    This test is to test when user unpin a message successfully
+    
+    Args:
+        login_list, channel_list, dm_list
+        
+    '''
+    # user[0] send a msg in channel[0]
+    res_1 = requests.post(url + 'message/send/v1',
+                        json = {'token': login_list[0]['token'],
+                                'channel_id': channel_list[0]['channel_id'],
+                                'message': 'Hello guys'}).json()
+    # user[0] send a msg in dm[0]
+    res_2 = requests.post(url + 'message/senddm/v1',
+                        json = {'token': login_list[0]['token'],
+                                'dm_id': dm_list[0]['dm_id'],
+                                'message': 'Hello guys'}).json()
+    requests.post(url + 'message/pin/v1',
+                  json = {'token': login_list[0]['token'],
+                          'message_id': res_1['message_id']})
+    requests.post(url + 'message/pin/v1',
+                  json = {'token': login_list[0]['token'],
+                          'message_id': res_2['message_id']})
+    res_3 = requests.post(url + 'message/unpin/v1',
+                          json = {'token': login_list[0]['token'],
+                                  'message_id': res_1['message_id']})
+    res_4 = requests.post(url + 'message/unpin/v1',
+                          json = {'token': login_list[0]['token'],
+                                  'message_id': res_2['message_id']})
+    assert res_3.status_code == res_4.status_code == 200
+    res_5 = requests.get(url + 'channel/messages/v2',
+                         params = {'token': login_list[0]['token'],
+                                  'channel_id': channel_list[0]['channel_id'],
+                                  'start': 0}).json()
+    res_6 = requests.get(url + 'dm/messages/v1',
+                         params = {'token': login_list[0]['token'],
+                                   'dm_id': dm_list[0]['dm_id'],
+                                   'start': 0}).json()
+    assert res_5['messages'][0]['is_pinned'] == False
+    assert res_6['messages'][0]['is_pinned'] == False
+
+def test_message_unpin_invalid_message_id(login_list, channel_list, dm_list):
+    '''
+    
+    This test is to test when message_id is not a valid message within a channel 
+    or DM that the authorised user has joined
+    
+    Args:
+        login_list, channel_list, dm_list
+        
+    Raises:
+        InputError
+        
+    '''
+    # user[0] send a msg in channel[0]
+    res_1 = requests.post(url + 'message/send/v1',
+                        json = {'token': login_list[0]['token'],
+                                'channel_id': channel_list[0]['channel_id'],
+                                'message': 'Hello guys'}).json()
+    # user[0] send a msg in dm[0]
+    res_2 = requests.post(url + 'message/senddm/v1',
+                        json = {'token': login_list[0]['token'],
+                                'dm_id': dm_list[0]['dm_id'],
+                                'message': 'Hello guys'}).json()
+    requests.post(url + 'message/pin/v1',
+                  json = {'token': login_list[0]['token'],
+                          'message_id': res_1['message_id']})
+    requests.post(url + 'message/pin/v1',
+                  json = {'token': login_list[0]['token'],
+                          'message_id': res_2['message_id']})
+    res_3 = requests.post(url + 'message/unpin/v1',
+                          json = {'token': login_list[1]['token'],
+                                  'message_id': res_1['message_id']})
+    res_4 = requests.post(url + 'message/unpin/v1',
+                          json = {'token': login_list[3]['token'],
+                                  'message_id': res_2['message_id']})
+    assert res_3.status_code == res_4.status_code == InputError.code
+
+def test_message_unpin_not_pinned_message(login_list, channel_list, dm_list):
+    '''
+    
+    This test is to test when the message is not already pinned
+    
+    Args:
+        login_list, channel_list, dm_list
+        
+    Raises:
+        InputError
+        
+    '''
+    # user[0] send a msg in channel[0]
+    res_1 = requests.post(url + 'message/send/v1',
+                        json = {'token': login_list[0]['token'],
+                                'channel_id': channel_list[0]['channel_id'],
+                                'message': 'Hello guys'}).json()
+    # user[0] send a msg in dm[0]
+    res_2 = requests.post(url + 'message/senddm/v1',
+                        json = {'token': login_list[0]['token'],
+                                'dm_id': dm_list[0]['dm_id'],
+                                'message': 'Hello guys'}).json()
+    res_3 = requests.post(url + 'message/unpin/v1',
+                          json = {'token': login_list[0]['token'],
+                                  'message_id': res_1['message_id']})
+    res_4 = requests.post(url + 'message/unpin/v1',
+                          json = {'token': login_list[0]['token'],
+                                  'message_id': res_2['message_id']})
+    assert res_3.status_code == res_4.status_code == InputError.code
+
+def test_message_unpin_no_permission(login_list, channel_list, dm_list):
+    '''
+    
+    This test is to test when message_id refers to a valid message in a 
+    joined channel/DM and the authorised user does not have owner permissions 
+    in the channel/DM
+    
+    Args:
+        login_list, channel_list, dm_list
+        
+    Raises:
+        AccessError
+        
+    '''
+    # user[0] add user[1] to channel[0]
+    requests.post(f"{url}channel/invite/v2",
+                  json= {'token': login_list[0]['token'],
+                         'channel_id': channel_list[0]['channel_id'],
+                         'u_id': login_list[1]['auth_user_id']})
+    # user[1] send a msg in channel[0]
+    res_1 = requests.post(url + 'message/send/v1',
+                        json = {'token': login_list[1]['token'],
+                                'channel_id': channel_list[0]['channel_id'],
+                                'message': 'Hello guys'}).json()
+    # user[1] send a msg in dm[0]
+    res_2 = requests.post(url + 'message/senddm/v1',
+                        json = {'token': login_list[1]['token'],
+                                'dm_id': dm_list[0]['dm_id'],
+                                'message': 'Hello guys'}).json()
+    requests.post(url + 'message/pin/v1',
+                  json = {'token': login_list[0]['token'],
+                          'message_id': res_1['message_id']})
+    requests.post(url + 'message/pin/v1',
+                  json = {'token': login_list[0]['token'],
+                          'message_id': res_2['message_id']})
+    res_3 = requests.post(url + 'message/unpin/v1',
+                          json = {'token': login_list[1]['token'],
+                                  'message_id': res_1['message_id']})
+    res_4 = requests.post(url + 'message/unpin/v1',
+                          json = {'token': login_list[1]['token'],
+                                  'message_id': res_2['message_id']})
+    assert res_3.status_code == res_4.status_code == AccessError.code
+    
+def test_message_unpin_invalid_token(login_list, channel_list, dm_list):
+    '''
+    
+    This test is to test when token is invalid
+    
+    Args:
+        login_list, channel_list, dm_list
+        
+    Raises:
+        AccessError
+        
+    '''
+    # user[0] send a msg in channel[0]
+    res_1 = requests.post(url + 'message/send/v1',
+                        json = {'token': login_list[0]['token'],
+                                'channel_id': channel_list[0]['channel_id'],
+                                'message': 'Hello guys'}).json()
+    # user[0] send a msg in dm[0]
+    res_2 = requests.post(url + 'message/senddm/v1',
+                        json = {'token': login_list[0]['token'],
+                                'dm_id': dm_list[0]['dm_id'],
+                                'message': 'Hello guys'}).json()
+    requests.post(url + 'message/pin/v1',
+                  json = {'token': login_list[0]['token'],
+                          'message_id': res_1['message_id']})
+    requests.post(url + 'message/pin/v1',
+                  json = {'token': login_list[0]['token'],
+                          'message_id': res_2['message_id']})
+    res_3 = requests.post(url + 'message/unpin/v1',
+                          json = {'token': -1,
+                                  'message_id': res_1['message_id']})
+    res_4 = requests.post(url + 'message/unpin/v1',
+                          json = {'token': -1,
+                                  'message_id': res_2['message_id']})
     assert res_3.status_code == AccessError.code
     assert res_4.status_code == AccessError.code
