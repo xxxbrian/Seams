@@ -1022,7 +1022,7 @@ def test_message_share_in_channel_normal(login_list, channel_list, dm_list):
     res_3 = requests.post(url + "message/share/v1",
                           json = {'token': login_list[0]['token'],
                                   'og_message_id': res_1['message_id'],
-                                  'message': 'This is Steve',
+                                  'message': 'This is Steve @bojinli',
                                   'channel_id': channel_list[1]['channel_id'],
                                   'dm_id': -1})
     assert res_3.status_code == 200
@@ -1030,7 +1030,7 @@ def test_message_share_in_channel_normal(login_list, channel_list, dm_list):
     res_4 = requests.post(url + "message/share/v1",
                           json = {'token': login_list[0]['token'],
                                   'og_message_id': res_1['message_id'],
-                                  'message': 'This is Steve',
+                                  'message': 'This is Steve @cicyzhou',
                                   'channel_id': -1,
                                   'dm_id': dm_list[0]['dm_id']})
     assert res_4.status_code == 200
@@ -1061,7 +1061,7 @@ def test_message_share_in_dm_normal(login_list, dm_list, channel_list):
     res_3 = requests.post(url + "message/share/v1",
                           json = {'token': login_list[0]['token'],
                                   'og_message_id': res_1['message_id'],
-                                  'message': 'This is Steve',
+                                  'message': 'This is Steve @brianlee',
                                   'channel_id': -1,
                                   'dm_id': dm_list[1]['dm_id']})
     assert res_3.status_code == 200
@@ -1069,7 +1069,7 @@ def test_message_share_in_dm_normal(login_list, dm_list, channel_list):
     res_4 = requests.post(url + "message/share/v1",
                           json = {'token': login_list[0]['token'],
                                   'og_message_id': res_1['message_id'],
-                                  'message': 'This is Steve',
+                                  'message': 'This is Steve @steveyang',
                                   'channel_id': channel_list[0]['channel_id'],
                                   'dm_id': -1})
     assert res_4.status_code == 200
@@ -1227,6 +1227,13 @@ def test_message_share_wrong_message_id(login_list, dm_list, channel_list):
                                   'channel_id': channel_list[0]['channel_id'],
                                   'dm_id': -1})
     assert res_2.status_code == InputError.code
+    res_2 = requests.post(url + "message/share/v1",
+                          json = {'token': login_list[0]['token'],
+                                  'og_message_id': -1,
+                                  'message': '',
+                                  'channel_id': channel_list[0]['channel_id'],
+                                  'dm_id': -1})
+    assert res_2.status_code == InputError.code
     # user[0] shares a msg in channel[1] to channel[0] with a new msg, but user[0] 
     # has not joined channel[1]
     res_3 = requests.post(url + "message/share/v1",
@@ -1257,6 +1264,13 @@ def test_message_share_wrong_message_id(login_list, dm_list, channel_list):
     res_6 = requests.post(url + "message/share/v1",
                           json = {'token': login_list[3]['token'],
                                   'og_message_id': res_4['message_id'],
+                                  'message': 'This is Steve',
+                                  'channel_id': -1,
+                                  'dm_id': dm_list[2]['dm_id']})
+    assert res_6.status_code == InputError.code
+    res_6 = requests.post(url + "message/share/v1",
+                          json = {'token': login_list[3]['token'],
+                                  'og_message_id': -1,
                                   'message': 'This is Steve',
                                   'channel_id': -1,
                                   'dm_id': dm_list[2]['dm_id']})
@@ -1462,7 +1476,16 @@ def test_message_react_invalid_message_id(login_list, channel_list, dm_list):
                           json = {'token': login_list[3]['token'],
                                   'message_id': res_2['message_id'],
                                   'react_id': 1})
-    assert res_3.status_code == res_4.status_code == InputError.code    
+    res_5 = requests.post(url + 'message/react/v1',
+                          json = {'token': login_list[3]['token'],
+                                  'message_id': -1,
+                                  'react_id': 1})
+    res_6 = requests.post(url + 'message/react/v1',
+                          json = {'token': login_list[3]['token'],
+                                  'message_id': -1,
+                                  'react_id': 1})
+    assert res_3.status_code == res_4.status_code == InputError.code 
+    assert res_5.status_code == res_6.status_code == InputError.code   
 
 def test_message_react_invalid_react_id(login_list, channel_list, dm_list):
     '''
@@ -1584,12 +1607,12 @@ def test_message_unreact_normal(login_list, channel_list, dm_list):
     res_1 = requests.post(url + 'message/send/v1',
                         json = {'token': login_list[0]['token'],
                                 'channel_id': channel_list[0]['channel_id'],
-                                'message': 'Hello guys'}).json()
+                                'message': 'Hello guys @brianlee'}).json()
     # user[0] send a msg in dm[0]
     res_2 = requests.post(url + 'message/senddm/v1',
                         json = {'token': login_list[0]['token'],
                                 'dm_id': dm_list[0]['dm_id'],
-                                'message': 'Hello guys'}).json()
+                                'message': 'Hello guys @cicyzhou'}).json()
     requests.post(url + 'message/react/v1',
                           json = {'token': login_list[0]['token'],
                                   'message_id': res_1['message_id'],
@@ -1639,6 +1662,16 @@ def test_message_unreact_invalid_message_id(login_list, channel_list, dm_list):
                                   'react_id': 1})
     assert res_3.status_code == InputError.code
     assert res_4.status_code == InputError.code
+    res_5 = requests.post(url + 'message/unreact/v1',
+                          json = {'token': login_list[0]['token'],
+                                  'message_id': -1,
+                                  'react_id': 1})
+    res_6 = requests.post(url + 'message/unreact/v1',
+                          json = {'token': login_list[0]['token'],
+                                  'message_id': -2,
+                                  'react_id': 1})
+    assert res_5.status_code == InputError.code
+    assert res_6.status_code == InputError.code
     
 def test_message_unreact_invalid_react_id(login_list, channel_list, dm_list):
     '''
@@ -1814,6 +1847,13 @@ def test_message_pin_invalid_message_id(login_list, channel_list, dm_list):
                           json = {'token': login_list[3]['token'],
                                   'message_id': res_2['message_id']})
     assert res_3.status_code == res_4.status_code == InputError.code
+    res_5 = requests.post(url + 'message/pin/v1',
+                          json = {'token': login_list[1]['token'],
+                                  'message_id': -1})
+    res_6 = requests.post(url + 'message/pin/v1',
+                          json = {'token': login_list[3]['token'],
+                                  'message_id': -2})
+    assert res_5.status_code == res_6.status_code == InputError.code
     
 def test_message_pin_twice(login_list, channel_list, dm_list):
     '''
@@ -1999,6 +2039,13 @@ def test_message_unpin_invalid_message_id(login_list, channel_list, dm_list):
                           json = {'token': login_list[3]['token'],
                                   'message_id': res_2['message_id']})
     assert res_3.status_code == res_4.status_code == InputError.code
+    res_5 = requests.post(url + 'message/unpin/v1',
+                          json = {'token': login_list[1]['token'],
+                                  'message_id': -1})
+    res_6 = requests.post(url + 'message/unpin/v1',
+                          json = {'token': login_list[3]['token'],
+                                  'message_id': -2})
+    assert res_5.status_code == res_6.status_code == InputError.code
 
 def test_message_unpin_not_pinned_message(login_list, channel_list, dm_list):
     '''
@@ -2136,19 +2183,33 @@ def test_message_sendlater_normal(login_list, channel_list):
     requests.post(url + 'message/sendlater/v1', 
                   json={'token': login_list[0]['token'],
                         'channel_id': channel_list[0]['channel_id'],
-                        'message': 'I am SuperBoy',
-                        'time_sent': timestamp()+1})
+                        'message': 'I am SuperBoy @steveyang',
+                        'time_sent': timestamp()+10})
     res_1 = requests.get(url + 'channel/messages/v2', 
                          params = {'token': login_list[0]['token'],
                                    'channel_id': channel_list[0]['channel_id'],
                                    'start': 0}).json()
     assert len(res_1['messages']) == 0
-    time.sleep(1.1)
+    time.sleep(10.1)
     res_2 = requests.get(url + 'channel/messages/v2', 
                          params = {'token': login_list[0]['token'],
                                    'channel_id': channel_list[0]['channel_id'],
                                    'start': 0}).json()
     assert len(res_2['messages']) == 1
+    response_6 = requests.get(url + 'notifications/get/v1',
+                              params={'token': login_list[0]['token']}).json()
+    assert response_6['notifications'][0]['channel_id'] == channel_list[0]['channel_id']
+    assert response_6['notifications'][0]['dm_id'] == -1
+    assert response_6['notifications'][0]['notification_message'] == "steveyang tagged you in Steve's channel: I am SuperBoy @steve"
+    requests.post(url + 'message/sendlater/v1', 
+                  json={'token': login_list[0]['token'],
+                        'channel_id': channel_list[0]['channel_id'],
+                        'message': 'I am SuperBoy @cicyzhou',
+                        'time_sent': timestamp()+1})
+    time.sleep(1.1)
+    response_7 = requests.get(url + 'notifications/get/v1',
+                              params={'token': login_list[3]['token']}).json()
+    assert response_7['notifications'] == []
     
 def test_message_sendlater_invalid_channel_id(login_list, channel_list):
     '''
@@ -2275,7 +2336,7 @@ def test_message_sendlaterdm_normal(login_list, dm_list):
     requests.post(url + 'message/sendlaterdm/v1', 
                   json={'token': login_list[0]['token'],
                         'dm_id': dm_list[0]['dm_id'],
-                        'message': 'I am SuperBoy',
+                        'message': 'I am SuperBoy @steveyang',
                         'time_sent': timestamp()+10})
     res_1 = requests.get(url + 'dm/messages/v1', 
                          params = {'token': login_list[0]['token'],
@@ -2288,6 +2349,20 @@ def test_message_sendlaterdm_normal(login_list, dm_list):
                                    'dm_id': dm_list[0]['dm_id'],
                                    'start': 0}).json()
     assert len(res_2['messages']) == 1
+    response_6 = requests.get(url + 'notifications/get/v1',
+                              params={'token': login_list[0]['token']}).json()
+    assert response_6['notifications'][0]['dm_id'] == dm_list[0]['dm_id']
+    assert response_6['notifications'][0]['channel_id'] == -1
+    assert response_6['notifications'][0]['notification_message'] == "steveyang tagged you in bojinli, brianlee, steveyang: I am SuperBoy @steve"
+    requests.post(url + 'message/sendlaterdm/v1', 
+                  json={'token': login_list[0]['token'],
+                        'dm_id': dm_list[0]['dm_id'],
+                        'message': 'I am SuperBoy @cicyzhou',
+                        'time_sent': timestamp()+1})
+    time.sleep(1.1)
+    response_7 = requests.get(url + 'notifications/get/v1',
+                              params={'token': login_list[3]['token']}).json()
+    assert len(response_7['notifications']) == 2 # only 2 add notification
     
 def test_message_sendlaterdm_invalid_dm_id(login_list, dm_list):
     '''

@@ -210,6 +210,14 @@ def message_sendlater_v1(token, channel_id, message, time_sent):
         raise InputError(description='Time in the past')
     new_msg = Message(user.u_id, message, time_sent, channel)
     new_msg.add_to_store()
+    tagged_user_list = Message.get_tagged_user(message)
+    for tagged_user in tagged_user_list:
+        if channel.has_user(tagged_user):
+            new_nf = Notification(
+                channel,
+                f'{user.handle_str} tagged you in {channel.name}: {message[0:20]}',
+                time_sent)
+            tagged_user.add_notification(new_nf)
 
     return {'message_id': new_msg.message_id}
 
