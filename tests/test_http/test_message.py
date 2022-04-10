@@ -2276,13 +2276,13 @@ def test_message_sendlaterdm_normal(login_list, dm_list):
                   json={'token': login_list[0]['token'],
                         'dm_id': dm_list[0]['dm_id'],
                         'message': 'I am SuperBoy',
-                        'time_sent': timestamp()+1})
+                        'time_sent': timestamp()+10})
     res_1 = requests.get(url + 'dm/messages/v1', 
                          params = {'token': login_list[0]['token'],
                                    'dm_id': dm_list[0]['dm_id'],
                                    'start': 0}).json()
     assert len(res_1['messages']) == 0
-    time.sleep(1.1)
+    time.sleep(10.1)
     res_2 = requests.get(url + 'dm/messages/v1', 
                          params = {'token': login_list[0]['token'],
                                    'dm_id': dm_list[0]['dm_id'],
