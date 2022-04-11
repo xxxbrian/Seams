@@ -145,7 +145,8 @@ class User():
             for key, value in self.__dict__.items() if key in show
         }
         if 'profile_img_url' in show:
-            info_dict['pro_img_url'] = f'{url}profile_img/{self.profile_img}'
+            info_dict[
+                'profile_img_url'] = f'{url}profile_img/{self.profile_img}'
         return info_dict
 
     @staticmethod
