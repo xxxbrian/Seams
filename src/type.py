@@ -8,6 +8,7 @@ import os
 from datetime import timezone
 import datetime
 import secrets
+import random
 
 from src.data_store import data_store
 
@@ -100,7 +101,7 @@ class User():
         self.handle_str = self.generat_handle()
         self.group_id = 500 if self.u_id else 0
         self.notification = []
-        self.profile_img = 'default.jpg'
+        self.profile_img = f'default-{random.randint(1,1000)}.png'
         time_now = int_now()
         self.analytics = {
             'channels_joined': [{
