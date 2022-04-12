@@ -49,6 +49,67 @@ def create_user_list():
                                             "password": "123456"}).json())
     return user_list
 
+@pytest.fixture(name = 'channel_list')
+def channel_create(user_list):
+    '''
+    This function is to pre-create 4 channels for further tests
+    
+    Steve and Brian's channels are public channels. Bojin and Cicy's channels are private channels
+    
+    returns:
+        channel_list, contains 4 channels' channel_id
+    '''
+    channel_list = []
+    channel_list.append(requests.post(url + 'channels/create/v2',
+                                      json = {'token': user_list[0]['token'],
+                                              'name': "Steve's channel",
+                                              'is_public': True}).json())
+    channel_list.append(requests.post(url + 'channels/create/v2',
+                                      json = {'token': user_list[1]['token'],
+                                              'name': "Brian's channel",
+                                              'is_public': True}).json())
+    channel_list.append(requests.post(url + 'channels/create/v2',
+                                      json = {'token': user_list[2]['token'],
+                                              'name': "Bojin's channel",
+                                              'is_public': True}).json())
+    channel_list.append(requests.post(url + 'channels/create/v2',
+                                      json = {'token': user_list[3]['token'],
+                                              'name': "Cicy's channel",
+                                              'is_public': False}).json())
+    return channel_list
+
+@pytest.fixture(name = 'dm_list')
+def create_dm(user_list):
+    '''
+    This function is to pre-create some dms for further tests
+    
+    Return:
+        dm_list, contain dm_id and name
+        
+    dm_0 = 'bojinli, brianlee, steveyang'
+    dm_1 = 'bojinli, cicyzhou, steveyang'
+    dm_2 = 'bojinli, brianlee, cicyzhou'
+    
+    '''
+    dm_list = []
+    # dm_list[0]: user[0], user[1], user[2]
+    dm_list.append(requests.post(url + "dm/create/v1",
+                                 json = {'token': user_list[0]['token'],
+                                         'u_ids': [user_list[1]['auth_user_id'], 
+                                                   user_list[2]['auth_user_id']]}).json())
+    
+    # dm_list[1]: user[0], user[2]. user[3]
+    dm_list.append(requests.post(url + "dm/create/v1",
+                                 json = {'token': user_list[0]['token'],
+                                         'u_ids': [user_list[3]['auth_user_id'], 
+                                                   user_list[2]['auth_user_id']]}).json())
+    
+    # dm_list[2]: user[1], user[2]. user[3]
+    dm_list.append(requests.post(url + "dm/create/v1",
+                                 json = {'token': user_list[1]['token'],
+                                         'u_ids': [user_list[2]['auth_user_id'], 
+                                                   user_list[3]['auth_user_id']]}).json())
+    return dm_list
 
 @pytest.fixture(name = 'users')
 def users(user_list):
@@ -95,8 +156,147 @@ def users(user_list):
     ]
     return users
 
+################################################ user/stats/v1 test ################################################
+
+def test_user_stats_normal(user_list, channel_list, dm_list):
+    """
+
+    This test is to test when user successfuly check stats
+
+    """
+    requests.post(url + 'message/send/v1',
+                  json = {'token': user_list[0]['token'],
+                          'channel_id': channel_list[0]['channel_id'],
+                          'message': 'I am SuperBoy @steveyang'})
+    requests.post(url + 'message/senddm/v1',
+                  json = {'token': user_list[0]['token'],
+                          'dm_id': dm_list[0]['dm_id'],
+                          'message': 'I am SuperBoy @steveyang'})
+    requests.post(url + 'message/send/v1',
+                  json = {'token': user_list[1]['token'],
+                          'channel_id': channel_list[1]['channel_id'],
+                          'message': 'I am SuperBoy'})
+    requests.post(url + 'message/senddm/v1',
+                  json = {'token': user_list[2]['token'],
+                          'dm_id': dm_list[2]['dm_id'],
+                          'message': 'I am SuperBoy'})
+    res = requests.get(url + 'user/stats/v1',
+                       params = {'token': user_list[0]['token']}).json()
+    assert len(res['user_stats']['channels_joined']) == 2
+    assert res['user_stats']['channels_joined'][-1]['num_channels_joined'] == 1
+    assert len(res['user_stats']['dms_joined']) == 3
+    assert res['user_stats']['dms_joined'][-1]['num_dms_joined'] == 2
+    assert len(res['user_stats']['messages_sent']) == 3
+    assert res['user_stats']['messages_sent'][-1]['num_messages_sent'] == 2
+    assert res['user_stats']['involvement_rate'] == 5/11
+
+def test_user_stats_invalid_token(user_list, channel_list, dm_list):
+    """
+
+    This test is to test when token is invalid
+    
+    Raises:
+        AccessError
+
+    """
+    requests.post(url + 'message/send/v1',
+                  json = {'token': user_list[0]['token'],
+                          'channel_id': channel_list[0]['channel_id'],
+                          'message': 'I am SuperBoy @steveyang'})
+    requests.post(url + 'message/senddm/v1',
+                  json = {'token': user_list[0]['token'],
+                          'dm_id': dm_list[0]['dm_id'],
+                          'message': 'I am SuperBoy @steveyang'})
+    requests.post(url + 'message/send/v1',
+                  json = {'token': user_list[1]['token'],
+                          'channel_id': channel_list[1]['channel_id'],
+                          'message': 'I am SuperBoy'})
+    requests.post(url + 'message/senddm/v1',
+                  json = {'token': user_list[2]['token'],
+                          'dm_id': dm_list[2]['dm_id'],
+                          'message': 'I am SuperBoy'})
+    res = requests.get(url + 'user/stats/v1',
+                       params = {'token': -1})
+    assert res.status_code == AccessError.code
+    
+################################################ users/stats/v1 test ################################################
+
+def test_users_stats_normal(user_list, channel_list, dm_list):
+    '''
+    
+    This test is to test when users_list get info successfully
+    
+    '''
+    requests.post(url + 'message/send/v1',
+                  json = {'token': user_list[0]['token'],
+                          'channel_id': channel_list[0]['channel_id'],
+                          'message': 'I am SuperBoy @steveyang'})
+    requests.post(url + 'message/senddm/v1',
+                  json = {'token': user_list[0]['token'],
+                          'dm_id': dm_list[0]['dm_id'],
+                          'message': 'I am SuperBoy @steveyang'})
+    requests.post(url + 'message/send/v1',
+                  json = {'token': user_list[1]['token'],
+                          'channel_id': channel_list[1]['channel_id'],
+                          'message': 'I am SuperBoy'})
+    requests.post(url + 'message/senddm/v1',
+                  json = {'token': user_list[2]['token'],
+                          'dm_id': dm_list[2]['dm_id'],
+                          'message': 'I am SuperBoy'})
+    # remove a dm
+    requests.delete(url + 'dm/remove/v1',
+                    json = {"token": user_list[0]["token"], 
+                            "dm_id": dm_list[0]['dm_id']})
+    res = requests.get(url + 'users/stats/v1',
+                       params = {'token': user_list[0]['token']}).json()
+    assert res['workspace_stats']['channels_exist'][-1]['num_channels_exist'] == 4
+    assert res['workspace_stats']['dms_exist'][-1]['num_dms_exist'] == 2
+    assert res['workspace_stats']['messages_exist'][-1]['num_messages_sent'] == 3
+    assert res['workspace_stats']['involvement_rate'] == 1
+    requests.post(f"{url}auth/register/v2",
+                  json = { 'email': 'z537@unsw.com',
+                           'password': '123456',
+                           'name_first': 'Stephen',
+                           'name_last': 'Curry'})
+    res = requests.get(url + 'users/stats/v1',
+                       params = {'token': user_list[0]['token']}).json()
+    assert res['workspace_stats']['involvement_rate'] == 4/5
+    
+def test_users_stats_invalid_token(user_list, channel_list, dm_list):
+    '''
+    
+    This test is to test when token is invalid
+    
+    Raises:
+        AccessError
+    
+    '''
+    requests.post(url + 'message/send/v1',
+                  json = {'token': user_list[0]['token'],
+                          'channel_id': channel_list[0]['channel_id'],
+                          'message': 'I am SuperBoy @steveyang'})
+    requests.post(url + 'message/senddm/v1',
+                  json = {'token': user_list[0]['token'],
+                          'dm_id': dm_list[0]['dm_id'],
+                          'message': 'I am SuperBoy @steveyang'})
+    requests.post(url + 'message/send/v1',
+                  json = {'token': user_list[1]['token'],
+                          'channel_id': channel_list[1]['channel_id'],
+                          'message': 'I am SuperBoy'})
+    requests.post(url + 'message/senddm/v1',
+                  json = {'token': user_list[2]['token'],
+                          'dm_id': dm_list[2]['dm_id'],
+                          'message': 'I am SuperBoy'})
+    # remove a dm
+    requests.delete(url + 'dm/remove/v1',
+                    json = {"token": user_list[0]["token"], 
+                            "dm_id": dm_list[0]['dm_id']})
+    res = requests.get(url + 'users/stats/v1',
+                       params = {'token': -1})
+    assert res.status_code == AccessError.code
+    
 ################################################ users/all/v1 test ################################################
- 
+
 def test_users_all_valid_token(user_list, users):
     '''
     
@@ -740,4 +940,133 @@ def test_user_profile_sethandle_invalid_token(user_list):
     assert response_3.status_code == AccessError.code
     assert response_4.status_code == AccessError.code
     assert response_5.status_code == AccessError.code
+    
+################################################ user/profile/uploadphoto/v1 test ################################################
+    
+def test_user_profile_uploadphoto_normal(user_list):
+    """
+
+    Test user_profile_uploadphoto when all condition are valid
+    
+    """
+    resp = requests.post(url + 'user/profile/uploadphoto/v1', json={
+        "token": user_list[0]["token"],
+        "img_url": 'http://unswcse.alwaysdata.net/profile_img/vc1LgHIMq4DHV1UIfMCHdGOC7lrW0JKi2xliwRthcIc.jpg',
+        "x_start": 0,
+        "y_start": 0,
+        "x_end": 200,
+        "y_end": 200,
+    })
+    
+    assert resp.status_code == 200
+    
+def test_user_profile_uploadphoto_invalid_URL(user_list):
+    """
+
+    Test user_profile_uploadphoto when img_url returns an
+    HTTP status other than 200, or any other errors occur 
+    when attempting to retrieve the image
+    
+    Raises:
+        InputError
+    
+    """
+    resp = requests.post(url + 'user/profile/uploadphoto/v1', json={
+        "token": user_list[0]["token"],
+        "img_url": 'http://unswcs.alwaysdata.net/profile_img/vc1LgHIMq4DHV1UIfMCHdGOC7lrW0JKi2xliwRthcIc.jpg',
+        "x_start": 0,
+        "y_start": 0,
+        "x_end": 200,
+        "y_end": 200,
+    })
+    
+    assert resp.status_code == InputError.code
+    
+def test_user_profile_uploadphoto_out_of_dimensions(user_list):
+    """
+
+    Test user_profile_uploadphoto when any of x_start, y_start, 
+    x_end, y_end are not within the dimensions of the image at the URL
+    
+    Raises:
+        InputError
+    
+    """
+    resp = requests.post(url + 'user/profile/uploadphoto/v1', json={
+        "token": user_list[0]["token"],
+        "img_url": 'http://unswcse.alwaysdata.net/profile_img/vc1LgHIMq4DHV1UIfMCHdGOC7lrW0JKi2xliwRthcIc.jpg',
+        "x_start": 0,
+        "y_start": 0,
+        "x_end": 1800,
+        "y_end": 2000,
+    })
+    
+    assert resp.status_code == InputError.code
+    
+def test_user_profile_uploadphoto_invalid_start_and_end(user_list):
+    """
+
+    Test user_profile_uploadphoto when image uploaded is not a JPG
+    
+    Raises:
+        InputError
+    
+    """
+    resp = requests.post(url + 'user/profile/uploadphoto/v1', json={
+        "token": user_list[0]["token"],
+        "img_url": 'http://unswcse.alwaysdata.net/profile_img/vc1LgHIMq4DHV1UIfMCHdGOC7lrW0JKi2xliwRthcIc.jpg',
+        "x_start": 100,
+        "y_start": 100,
+        "x_end": 100,
+        "y_end": 50,
+    })
+    assert resp.status_code == InputError.code
+    resp = requests.post(url + 'user/profile/uploadphoto/v1', json={
+        "token": user_list[0]["token"],
+        "img_url": 'http://unswcse.alwaysdata.net/profile_img/vc1LgHIMq4DHV1UIfMCHdGOC7lrW0JKi2xliwRthcIc.jpg',
+        "x_start": 100,
+        "y_start": 100,
+        "x_end": 50,
+        "y_end": 100,
+    })
+    assert resp.status_code == InputError.code
+    
+def test_user_profile_uploadphoto_not_JPG(user_list):
+    """
+
+    Test user_profile_uploadphoto when all condition are valid
+    
+    Raises:
+        InputError
+        
+    """
+    resp = requests.post(url + 'user/profile/uploadphoto/v1', json={
+        "token": user_list[0]["token"],
+        "img_url": 'https://avatars.githubusercontent.com/u/86137559?v=4',
+        "x_start": 0,
+        "y_start": 0,
+        "x_end": 20,
+        "y_end": 20,
+    })
+    assert resp.status_code == InputError.code
+    
+def test_user_profile_uploadphoto_invalid_token(user_list):
+    '''
+    
+    This test is to test when token is invalid
+    
+    Raises:
+        AccessError
+        
+    '''
+    resp = requests.post(url + 'user/profile/uploadphoto/v1', json={
+        "token": -1,
+        "img_url": 'http://unswcse.alwaysdata.net/profile_img/vc1LgHIMq4DHV1UIfMCHdGOC7lrW0JKi2xliwRthcIc.jpg',
+        "x_start": 0,
+        "y_start": 0,
+        "x_end": 200,
+        "y_end": 200,
+    })
+    
+    assert resp.status_code == AccessError.code
     
