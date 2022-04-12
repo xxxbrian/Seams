@@ -741,3 +741,132 @@ def test_user_profile_sethandle_invalid_token(user_list):
     assert response_4.status_code == AccessError.code
     assert response_5.status_code == AccessError.code
     
+################################################ user/profile/uploadphoto/v1 test ################################################
+    
+def test_user_profile_uploadphoto_normal(user_list):
+    """
+
+    Test user_profile_uploadphoto when all condition are valid
+    
+    """
+    resp = requests.post(url + 'user/profile/uploadphoto/v1', json={
+        "token": user_list[0]["token"],
+        "img_url": 'http://unswcse.alwaysdata.net/profile_img/vc1LgHIMq4DHV1UIfMCHdGOC7lrW0JKi2xliwRthcIc.jpg',
+        "x_start": 0,
+        "y_start": 0,
+        "x_end": 200,
+        "y_end": 200,
+    })
+    
+    assert resp.status_code == 200
+    
+def test_user_profile_uploadphoto_invalid_URL(user_list):
+    """
+
+    Test user_profile_uploadphoto when img_url returns an
+    HTTP status other than 200, or any other errors occur 
+    when attempting to retrieve the image
+    
+    Raises:
+        InputError
+    
+    """
+    resp = requests.post(url + 'user/profile/uploadphoto/v1', json={
+        "token": user_list[0]["token"],
+        "img_url": 'http://unswcs.alwaysdata.net/profile_img/vc1LgHIMq4DHV1UIfMCHdGOC7lrW0JKi2xliwRthcIc.jpg',
+        "x_start": 0,
+        "y_start": 0,
+        "x_end": 200,
+        "y_end": 200,
+    })
+    
+    assert resp.status_code == InputError.code
+    
+def test_user_profile_uploadphoto_out_of_dimensions(user_list):
+    """
+
+    Test user_profile_uploadphoto when any of x_start, y_start, 
+    x_end, y_end are not within the dimensions of the image at the URL
+    
+    Raises:
+        InputError
+    
+    """
+    resp = requests.post(url + 'user/profile/uploadphoto/v1', json={
+        "token": user_list[0]["token"],
+        "img_url": 'http://unswcse.alwaysdata.net/profile_img/vc1LgHIMq4DHV1UIfMCHdGOC7lrW0JKi2xliwRthcIc.jpg',
+        "x_start": 0,
+        "y_start": 0,
+        "x_end": 1800,
+        "y_end": 2000,
+    })
+    
+    assert resp.status_code == InputError.code
+    
+def test_user_profile_uploadphoto_invalid_start_and_end(user_list):
+    """
+
+    Test user_profile_uploadphoto when image uploaded is not a JPG
+    
+    Raises:
+        InputError
+    
+    """
+    resp = requests.post(url + 'user/profile/uploadphoto/v1', json={
+        "token": user_list[0]["token"],
+        "img_url": 'http://unswcse.alwaysdata.net/profile_img/vc1LgHIMq4DHV1UIfMCHdGOC7lrW0JKi2xliwRthcIc.jpg',
+        "x_start": 100,
+        "y_start": 100,
+        "x_end": 100,
+        "y_end": 50,
+    })
+    assert resp.status_code == InputError.code
+    resp = requests.post(url + 'user/profile/uploadphoto/v1', json={
+        "token": user_list[0]["token"],
+        "img_url": 'http://unswcse.alwaysdata.net/profile_img/vc1LgHIMq4DHV1UIfMCHdGOC7lrW0JKi2xliwRthcIc.jpg',
+        "x_start": 100,
+        "y_start": 100,
+        "x_end": 50,
+        "y_end": 100,
+    })
+    assert resp.status_code == InputError.code
+    
+def test_user_profile_uploadphoto_not_JPG(user_list):
+    """
+
+    Test user_profile_uploadphoto when all condition are valid
+    
+    Raises:
+        InputError
+        
+    """
+    resp = requests.post(url + 'user/profile/uploadphoto/v1', json={
+        "token": user_list[0]["token"],
+        "img_url": 'https://avatars.githubusercontent.com/u/86137559?v=4',
+        "x_start": 0,
+        "y_start": 0,
+        "x_end": 20,
+        "y_end": 20,
+    })
+    assert resp.status_code == InputError.code
+    
+def test_user_profile_uploadphoto_invalid_token(user_list):
+    '''
+    
+    This test is to test when token is invalid
+    
+    Raises:
+        AccessError
+        
+    '''
+    resp = requests.post(url + 'user/profile/uploadphoto/v1', json={
+        "token": -1,
+        "img_url": 'http://unswcse.alwaysdata.net/profile_img/vc1LgHIMq4DHV1UIfMCHdGOC7lrW0JKi2xliwRthcIc.jpg',
+        "x_start": 0,
+        "y_start": 0,
+        "x_end": 200,
+        "y_end": 200,
+    })
+    
+    assert resp.status_code == AccessError.code
+    
