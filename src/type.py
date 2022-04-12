@@ -701,6 +701,8 @@ class Message():
             key: value
             for key, value in self.__dict__.items() if key in show
         }
+        if 'time_sent' in show:
+            info_dict['time_sent'] = int(info_dict['time_sent'])
         if 'message' in show:
             info_dict['message'] = self.content
         if 'reacts' in show:
