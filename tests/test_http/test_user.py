@@ -263,7 +263,7 @@ def test_users_stats_normal(user_list, channel_list, dm_list):
                        params = {'token': user_list[0]['token']}).json()
     assert res['workspace_stats']['involvement_rate'] == 4/5
     
-def test_users_stats_normal(user_list, channel_list, dm_list):
+def test_users_stats_invalid_token(user_list, channel_list, dm_list):
     '''
     
     This test is to test when token is invalid
