@@ -175,13 +175,52 @@ def test_user_stats_normal(user_list, channel_list, dm_list):
                   json = {'token': user_list[0]['token'],
                           'dm_id': dm_list[0]['dm_id'],
                           'message': 'I am SuperBoy @steveyang'})
-    time.sleep(1)
+    requests.post(url + 'message/send/v1',
+                  json = {'token': user_list[1]['token'],
+                          'channel_id': channel_list[1]['channel_id'],
+                          'message': 'I am SuperBoy'})
+    requests.post(url + 'message/senddm/v1',
+                  json = {'token': user_list[2]['token'],
+                          'dm_id': dm_list[2]['dm_id'],
+                          'message': 'I am SuperBoy'})
     res = requests.get(url + 'user/stats/v1',
                        params = {'token': user_list[0]['token']}).json()
     assert len(res['user_stats']['channels_joined']) == 2
+    assert res['user_stats']['channels_joined'][-1]['num_channels_joined'] == 1
     assert len(res['user_stats']['dms_joined']) == 3
+    assert res['user_stats']['dms_joined'][-1]['num_dms_joined'] == 2
     assert len(res['user_stats']['messages_sent']) == 3
-    assert res['user_stats']['involvement_rate'] == 5/9
+    assert res['user_stats']['messages_sent'][-1]['num_messages_sent'] == 2
+    assert res['user_stats']['involvement_rate'] == 5/11
+
+def test_user_stats_invalid_token(user_list, channel_list, dm_list):
+    """
+
+    This test is to test when token is invalid
+    
+    Raises:
+        AccessError
+
+    """
+    requests.post(url + 'message/send/v1',
+                  json = {'token': user_list[0]['token'],
+                          'channel_id': channel_list[0]['channel_id'],
+                          'message': 'I am SuperBoy @steveyang'})
+    requests.post(url + 'message/senddm/v1',
+                  json = {'token': user_list[0]['token'],
+                          'dm_id': dm_list[0]['dm_id'],
+                          'message': 'I am SuperBoy @steveyang'})
+    requests.post(url + 'message/send/v1',
+                  json = {'token': user_list[1]['token'],
+                          'channel_id': channel_list[1]['channel_id'],
+                          'message': 'I am SuperBoy'})
+    requests.post(url + 'message/senddm/v1',
+                  json = {'token': user_list[2]['token'],
+                          'dm_id': dm_list[2]['dm_id'],
+                          'message': 'I am SuperBoy'})
+    res = requests.get(url + 'user/stats/v1',
+                       params = {'token': -1})
+    assert res.status_code == AccessError.code
     
 def test_users_all_valid_token(user_list, users):
     '''
