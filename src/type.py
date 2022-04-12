@@ -9,16 +9,16 @@ from datetime import timezone
 import datetime
 import secrets
 import random
-from typing import List, Dict, Union, Optional
+from typing import List, Dict, Union, Optional, Callable
 
-from src.data_store import data_store
+from src.data_store import data_store, initial_object
 
 from src.config import url, SECRET
 
 store = data_store.get()
 
 
-def pickelsave(func):
+def pickelsave(func: Callable) -> Callable:
 
     def wrapper(*args, **kwargs):
         result = func(*args, **kwargs)
@@ -29,11 +29,28 @@ def pickelsave(func):
     return wrapper
 
 
-def int_now():
+def int_now() -> int:
     return int(time.time())
 
 
 class Seams():
+
+    @staticmethod
+    def clear() -> None:
+        store['workspace_stats'] = {
+            'channels_exist': [{
+                'num_channels_exist': 0,
+                'time_stamp': int(time.time())
+            }],
+            'dms_exist': [{
+                'num_dms_exist': 0,
+                'time_stamp': int(time.time())
+            }],
+            'messages_exist': [{
+                'num_messages_exist': 0,
+                'time_stamp': int(time.time())
+            }],
+        }
 
     @staticmethod
     def set_workspace_stats(key, offset, time) -> None:
@@ -209,6 +226,7 @@ class User():
         """clear user"""
         store['users'].clear()
         store['login_token'].clear()
+        store['reset_code'].clear()
 
     @staticmethod
     def get_last_id() -> int:
