@@ -4,6 +4,7 @@ import requests
 import json
 from src.config import url
 from src.error import InputError, AccessError
+import time
 
 @pytest.fixture(name = 'user_list')
 def create_user_list():
@@ -49,6 +50,67 @@ def create_user_list():
                                             "password": "123456"}).json())
     return user_list
 
+@pytest.fixture(name = 'channel_list')
+def channel_create(user_list):
+    '''
+    This function is to pre-create 4 channels for further tests
+    
+    Steve and Brian's channels are public channels. Bojin and Cicy's channels are private channels
+    
+    returns:
+        channel_list, contains 4 channels' channel_id
+    '''
+    channel_list = []
+    channel_list.append(requests.post(url + 'channels/create/v2',
+                                      json = {'token': user_list[0]['token'],
+                                              'name': "Steve's channel",
+                                              'is_public': True}).json())
+    channel_list.append(requests.post(url + 'channels/create/v2',
+                                      json = {'token': user_list[1]['token'],
+                                              'name': "Brian's channel",
+                                              'is_public': True}).json())
+    channel_list.append(requests.post(url + 'channels/create/v2',
+                                      json = {'token': user_list[2]['token'],
+                                              'name': "Bojin's channel",
+                                              'is_public': True}).json())
+    channel_list.append(requests.post(url + 'channels/create/v2',
+                                      json = {'token': user_list[3]['token'],
+                                              'name': "Cicy's channel",
+                                              'is_public': False}).json())
+    return channel_list
+
+@pytest.fixture(name = 'dm_list')
+def create_dm(user_list):
+    '''
+    This function is to pre-create some dms for further tests
+    
+    Return:
+        dm_list, contain dm_id and name
+        
+    dm_0 = 'bojinli, brianlee, steveyang'
+    dm_1 = 'bojinli, cicyzhou, steveyang'
+    dm_2 = 'bojinli, brianlee, cicyzhou'
+    
+    '''
+    dm_list = []
+    # dm_list[0]: user[0], user[1], user[2]
+    dm_list.append(requests.post(url + "dm/create/v1",
+                                 json = {'token': user_list[0]['token'],
+                                         'u_ids': [user_list[1]['auth_user_id'], 
+                                                   user_list[2]['auth_user_id']]}).json())
+    
+    # dm_list[1]: user[0], user[2]. user[3]
+    dm_list.append(requests.post(url + "dm/create/v1",
+                                 json = {'token': user_list[0]['token'],
+                                         'u_ids': [user_list[3]['auth_user_id'], 
+                                                   user_list[2]['auth_user_id']]}).json())
+    
+    # dm_list[2]: user[1], user[2]. user[3]
+    dm_list.append(requests.post(url + "dm/create/v1",
+                                 json = {'token': user_list[1]['token'],
+                                         'u_ids': [user_list[2]['auth_user_id'], 
+                                                   user_list[3]['auth_user_id']]}).json())
+    return dm_list
 
 @pytest.fixture(name = 'users')
 def users(user_list):
@@ -96,7 +158,31 @@ def users(user_list):
     return users
 
 ################################################ users/all/v1 test ################################################
- 
+
+################################################ user/stats/v1 test ################################################
+
+def test_user_stats_normal(user_list, channel_list, dm_list):
+    """
+
+    This test is to test when user successfuly check stats
+
+    """
+    requests.post(url + 'message/send/v1',
+                  json = {'token': user_list[0]['token'],
+                          'channel_id': channel_list[0]['channel_id'],
+                          'message': 'I am SuperBoy @steveyang'})
+    requests.post(url + 'message/senddm/v1',
+                  json = {'token': user_list[0]['token'],
+                          'dm_id': dm_list[0]['dm_id'],
+                          'message': 'I am SuperBoy @steveyang'})
+    time.sleep(1)
+    res = requests.get(url + 'user/stats/v1',
+                       params = {'token': user_list[0]['token']}).json()
+    assert len(res['user_stats']['channels_joined']) == 2
+    assert len(res['user_stats']['dms_joined']) == 3
+    assert len(res['user_stats']['messages_sent']) == 3
+    assert res['user_stats']['involvement_rate'] == 5/9
+    
 def test_users_all_valid_token(user_list, users):
     '''
     
