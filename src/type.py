@@ -8,10 +8,11 @@ import os
 from datetime import timezone
 import datetime
 import secrets
+import random
 
 from src.data_store import data_store
 
-from src.config import SECRET
+from src.config import url, SECRET
 
 store = data_store.get()
 
@@ -25,6 +26,43 @@ def pickelsave(func):
         return result
 
     return wrapper
+
+
+def int_now():
+    return int(time.time())
+
+
+class Seams():
+
+    @staticmethod
+    def set_workspace_stats(key, offset, time):
+        num_key = f'num_{key}'
+        last_num_value = store['workspace_stats'][key][-1][num_key]
+        store['workspace_stats'][key].append({
+            num_key: last_num_value + offset,
+            'time_stamp': time
+        })
+
+    @staticmethod
+    def analytics_filter(data, key, time):
+        return [i for i in data[key] if i['time_stamp'] < time]
+
+    @staticmethod
+    def get_workspace_stats() -> dict:
+        now = int_now()
+        info_dict = {}
+        for key in store['workspace_stats'].keys():
+            info_dict[key] = Seams.analytics_filter(store['workspace_stats'],
+                                                    key, now)
+        user_in_cord = 0
+        all_users = User.find_all()
+        for user in all_users:
+            if user.analytics['channels_joined'][-1][
+                    'num_channels_joined'] or user.analytics['dms_joined'][-1][
+                        'num_dms_joined']:
+                user_in_cord += 1
+        info_dict['utilization_rate'] = user_in_cord / len(all_users)
+        return info_dict
 
 
 class User():
@@ -63,6 +101,22 @@ class User():
         self.handle_str = self.generat_handle()
         self.group_id = 500 if self.u_id else 0
         self.notification = []
+        self.profile_img = f'default-{random.randint(1,1000)}.png'
+        time_now = int_now()
+        self.analytics = {
+            'channels_joined': [{
+                'num_channels_joined': 0,
+                'time_stamp': time_now
+            }],
+            'dms_joined': [{
+                'num_dms_joined': 0,
+                'time_stamp': time_now
+            }],
+            'messages_sent': [{
+                'num_messages_sent': 0,
+                'time_stamp': time_now
+            }],
+        }
 
     # def __setattr__(self, key, value):
     #     self.__dict__[key] = value
@@ -81,13 +135,20 @@ class User():
     def __hash__(self) -> int:
         return hash(self.handle_str)
 
-    def todict(self,
-               show={'u_id', 'email', 'name_first', 'name_last',
-                     'handle_str'}):
-        return {
+    def todict(
+        self,
+        show={
+            'u_id', 'email', 'name_first', 'name_last', 'handle_str',
+            'profile_img_url'
+        }):
+        info_dict = {
             key: value
             for key, value in self.__dict__.items() if key in show
         }
+        if 'profile_img_url' in show:
+            info_dict[
+                'profile_img_url'] = f'{url}profile_img/{self.profile_img}'
+        return info_dict
 
     @staticmethod
     def find_by_id(u_id: int, only_active=True):
@@ -317,6 +378,41 @@ class User():
             if self == User.find_by_token(token):
                 User.remove_token(token)
 
+    def set_profile_img(self, img_name):
+        self.profile_img = img_name
+
+    def set_analytics(self, key, offset, time):
+        num_key = f'num_{key}'
+        last_num_value = self.analytics[key][-1][num_key]
+        self.analytics[key].append({
+            num_key: last_num_value + offset,
+            'time_stamp': time
+        })
+
+    # def analytics_filter(data, key, time):
+    #     return [i for i in data[key] if i['time_stamp'] < time]
+
+    def get_analytics(self) -> dict:
+        now = int_now()
+        info_dict = {}
+        for key in self.analytics.keys():
+            info_dict[key] = Seams.analytics_filter(self.analytics, key, now)
+
+        num_channels_joined = info_dict['channels_joined'][-1][
+            'num_channels_joined']
+        num_dms_joined = info_dict['dms_joined'][-1]['num_dms_joined']
+        num_messages_sent = info_dict['messages_sent'][-1]['num_messages_sent']
+        num_channels = len(Channel.get_all())
+        num_dms = len(DM.get_all())
+        num_messages = len(Message.get_all())
+        sum_num = num_channels + num_dms + num_messages
+        involvement_rate = (
+            (num_channels_joined + num_dms_joined + num_messages_sent) /
+            sum_num) if sum_num != 0 else 0
+        info_dict[
+            'involvement_rate'] = involvement_rate if involvement_rate < 1 else 1
+        return info_dict
+
 
 class Channel():
     '''
@@ -412,6 +508,8 @@ class Channel():
 
     def add_to_store(self) -> None:
         store['channels'].append(self)
+        self.owners[0].set_analytics('channels_joined', 1, int_now())
+        Seams.set_workspace_stats('channels_exist', 1, int_now())
 
     def has_user(self, user: User) -> bool:
         return user in self.members
@@ -424,9 +522,11 @@ class Channel():
 
     def leave(self, user: User) -> None:
         self.members.remove(user)
+        user.set_analytics('channels_joined', -1, int_now())
 
     def join(self, user: User) -> None:
         self.members.append(user)
+        user.set_analytics('channels_joined', 1, int_now())
 
     @staticmethod
     def check_name_invalid(name: str) -> bool:
@@ -539,12 +639,16 @@ class DM():
 
     def add_to_store(self) -> None:
         store['dms'].append(self)
+        for user in self.members:
+            user.set_analytics('dms_joined', 1, int_now())
+        Seams.set_workspace_stats('dms_exist', 1, int_now())
 
     def has_user(self, user: User) -> bool:
         return user in self.members
 
     def leave(self, user: User) -> None:
         self.members.remove(user)
+        user.set_analytics('dms_joined', -1, int_now())
 
     def get_messages(self, start=0, end=-1) -> list:
         return Message.get_messages(self, start, end)
@@ -561,6 +665,11 @@ class DM():
 
     def remove(self):
         self.is_active = False
+        for msg in self.messages:
+            msg.remove()
+        for user in self.members:
+            user.set_analytics('dms_joined', -1, int_now())
+        Seams.set_workspace_stats('dms_exist', -1, int_now())
 
 
 class Message():
@@ -633,16 +742,9 @@ class Message():
     def add_to_store(self) -> None:
         store['messages'].insert(0, self)
         self.sup.add_message(self)
-        # if type(self.sup) is Channel:
-        #     self.add_to_channel(self.sup)
-        # if type(self.sup) is DM:
-        #     self.add_to_dm(self.sup)
-
-    # def add_to_channel(self, channel: Channel) -> None:
-    #     channel.messages.insert(0, self)
-
-    # def add_to_dm(self, dm: DM) -> None:
-    #     dm.messages.insert(0, self)
+        user = User.find_by_id(self.u_id)
+        user.set_analytics('messages_sent', 1, int(self.time_sent))
+        Seams.set_workspace_stats('messages_exist', 1, int(self.time_sent))
 
     @staticmethod
     def check_length_invalid(msg: str) -> bool:
@@ -650,6 +752,7 @@ class Message():
 
     def remove(self):
         self.is_active = False
+        Seams.set_workspace_stats('messages_exist', -1, int_now())
 
     @staticmethod
     def check_query_str_invalid(query_str: str) -> bool:
@@ -670,6 +773,10 @@ class Message():
             [msg for msg in sup.messages if msg.is_available()])
         end = len(all_message) if end < 0 else end
         return all_message[start:end]
+
+    @staticmethod
+    def get_all() -> list:
+        return [msg for msg in store['messages'] if msg.is_available()]
 
     @staticmethod
     def get_tagged_user(msg: str):
