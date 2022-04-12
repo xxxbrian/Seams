@@ -8,51 +8,38 @@ from src.error import InputError, AccessError
 from src.server import channels_list
 import random
 
-@pytest.fixture(name = 'user_list')
-def create_user_list():
-    '''
-    This function is to pre-register 4 users for further tests
-    
-    returns:
-        user_list, contains 4 pre-register users' response
-    '''
-    requests.delete(f"{url}clear/v1", json = {})    # clear all info in server
-    user_list = []
-    user_list.append(requests.post(f"{url}auth/register/v2",
-                                   json = 
-                                       {'email': 'z5374603@unsw.com',
-                                        'password': '123456',
-                                        'name_first': 'Steve',
-                                        'name_last': 'Yang'}))
-    user_list.append(requests.post(f"{url}auth/register/v2",
-                                   json = 
-                                       {'email': 'z5374602@unsw.com',
-                                        'password': '123456',
-                                        'name_first': 'Brian',
-                                        'name_last': 'Lee'}))
-    user_list.append(requests.post(f"{url}auth/register/v2",
-                                   json = 
-                                       {'email': 'z5374601@unsw.com',
-                                        'password': '123456',
-                                        'name_first': 'Bojin',
-                                        'name_last': 'Li'}))
-    user_list.append(requests.post(f"{url}auth/register/v2",
-                                   json = 
-                                       {'email': 'z5374600@unsw.com',
-                                        'password': '123456',
-                                        'name_first':'Cicy',
-                                        'name_last': 'Zhou'}))
-    return user_list
-
 @pytest.fixture(name = 'login_list')
 def login_users():
     '''
+    
     This function is to pre-login 4 users for further tests
     
     returns:
         login_list, contains 4 pre-register users' information
+        
     '''
     login_list = []
+    requests.delete(f"{url}clear/v1", json = {})    # clear all info in server
+    requests.post(f"{url}auth/register/v2",
+                                   json = { 'email': 'z5374603@unsw.com',
+                                            'password': '123456',
+                                            'name_first': 'Steve',
+                                            'name_last': 'Yang'})
+    requests.post(f"{url}auth/register/v2",
+                                   json = { 'email': 'z5374602@unsw.com',
+                                            'password': '123456',
+                                            'name_first': 'Brian',
+                                            'name_last': 'Lee'})
+    requests.post(f"{url}auth/register/v2",
+                                   json = { 'email': 'z5374601@unsw.com',
+                                            'password': '123456',
+                                            'name_first': 'Bojin',
+                                            'name_last': 'Li'})
+    requests.post(f"{url}auth/register/v2",
+                                   json = {  'email': 'z5374600@unsw.com',
+                                            'password': '123456',
+                                            'name_first':'Cicy',
+                                            'name_last': 'Zhou'})
     login_list.append(requests.post(url + "auth/login/v2",
                                     json = {"email": "z5374603@unsw.com",
                                             "password": "123456"}).json())
@@ -90,7 +77,7 @@ def channel_create(login_list):
 
 ######################################## Test_channel/leave/v1 ########################################
 
-def test_channel_leave_normal(user_list, login_list, channel_list):
+def test_channel_leave_normal(login_list, channel_list):
     '''
     
     This test is to test user leaves channel successfully
@@ -111,26 +98,20 @@ def test_channel_leave_normal(user_list, login_list, channel_list):
     response_1 = requests.get(url + 'channel/details/v2',
                               params = {'token': login_list[0]['token'],
                                         'channel_id': channel_list[0]['channel_id']}).json()
-    assert response_1 == {
-        'name': "Steve's channel",
-        'is_public': True,
-        'owner_members':[{
-            'u_id': login_list[0]['auth_user_id'],
-            'email': "z5374603@unsw.com",
-            'name_first': 'Steve',
-            'name_last': 'Yang',
-            'handle_str': 'steveyang'
-        }],
-        'all_members': [{
-            'u_id': login_list[0]['auth_user_id'],
-            'email': "z5374603@unsw.com",
-            'name_first': 'Steve',
-            'name_last': 'Yang',
-            'handle_str': 'steveyang'
-        }],
-    }
+    assert response_1['name'] == "Steve's channel"
+    assert response_1['is_public'] == True
+    assert response_1['owner_members'][0]['u_id'] == login_list[0]['auth_user_id']
+    assert response_1['owner_members'][0]['email'] == "z5374603@unsw.com"
+    assert response_1['owner_members'][0]['name_first'] == 'Steve'
+    assert response_1['owner_members'][0]['name_last'] == 'Yang'
+    assert response_1['owner_members'][0]['handle_str'] == 'steveyang'
+    assert response_1['all_members'][0]['u_id'] == login_list[0]['auth_user_id']
+    assert response_1['all_members'][0]['email'] == "z5374603@unsw.com"
+    assert response_1['all_members'][0]['name_first'] == 'Steve'
+    assert response_1['all_members'][0]['name_last'] == 'Yang'
+    assert response_1['all_members'][0]['handle_str'] == 'steveyang'
     
-def test_channel_leave_owner_leave(user_list, login_list, channel_list):
+def test_channel_leave_owner_leave(login_list, channel_list):
     '''
     
     This test is to test the owner leaves the channel but the channel remain
@@ -156,7 +137,7 @@ def test_channel_leave_owner_leave(user_list, login_list, channel_list):
         'name': "Brian's channel"
     }]}
     
-def test_channel_leave_invalid_channel_id(user_list, login_list, channel_list):
+def test_channel_leave_invalid_channel_id(login_list, channel_list):
     '''
     
     This test is to test when channel id does not refer to a valid channel
@@ -175,7 +156,7 @@ def test_channel_leave_invalid_channel_id(user_list, login_list, channel_list):
                                        'channel_id': invalid_channel_id[0]})
     assert response_1.status_code == InputError.code
     
-def test_channel_leave_invalid_user(user_list, login_list, channel_list):
+def test_channel_leave_invalid_user(login_list, channel_list):
     '''
     
     This test is to test when user who isn't in the channel but want to leave
@@ -189,7 +170,7 @@ def test_channel_leave_invalid_user(user_list, login_list, channel_list):
                                        'channel_id': channel_list[0]['channel_id']})
     assert response_1.status_code == AccessError.code
     
-def test_channel_leave_invalid_token(user_list, login_list, channel_list):
+def test_channel_leave_invalid_token(login_list, channel_list):
     '''
     
     This test is to test when input invalid token
@@ -226,7 +207,7 @@ def test_channel_leave_invalid_token(user_list, login_list, channel_list):
     
 ######################################## Test_channel/addowner/v1 ########################################
 
-def test_channel_add_owner_normal(user_list, login_list, channel_list):
+def test_channel_add_owner_normal(login_list, channel_list):
     '''
     
     This test is to test when add an user as a owner successfully
@@ -246,42 +227,30 @@ def test_channel_add_owner_normal(user_list, login_list, channel_list):
     response_1 = requests.get(url + 'channel/details/v2',
                               params = {'token': login_list[0]['token'],
                                         'channel_id': channel_list[0]['channel_id']}).json()
-    assert response_1 == {
-        'name': "Steve's channel",
-        'is_public': True,
-        'owner_members':[
-        {
-            'u_id': login_list[0]['auth_user_id'],
-            'email': "z5374603@unsw.com",
-            'name_first': 'Steve',
-            'name_last': 'Yang',
-            'handle_str': 'steveyang'
-        },
-        {
-            'u_id': login_list[1]['auth_user_id'],
-            'email': "z5374602@unsw.com",
-            'name_first': 'Brian',
-            'name_last': 'Lee',
-            'handle_str': 'brianlee'
-        }],
-        'all_members': [
-        {
-            'u_id': login_list[0]['auth_user_id'],
-            'email': "z5374603@unsw.com",
-            'name_first': 'Steve',
-            'name_last': 'Yang',
-            'handle_str': 'steveyang'
-        },
-        {
-            'u_id': login_list[1]['auth_user_id'],
-            'email': "z5374602@unsw.com",
-            'name_first': 'Brian',
-            'name_last': 'Lee',
-            'handle_str': 'brianlee'
-        }],
-    }
+    assert response_1['name'] == "Steve's channel"
+    assert response_1['is_public'] == True
+    assert response_1['owner_members'][0]['u_id'] == login_list[0]['auth_user_id']
+    assert response_1['owner_members'][0]['email'] == "z5374603@unsw.com"
+    assert response_1['owner_members'][0]['name_first'] == 'Steve'
+    assert response_1['owner_members'][0]['name_last'] == 'Yang'
+    assert response_1['owner_members'][0]['handle_str'] == 'steveyang'
+    assert response_1['owner_members'][1]['u_id'] == login_list[1]['auth_user_id']
+    assert response_1['owner_members'][1]['email'] == "z5374602@unsw.com"
+    assert response_1['owner_members'][1]['name_first'] == 'Brian'
+    assert response_1['owner_members'][1]['name_last'] == 'Lee'
+    assert response_1['owner_members'][1]['handle_str'] == 'brianlee'
+    assert response_1['all_members'][0]['u_id'] == login_list[0]['auth_user_id']
+    assert response_1['all_members'][0]['email'] == "z5374603@unsw.com"
+    assert response_1['all_members'][0]['name_first'] == 'Steve'
+    assert response_1['all_members'][0]['name_last'] == 'Yang'
+    assert response_1['all_members'][0]['handle_str'] == 'steveyang'
+    assert response_1['all_members'][1]['u_id'] == login_list[1]['auth_user_id']
+    assert response_1['all_members'][1]['email'] == "z5374602@unsw.com"
+    assert response_1['all_members'][1]['name_first'] == 'Brian'
+    assert response_1['all_members'][1]['name_last'] == 'Lee'
+    assert response_1['all_members'][1]['handle_str'] == 'brianlee'
 
-def test_channel_add_owner_invalid_channel_id(user_list, login_list, channel_list):
+def test_channel_add_owner_invalid_channel_id(login_list, channel_list):
     '''
     
     This test is to test when channel_id does not refer to a valid channel
@@ -308,7 +277,7 @@ def test_channel_add_owner_invalid_channel_id(user_list, login_list, channel_lis
                                        'u_id': login_list[1]['auth_user_id']})
     assert response_1.status_code == InputError.code
 
-def test_channel_add_owner_invalid_u_id(user_list, login_list, channel_list):
+def test_channel_add_owner_invalid_u_id(login_list, channel_list):
     '''
     
     This test is to test when u_id does not refer to a valid user
@@ -335,7 +304,7 @@ def test_channel_add_owner_invalid_u_id(user_list, login_list, channel_list):
                                        'u_id': invalid_u_id[0]})
     assert response_1.status_code == InputError.code
 
-def test_channel_add_owner_wrong_u_id(user_list, login_list, channel_list):
+def test_channel_add_owner_wrong_u_id(login_list, channel_list):
     '''
     
     This test is to test when u_id refers to a user who is not a member of the channel
@@ -351,7 +320,7 @@ def test_channel_add_owner_wrong_u_id(user_list, login_list, channel_list):
                                        'u_id': login_list[1]['auth_user_id']})
     assert response_1.status_code == InputError.code
     
-def test_channel_add_owner_add_owner_u_id(user_list, login_list, channel_list):
+def test_channel_add_owner_add_owner_u_id(login_list, channel_list):
     '''
     
     This test is to test when u_id refers to a user who is already an owner of the channel
@@ -367,7 +336,7 @@ def test_channel_add_owner_add_owner_u_id(user_list, login_list, channel_list):
                                        'u_id': login_list[0]['auth_user_id']})
     assert response_1.status_code == InputError.code
     
-def test_channel_add_owner_no_permissions(user_list, login_list, channel_list):
+def test_channel_add_owner_no_permissions(login_list, channel_list):
     '''
     
     This test is to test when channel_id is valid and the authorised user does not 
@@ -391,7 +360,7 @@ def test_channel_add_owner_no_permissions(user_list, login_list, channel_list):
                                        'u_id': login_list[2]['auth_user_id']})
     assert response_1.status_code == AccessError.code
     
-def test_channel_add_owner_invalid_token(user_list, login_list, channel_list):
+def test_channel_add_owner_invalid_token(login_list, channel_list):
     '''
     
     This test is to test when input invalid token
@@ -453,7 +422,7 @@ def test_channel_add_owner_invalid_token(user_list, login_list, channel_list):
     
 ######################################## Test_channel/removeowner/v1 ########################################
     
-def test_channel_remove_owner_normal(user_list, login_list, channel_list):
+def test_channel_remove_owner_normal(login_list, channel_list):
     '''
     
     This test is to test when remove an user as a owner successfully
@@ -478,34 +447,25 @@ def test_channel_remove_owner_normal(user_list, login_list, channel_list):
     response_1 = requests.get(url + 'channel/details/v2',
                               params = {'token': login_list[0]['token'],
                                         'channel_id': channel_list[0]['channel_id']}).json()
-    assert response_1 == {
-        'name': "Steve's channel",
-        'is_public': True,
-        'owner_members':[{
-            'u_id': login_list[0]['auth_user_id'],
-            'email': "z5374603@unsw.com",
-            'name_first': 'Steve',
-            'name_last': 'Yang',
-            'handle_str': 'steveyang'
-        }],
-        'all_members': [
-        {
-            'u_id': login_list[0]['auth_user_id'],
-            'email': "z5374603@unsw.com",
-            'name_first': 'Steve',
-            'name_last': 'Yang',
-            'handle_str': 'steveyang'
-        },
-        {
-            'u_id': login_list[1]['auth_user_id'],
-            'email': "z5374602@unsw.com",
-            'name_first': 'Brian',
-            'name_last': 'Lee',
-            'handle_str': 'brianlee'
-        }],
-    }
+    assert response_1['name'] == "Steve's channel"
+    assert response_1['is_public'] == True
+    assert response_1['owner_members'][0]['u_id'] == login_list[0]['auth_user_id']
+    assert response_1['owner_members'][0]['email'] == "z5374603@unsw.com"
+    assert response_1['owner_members'][0]['name_first'] == 'Steve'
+    assert response_1['owner_members'][0]['name_last'] == 'Yang'
+    assert response_1['owner_members'][0]['handle_str'] == 'steveyang'
+    assert response_1['all_members'][0]['u_id'] == login_list[0]['auth_user_id']
+    assert response_1['all_members'][0]['email'] == "z5374603@unsw.com"
+    assert response_1['all_members'][0]['name_first'] == 'Steve'
+    assert response_1['all_members'][0]['name_last'] == 'Yang'
+    assert response_1['all_members'][0]['handle_str'] == 'steveyang'
+    assert response_1['all_members'][1]['u_id'] == login_list[1]['auth_user_id']
+    assert response_1['all_members'][1]['email'] == "z5374602@unsw.com"
+    assert response_1['all_members'][1]['name_first'] == 'Brian'
+    assert response_1['all_members'][1]['name_last'] == 'Lee'
+    assert response_1['all_members'][1]['handle_str'] == 'brianlee'
     
-def test_channel_remove_owner_invalid_channel_id(user_list, login_list, channel_list):
+def test_channel_remove_owner_invalid_channel_id(login_list, channel_list):
     '''
     
     This test is to test when channel_id does not refer to a valid channel
@@ -537,7 +497,7 @@ def test_channel_remove_owner_invalid_channel_id(user_list, login_list, channel_
                                        'u_id': login_list[1]['auth_user_id']})
     assert response_1.status_code == InputError.code
     
-def test_channel_remove_owner_invalid_u_id(user_list, login_list, channel_list):
+def test_channel_remove_owner_invalid_u_id(login_list, channel_list):
     '''
     
     This test is to test when u_id does not refer to a valid user
@@ -569,7 +529,7 @@ def test_channel_remove_owner_invalid_u_id(user_list, login_list, channel_list):
                                        'u_id': invalid_u_id[0]})
     assert response_1.status_code == InputError.code
     
-def test_channel_remove_owner_not_owner_u_id(user_list, login_list, channel_list):
+def test_channel_remove_owner_not_owner_u_id(login_list, channel_list):
     '''
     
     This test is to test when u_id refers to a user who is not an owner of the channel
@@ -591,7 +551,7 @@ def test_channel_remove_owner_not_owner_u_id(user_list, login_list, channel_list
                                        'u_id':login_list[1]['auth_user_id']})
     assert response_1.status_code == InputError.code
     
-def test_channel_remove_owner_only_owner_u_id(user_list, login_list, channel_list):
+def test_channel_remove_owner_only_owner_u_id(login_list, channel_list):
     '''
     
     This test is to test when u_id refers to a user who is currently the only owner of the channel
@@ -607,7 +567,7 @@ def test_channel_remove_owner_only_owner_u_id(user_list, login_list, channel_lis
                                        'u_id':login_list[0]['auth_user_id']})
     assert response_1.status_code == InputError.code
     
-def test_channel_remove_owner_no_permissions(user_list, login_list, channel_list):
+def test_channel_remove_owner_no_permissions(login_list, channel_list):
     '''
     
     This test is to test when channel_id is valid and the authorised user does not 
@@ -630,7 +590,7 @@ def test_channel_remove_owner_no_permissions(user_list, login_list, channel_list
                                        'u_id': login_list[0]['auth_user_id']})
     assert response_1.status_code == AccessError.code
     
-def test_channel_remove_owner_invalid_token(user_list, login_list, channel_list):
+def test_channel_remove_owner_invalid_token(login_list, channel_list):
     '''
     
     This test is to test when input invalid token

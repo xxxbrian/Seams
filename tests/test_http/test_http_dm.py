@@ -109,87 +109,57 @@ def test_dm_details_normal(user_list, login_list, dm_list):
     response_3 = requests.get(url + 'dm/details/v1',
                               params = {'token': login_list[1]['token'],
                                         'dm_id': dm_list[2]['dm_id']}).json()
-    assert response_1 == {
-        'name': dm_0,
-        'members':
-            [
-                {
-                    'u_id': login_list[1]['auth_user_id'],
-                    'email': "z5374602@unsw.com",
-                    'name_first': 'Brian',
-                    'name_last': 'Lee',
-                    'handle_str': 'brianlee'
-                },
-                {
-                    'u_id': login_list[2]['auth_user_id'],
-                    'email': "z5374601@unsw.com",
-                    'name_first': 'Bojin',
-                    'name_last': 'Li',
-                    'handle_str': 'bojinli'
-                },
-                {
-                    'u_id': login_list[0]['auth_user_id'],
-                    'email': "z5374603@unsw.com",
-                    'name_first': 'Steve',
-                    'name_last': 'Yang',
-                    'handle_str': 'steveyang'
-                },
-            ]
-    }
-    assert response_2 == {
-        'name': dm_1,
-        'members':
-            [
-                {
-                    'u_id': login_list[3]['auth_user_id'],
-                    'email': "z5374600@unsw.com",
-                    'name_first': 'Cicy',
-                    'name_last': 'Zhou',
-                    'handle_str': 'cicyzhou'
-                },
-                {
-                    'u_id': login_list[2]['auth_user_id'],
-                    'email': "z5374601@unsw.com",
-                    'name_first': 'Bojin',
-                    'name_last': 'Li',
-                    'handle_str': 'bojinli'
-                },
-                {
-                    'u_id': login_list[0]['auth_user_id'],
-                    'email': "z5374603@unsw.com",
-                    'name_first': 'Steve',
-                    'name_last': 'Yang',
-                    'handle_str': 'steveyang'
-                },
-            ]
-    }
-    assert response_3 == {
-        'name': dm_2,
-        'members':
-            [
-                {
-                    'u_id': login_list[2]['auth_user_id'],
-                    'email': "z5374601@unsw.com",
-                    'name_first': 'Bojin',
-                    'name_last': 'Li',
-                    'handle_str': 'bojinli'
-                },
-                {
-                    'u_id': login_list[3]['auth_user_id'],
-                    'email': "z5374600@unsw.com",
-                    'name_first': 'Cicy',
-                    'name_last': 'Zhou',
-                    'handle_str': 'cicyzhou'
-                },
-                {
-                    'u_id': login_list[1]['auth_user_id'],
-                    'email': "z5374602@unsw.com",
-                    'name_first': 'Brian',
-                    'name_last': 'Lee',
-                    'handle_str': 'brianlee'
-                },
-            ]
-    }
+
+    assert response_1['name'] == dm_0
+    assert response_1['members'][0]['u_id'] == login_list[1]['auth_user_id']
+    assert response_1['members'][0]['email'] == "z5374602@unsw.com"
+    assert response_1['members'][0]['name_first'] == 'Brian'
+    assert response_1['members'][0]['name_last'] == 'Lee'
+    assert response_1['members'][0]['handle_str'] == 'brianlee'
+    assert response_1['members'][1]['u_id'] == login_list[2]['auth_user_id']
+    assert response_1['members'][1]['email'] == "z5374601@unsw.com"
+    assert response_1['members'][1]['name_first'] == 'Bojin'
+    assert response_1['members'][1]['name_last'] == 'Li'
+    assert response_1['members'][1]['handle_str'] == 'bojinli'
+    assert response_1['members'][2]['u_id'] == login_list[0]['auth_user_id']
+    assert response_1['members'][2]['email'] == "z5374603@unsw.com"
+    assert response_1['members'][2]['name_first'] == 'Steve'
+    assert response_1['members'][2]['name_last'] == 'Yang'
+    assert response_1['members'][2]['handle_str'] == 'steveyang'
+    
+    assert response_2['name'] == dm_1
+    assert response_2['members'][0]['u_id'] == login_list[3]['auth_user_id']
+    assert response_2['members'][0]['email'] == "z5374600@unsw.com"
+    assert response_2['members'][0]['name_first'] == 'Cicy'
+    assert response_2['members'][0]['name_last'] == 'Zhou'
+    assert response_2['members'][0]['handle_str'] == 'cicyzhou'
+    assert response_2['members'][1]['u_id'] == login_list[2]['auth_user_id']
+    assert response_2['members'][1]['email'] == "z5374601@unsw.com"
+    assert response_2['members'][1]['name_first'] == 'Bojin'
+    assert response_2['members'][1]['name_last'] == 'Li'
+    assert response_2['members'][1]['handle_str'] == 'bojinli'
+    assert response_2['members'][2]['u_id'] == login_list[0]['auth_user_id']
+    assert response_2['members'][2]['email'] == "z5374603@unsw.com"
+    assert response_2['members'][2]['name_first'] == 'Steve'
+    assert response_2['members'][2]['name_last'] == 'Yang'
+    assert response_2['members'][2]['handle_str'] == 'steveyang'
+    
+    assert response_3['name'] == dm_2
+    assert response_3['members'][0]['u_id'] == login_list[2]['auth_user_id']
+    assert response_3['members'][0]['email'] == "z5374601@unsw.com"
+    assert response_3['members'][0]['name_first'] == 'Bojin'
+    assert response_3['members'][0]['name_last'] == 'Li'
+    assert response_3['members'][0]['handle_str'] == 'bojinli'
+    assert response_3['members'][1]['u_id'] == login_list[3]['auth_user_id']
+    assert response_3['members'][1]['email'] == "z5374600@unsw.com"
+    assert response_3['members'][1]['name_first'] == 'Cicy'
+    assert response_3['members'][1]['name_last'] == 'Zhou'
+    assert response_3['members'][1]['handle_str'] == 'cicyzhou'
+    assert response_3['members'][2]['u_id'] == login_list[1]['auth_user_id']
+    assert response_3['members'][2]['email'] == "z5374602@unsw.com"
+    assert response_3['members'][2]['name_first'] == 'Brian'
+    assert response_3['members'][2]['name_last'] == 'Lee'
+    assert response_3['members'][2]['handle_str'] == 'brianlee'
     
 def test_dm_details_invalid_dm_id(user_list, login_list, dm_list):
     '''
@@ -258,26 +228,17 @@ def test_dm_leave_normal(user_list, login_list, dm_list):
     response_1 = requests.get(url + 'dm/details/v1',
                               params = {'token': login_list[0]['token'],
                                         'dm_id': dm_list[0]['dm_id']}).json()
-    assert response_1 == {
-        'name': dm_0,
-        'members':
-            [
-                {
-                    'u_id': login_list[2]['auth_user_id'],
-                    'email': "z5374601@unsw.com",
-                    'name_first': 'Bojin',
-                    'name_last': 'Li',
-                    'handle_str': 'bojinli'
-                },
-                {
-                    'u_id': login_list[0]['auth_user_id'],
-                    'email': "z5374603@unsw.com",
-                    'name_first': 'Steve',
-                    'name_last': 'Yang',
-                    'handle_str': 'steveyang'
-                },
-            ]
-    }
+    assert response_1['name'] == dm_0
+    assert response_1['members'][0]['u_id'] == login_list[2]['auth_user_id']
+    assert response_1['members'][0]['email'] == "z5374601@unsw.com"
+    assert response_1['members'][0]['name_first'] == 'Bojin'
+    assert response_1['members'][0]['name_last'] == 'Li'
+    assert response_1['members'][0]['handle_str'] == 'bojinli'
+    assert response_1['members'][1]['u_id'] == login_list[0]['auth_user_id']
+    assert response_1['members'][1]['email'] == "z5374603@unsw.com"
+    assert response_1['members'][1]['name_first'] == 'Steve'
+    assert response_1['members'][1]['name_last'] == 'Yang'
+    assert response_1['members'][1]['handle_str'] == 'steveyang'
     
 def test_dm_leave_owner_leaves(user_list, login_list, dm_list):
     '''
@@ -296,26 +257,17 @@ def test_dm_leave_owner_leaves(user_list, login_list, dm_list):
     response_1 = requests.get(url + 'dm/details/v1',
                               params = {'token': login_list[1]['token'],
                                         'dm_id': dm_list[0]['dm_id']}).json()
-    assert response_1 == {
-        'name': dm_0,
-        'members':
-            [
-                {
-                    'u_id': login_list[1]['auth_user_id'],
-                    'email': "z5374602@unsw.com",
-                    'name_first': 'Brian',
-                    'name_last': 'Lee',
-                    'handle_str': 'brianlee'
-                },
-                {
-                    'u_id': login_list[2]['auth_user_id'],
-                    'email': "z5374601@unsw.com",
-                    'name_first': 'Bojin',
-                    'name_last': 'Li',
-                    'handle_str': 'bojinli'
-                },
-            ]
-    }
+    assert response_1['name'] == dm_0
+    assert response_1['members'][0]['u_id'] == login_list[1]['auth_user_id']
+    assert response_1['members'][0]['email'] == "z5374602@unsw.com"
+    assert response_1['members'][0]['name_first'] == 'Brian'
+    assert response_1['members'][0]['name_last'] == 'Lee'
+    assert response_1['members'][0]['handle_str'] == 'brianlee'
+    assert response_1['members'][1]['u_id'] == login_list[2]['auth_user_id']
+    assert response_1['members'][1]['email'] == "z5374601@unsw.com"
+    assert response_1['members'][1]['name_first'] == 'Bojin'
+    assert response_1['members'][1]['name_last'] == 'Li'
+    assert response_1['members'][1]['handle_str'] == 'bojinli'
     
 def test_dm_leave_invalid_dm_id(user_list, login_list, dm_list):
     '''
