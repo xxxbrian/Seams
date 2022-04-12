@@ -9,6 +9,7 @@ from datetime import timezone
 import datetime
 import secrets
 import random
+from typing import List, Dict, Union, Optional
 
 from src.data_store import data_store
 
@@ -35,7 +36,7 @@ def int_now():
 class Seams():
 
     @staticmethod
-    def set_workspace_stats(key, offset, time):
+    def set_workspace_stats(key, offset, time) -> None:
         num_key = f'num_{key}'
         last_num_value = store['workspace_stats'][key][-1][num_key]
         store['workspace_stats'][key].append({
@@ -44,7 +45,7 @@ class Seams():
         })
 
     @staticmethod
-    def analytics_filter(data, key, time):
+    def analytics_filter(data, key, time) -> List[dict]:
         return [i for i in data[key] if i['time_stamp'] <= time]
 
     @staticmethod
@@ -93,17 +94,17 @@ class User():
 
     def __init__(self, email: str, password: str, name_first: str,
                  name_last: str) -> None:
-        self.u_id = User.get_last_id() + 1
-        self.email = email
-        self.password = User.encrypt(password)
-        self.name_first = name_first
-        self.name_last = name_last
-        self.handle_str = self.generat_handle()
-        self.group_id = 500 if self.u_id else 0
-        self.notification = []
-        self.profile_img = f'default-{random.randint(1,1000)}.png'
+        self.u_id: int = User.get_last_id() + 1
+        self.email: str = email
+        self.password: str = User.encrypt(password)
+        self.name_first: str = name_first
+        self.name_last: str = name_last
+        self.handle_str: str = self.generat_handle()
+        self.group_id: int = 500 if self.u_id else 0
+        self.notification: List[Notification] = []
+        self.profile_img: str = f'default-{random.randint(1,1000)}.png'
         time_now = int_now()
-        self.analytics = {
+        self.analytics: dict = {
             'channels_joined': [{
                 'num_channels_joined': 0,
                 'time_stamp': time_now
@@ -122,7 +123,7 @@ class User():
     #     self.__dict__[key] = value
 
     # COVERAGE
-    def __str__(self):
+    def __str__(self) -> str:
         info = 'User object:\n'+\
             f' - u_id:       {self.u_id}\n' + \
             f' - email:      {self.email}\n' + \
@@ -140,7 +141,8 @@ class User():
         show={
             'u_id', 'email', 'name_first', 'name_last', 'handle_str',
             'profile_img_url'
-        }):
+        }
+    ) -> dict:
         info_dict = {
             key: value
             for key, value in self.__dict__.items() if key in show
@@ -161,11 +163,11 @@ class User():
         Return:
             user
         '''
-
+        res: Optional[User] = None
         for user in store['users']:
             if user.u_id == u_id and (not only_active or user.is_active()):
-                return user
-        return None
+                res = user
+        return res
 
     @staticmethod
     def find_by_email(email: str, only_active=True):
@@ -178,11 +180,11 @@ class User():
         Return:
             User
         '''
-
+        res: Optional[User] = None
         for user in store['users']:
             if user.email == email and (not only_active or user.is_active()):
-                return user
-        return None
+                res = user
+        return res
 
     @staticmethod
     def find_by_handle(handle_str: str, only_active=True):
@@ -195,12 +197,12 @@ class User():
         Return:
             User
         '''
-
+        res: Optional[User] = None
         for user in store['users']:
             if user.handle_str == handle_str and (not only_active
                                                   or user.is_active()):
-                return user
-        return None
+                res = user
+        return res
 
     @staticmethod
     def clear() -> None:
@@ -211,7 +213,7 @@ class User():
     @staticmethod
     def get_last_id() -> int:
         """return last user id"""
-        users = list(reversed(store['users']))
+        users: List[User] = list(reversed(store['users']))
         u_id = users[0].u_id if len(users) > 0 else -1
         return u_id
 
@@ -272,24 +274,26 @@ class User():
 
     @staticmethod
     def find_by_token(token):
+        res: Optional[User] = None
         if User.token_in_store(token):
             preload = jwt.decode(token, SECRET, algorithms=['HS256'])
-            return User.find_by_id(preload['u_id'])
-        return None
+            res = User.find_by_id(preload['u_id'])
+        return res
 
     @staticmethod
-    def token_in_store(token):
+    def token_in_store(token) -> bool:
         return token in store['login_token']
 
     @staticmethod
-    def remove_token(token):
+    def remove_token(token) -> None:
         store['login_token'].remove(token)
 
     @staticmethod
     def find_all():
-        return [i for i in store['users'] if i.is_active()]
+        res: List[User] = [i for i in store['users'] if i.is_active()]
+        return res
 
-    def del_account(self):
+    def del_account(self) -> None:
         self.group_id = -1
         self.name_first = 'Removed'
         self.name_last = 'user'
@@ -297,10 +301,10 @@ class User():
             if msg.u_id == self.u_id:
                 msg.content = 'Removed user'
 
-    def is_active(self):
+    def is_active(self) -> bool:
         return self.group_id >= 0
 
-    def is_admin(self):
+    def is_admin(self) -> bool:
         return self.group_id == 0
 
     @staticmethod
@@ -344,16 +348,18 @@ class User():
         return user.password == User.encrypt(password)
 
     @staticmethod
-    def encrypt(password: str):
+    def encrypt(password: str) -> str:
         return hashlib.sha256(password.encode()).hexdigest()
 
-    def add_notification(self, notification):
+    def add_notification(self, notification) -> None:
         self.notification.insert(0, notification)
 
     def get_notification(self):
-        return sorted([ntf for ntf in self.notification if ntf.is_available()])
+        res: List[Notification] = sorted(
+            [ntf for ntf in self.notification if ntf.is_available()])
+        return res
 
-    def generat_reset_code(self):
+    def generat_reset_code(self) -> str:
         code = secrets.token_urlsafe()[0:8]
         if code in store['reset_code'].values():
             return self.generat_reset_code()
@@ -363,25 +369,25 @@ class User():
 
     @staticmethod
     def find_by_reset_code(code):
-        user = None
+        user: Optional[User] = None
         for u, c in store['reset_code'].items():
             if c == code:
                 user = u
         return user
 
-    def remove_reset_code(self):
+    def remove_reset_code(self) -> None:
         store['reset_code'].pop(self)
 
-    def password_set(self, pwd: str):
+    def password_set(self, pwd: str) -> None:
         self.password = User.encrypt(pwd)
         for token in store['login_token']:
             if self == User.find_by_token(token):
                 User.remove_token(token)
 
-    def set_profile_img(self, img_name):
+    def set_profile_img(self, img_name) -> None:
         self.profile_img = img_name
 
-    def set_analytics(self, key, offset, time):
+    def set_analytics(self, key, offset, time) -> None:
         num_key = f'num_{key}'
         last_num_value = self.analytics[key][-1][num_key]
         self.analytics[key].append({
@@ -437,24 +443,25 @@ class Channel():
     '''
 
     def __init__(self, u_id: int, name: str, is_public: bool = True) -> None:
-        self.name = name
-        self.owners = [User.find_by_id(u_id)]
-        self.members = [User.find_by_id(u_id)]
-        self.channel_id = Channel.get_last_id() + 1
-        self.is_public = is_public
-        self.messages = []
-        self.standup = {
-            'is_active': False,
-            'auth_user': None,
-            'time_finish': None,
-            'message_buffer': [],
-        }
+        self.name: str = name
+        self.owners: List[User] = [User.find_by_id(u_id)]
+        self.members: List[User] = [User.find_by_id(u_id)]
+        self.channel_id: int = Channel.get_last_id() + 1
+        self.is_public: bool = is_public
+        self.messages: List[Message] = []
+        self.standup: Dict[bool, Optional[User], Optional[Union[int, float]],
+                           List[str]] = {
+                               'is_active': False,
+                               'auth_user': None,
+                               'time_finish': None,
+                               'message_buffer': [],
+                           }
 
     # def __setattr__(self, key, value):
     #     self.__dict__[key] = value
 
     # COVERAGE
-    def __str__(self):
+    def __str__(self) -> str:
         channel_type = 'public' if self.is_public else 'privte'
         info = 'Channel object:\n'+\
             f' - name:        {self.name}\n'+\
@@ -463,7 +470,7 @@ class Channel():
             f' - members:     {len(self.members)} ({len(self.owners)}owners)'
         return info
 
-    def todict(self, show={'channel_id', 'name', 'is_public'}):
+    def todict(self, show={'channel_id', 'name', 'is_public'}) -> dict:
         info_dict = {
             key: value
             for key, value in self.__dict__.items() if key in show
@@ -481,12 +488,12 @@ class Channel():
 
     @staticmethod
     def get_last_id() -> int:
-        channel = list(reversed(store['channels']))
+        channel: List[Channel] = list(reversed(store['channels']))
         channel_id = channel[0].channel_id if len(channel) > 0 else -1
         return channel_id
 
     @staticmethod
-    def find_by_id(channel_id):
+    def find_by_id(channel_id: int):
         '''
         Find channel by channel's channel_id
 
@@ -496,11 +503,11 @@ class Channel():
         Return:
             Channel
         '''
-
+        res: Optional[User] = None
         for channel in store['channels']:
             if channel.channel_id == channel_id:
-                return channel
-        return None
+                res = channel
+        return res
 
     @staticmethod
     def clear() -> None:
@@ -536,28 +543,31 @@ class Channel():
         return len(name) < 1 or len(name) > 20
 
     @staticmethod
-    def get_all() -> list:
-        return store['channels']
+    def get_all():
+        res: List[Channel] = store['channels']
+        return res
 
-    def get_messages(self, start=0, end=-1) -> list:
-        return Message.get_messages(self, start, end)
+    def get_messages(self, start=0, end=-1):
+        res: List[Message] = Message.get_messages(self, start, end)
+        return res
 
-    def add_message(self, msg):
+    def add_message(self, msg) -> None:
         self.messages.insert(0, msg)
 
-    def has_owner(self, user: User):
+    def has_owner(self, user: User) -> bool:
         return user in self.owners or user.is_admin()
 
-    def standup_set(self, auth_user: User, time_finish):
+    def standup_set(self, auth_user: User, time_finish: Union[int,
+                                                              float]) -> bool:
         self.standup['is_active'] = True
         self.standup['auth_user'] = auth_user
         self.standup['time_finish'] = time_finish
 
-    def standup_add(self, sender, message):
+    def standup_add(self, sender: User, message: str) -> None:
         self.standup['message_buffer'].append(
             f'{sender.handle_str}: {message}')
 
-    def standup_do(self):
+    def standup_do(self) -> None:
         self.standup['is_active'] = False
         utc_time = Message.utc_timestamp()
         auth_user = self.standup['auth_user']
@@ -573,18 +583,18 @@ class Channel():
 class DM():
 
     def __init__(self, u_id: int, u_ids: list) -> None:
-        self.name = self.generat_name(u_ids)
-        self.owner = User.find_by_id(u_id)
-        self.members = [User.find_by_id(u_id) for u_id in u_ids]
-        self.dm_id = DM.get_last_id() + 1
-        self.messages = []
-        self.is_active = True
+        self.name: str = self.generat_name(u_ids)
+        self.owner: User = User.find_by_id(u_id)
+        self.members: List[User] = [User.find_by_id(u_id) for u_id in u_ids]
+        self.dm_id: int = DM.get_last_id() + 1
+        self.messages: List[Message] = []
+        self.is_active: bool = True
 
     # def __setattr__(self, key, value):
     #     self.__dict__[key] = value
 
     # COVERAGE
-    def __str__(self):
+    def __str__(self) -> str:
         info = 'DM object:\n'+\
             f' - name:        {self.name}\n'+\
             f' - DM_id:       {self.dm_id}\n'+\
@@ -592,7 +602,7 @@ class DM():
             f' - members:     {len(self.members)}'
         return info
 
-    def todict(self, show={'dm_id', 'name'}):
+    def todict(self, show={'dm_id', 'name'}) -> dict:
         info_dict = {
             key: value
             for key, value in self.__dict__.items() if key in show
@@ -607,17 +617,19 @@ class DM():
 
     @staticmethod
     def get_last_id() -> int:
-        dm = list(reversed(store['dms']))
+        dm: List[DM] = list(reversed(store['dms']))
         dm_id = dm[0].dm_id if len(dm) > 0 else -1
         return dm_id
 
-    def generat_name(self, u_ids: list) -> str:
-        name_list = [User.find_by_id(u_id).handle_str for u_id in u_ids]
+    def generat_name(self, u_ids: List[int]) -> str:
+        name_list: List[str] = [
+            User.find_by_id(u_id).handle_str for u_id in u_ids
+        ]
         name_list.sort()
         return ', '.join(name_list)
 
     @staticmethod
-    def find_by_id(dm_id):
+    def find_by_id(dm_id: int):
         '''
         Find dm by dm's dm_id
 
@@ -627,11 +639,11 @@ class DM():
         Return:
             DM
         '''
-
+        res: Optional[DM] = None
         for dm in store['dms']:
             if dm.dm_id == dm_id and dm.is_active:
-                return dm
-        return None
+                res = dm
+        return res
 
     @staticmethod
     def clear() -> None:
@@ -657,13 +669,13 @@ class DM():
     def get_all() -> list:
         return [dm for dm in store['dms'] if dm.is_active]
 
-    def add_message(self, msg):
+    def add_message(self, msg) -> None:
         self.messages.insert(0, msg)
 
-    def has_owner(self, user: User):
+    def has_owner(self, user: User) -> bool:
         return user is self.owner
 
-    def remove(self):
+    def remove(self) -> None:
         self.is_active = False
         for msg in self.messages:
             msg.remove()
@@ -675,20 +687,20 @@ class DM():
 class Message():
 
     def __init__(self, u_id: int, content: str, time_sent: int, sup) -> None:
-        self.message_id = Message.get_last_id() + 1
-        self.u_id = u_id
-        self.sender = User.find_by_id(u_id)
-        self.content = content
-        self.time_sent = time_sent
-        self.is_active = True
-        self.sup = sup
-        self.react_dict = {1: []}
-        self.is_pinned = False
+        self.message_id: int = Message.get_last_id() + 1
+        self.u_id: int = u_id
+        self.sender: User = User.find_by_id(u_id)
+        self.content: str = content
+        self.time_sent: Union[int, float] = time_sent
+        self.is_active: bool = True
+        self.sup: Union[Channel, DM] = sup
+        self.react_dict: dict = {1: []}
+        self.is_pinned: bool = False
 
     # def __setattr__(self, key, value):
     #     self.__dict__[key] = value
 
-    def __lt__(self, other):
+    def __lt__(self, other) -> bool:
         return self.time_sent > other.time_sent
 
     def todict(self,
@@ -696,7 +708,7 @@ class Message():
                    'message_id', 'u_id', 'message', 'time_sent', 'reacts',
                    'is_pinned'
                },
-               auth_user=None):
+               auth_user=None) -> dict:
         info_dict = {
             key: value
             for key, value in self.__dict__.items() if key in show
@@ -717,7 +729,7 @@ class Message():
 
     @staticmethod
     def get_last_id() -> int:
-        msg = store['messages']
+        msg: List[Message] = store['messages']
         message_id = msg[0].message_id if len(msg) > 0 else -1
         return message_id
 
@@ -732,10 +744,11 @@ class Message():
         Return:
             Message
         '''
+        res: Message = None
         for msg in store['messages']:
             if msg.message_id == message_id and msg.is_active:
-                return msg
-        return None
+                res = msg
+        return res
 
     @staticmethod
     def clear() -> None:
@@ -752,7 +765,7 @@ class Message():
     def check_length_invalid(msg: str) -> bool:
         return len(msg) < 1 or len(msg) > 1000
 
-    def remove(self):
+    def remove(self) -> None:
         self.is_active = False
         Seams.set_workspace_stats('messages_exist', -1, int_now())
 
@@ -761,7 +774,7 @@ class Message():
         return len(query_str) < 1 or len(query_str) > 1000
 
     @staticmethod
-    def utc_timestamp() -> int:
+    def utc_timestamp() -> float:
         dt = datetime.datetime.now(timezone.utc)
         utc_time = dt.replace(tzinfo=timezone.utc)
         return utc_time.timestamp()
@@ -770,15 +783,18 @@ class Message():
         return self.is_active and self.time_sent < Message.utc_timestamp()
 
     @staticmethod
-    def get_messages(sup, start: int, end: int) -> list:
-        all_message = sorted(
+    def get_messages(sup: Union[Channel, DM], start: int, end: int):
+        all_message: List[Message] = sorted(
             [msg for msg in sup.messages if msg.is_available()])
         end = len(all_message) if end < 0 else end
         return all_message[start:end]
 
     @staticmethod
-    def get_all() -> list:
-        return [msg for msg in store['messages'] if msg.is_available()]
+    def get_all():
+        res: List[Message] = [
+            msg for msg in store['messages'] if msg.is_available()
+        ]
+        return res
 
     @staticmethod
     def get_tagged_user(msg: str):
@@ -788,21 +804,23 @@ class Message():
             set(
                 User.find_by_handle(handle.replace('@', ''))
                 for handle in handles))
-        return [user for user in all_user if not user is None]
+        res: List[User] = [user for user in all_user if not user is None]
+        return res
 
 
 class Notification:
 
     def __init__(self, sup, content: str, time_sent=None) -> None:
-        self.sup = sup
-        self.content = content
-        self.time_sent = Message.utc_timestamp(
+        self.sup: Union[Channel, DM] = sup
+        self.content: str = content
+        self.time_sent: Union[int, float] = Message.utc_timestamp(
         ) if time_sent is None else time_sent
 
-    def __lt__(self, other):
+    def __lt__(self, other) -> bool:
         return self.time_sent > other.time_sent
 
-    def todict(self, show={'channel_id', 'dm_id', 'notification_message'}):
+    def todict(self,
+               show={'channel_id', 'dm_id', 'notification_message'}) -> dict:
         info_dict = {
             key: value
             for key, value in self.__dict__.items() if key in show
@@ -819,6 +837,9 @@ class Notification:
     def is_available(self) -> bool:
         return self.time_sent < Message.utc_timestamp()
 
+
+store: Dict[str, Union[List[User], List[Channel], List[DM], List[Message],
+                       List[str], dict]]
 
 if os.path.exists('data_store.pickle'):
     with open('data_store.pickle', 'rb') as f:
