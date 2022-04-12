@@ -157,8 +157,6 @@ def users(user_list):
     ]
     return users
 
-################################################ users/all/v1 test ################################################
-
 ################################################ user/stats/v1 test ################################################
 
 def test_user_stats_normal(user_list, channel_list, dm_list):
@@ -222,6 +220,43 @@ def test_user_stats_invalid_token(user_list, channel_list, dm_list):
                        params = {'token': -1})
     assert res.status_code == AccessError.code
     
+################################################ users/stats/v1 test ################################################
+
+def test_users_stats_normal(user_list, channel_list, dm_list):
+    '''
+    
+    This test is to test when users_list get info successfully
+    
+    '''
+    requests.post(url + 'message/send/v1',
+                  json = {'token': user_list[0]['token'],
+                          'channel_id': channel_list[0]['channel_id'],
+                          'message': 'I am SuperBoy @steveyang'})
+    requests.post(url + 'message/senddm/v1',
+                  json = {'token': user_list[0]['token'],
+                          'dm_id': dm_list[0]['dm_id'],
+                          'message': 'I am SuperBoy @steveyang'})
+    requests.post(url + 'message/send/v1',
+                  json = {'token': user_list[1]['token'],
+                          'channel_id': channel_list[1]['channel_id'],
+                          'message': 'I am SuperBoy'})
+    requests.post(url + 'message/senddm/v1',
+                  json = {'token': user_list[2]['token'],
+                          'dm_id': dm_list[2]['dm_id'],
+                          'message': 'I am SuperBoy'})
+    # remove a dm
+    requests.delete(url + 'dm/remove/v1',
+                    json = {"token": user_list[0]["token"], 
+                            "dm_id": dm_list[0]['dm_id']})
+    res = requests.get(url + 'users/stats/v1',
+                       params = {'token': user_list[0]['token']}).json()
+    assert res['workspace_stats']['channels_exist'][-1]['num_channels_exist'] == 4
+    assert res['workspace_stats']['dms_exist'][-1]['num_dms_exist'] == 2
+    assert res['workspace_stats']['messages_exist'][-1]['num_messages_sent'] == 3
+    assert res['workspace_stats']['involvement_rate'] == 1
+    
+################################################ users/all/v1 test ################################################
+
 def test_users_all_valid_token(user_list, users):
     '''
     
