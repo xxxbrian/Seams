@@ -13,32 +13,40 @@ def create_user_list():
     returns:
         user_list (dictionary), contains 4 pre-register users' information
     '''
-    requests.delete(f"{url}clear/v1", json = {})    # clear all info in server
     user_list = []
-    user_list.append(requests.post(f"{url}auth/register/v2",
-                                   json = 
-                                       {'email': 'z5374603@unsw.com',
-                                        'password': '123456',
-                                        'name_first': 'Steve',
-                                        'name_last': 'Yang'}).json())
-    user_list.append(requests.post(f"{url}auth/register/v2",
-                                   json = 
-                                       {'email': 'z5374602@unsw.com',
-                                        'password': '123456',
-                                        'name_first': 'Brian',
-                                        'name_last': 'Lee'}).json())
-    user_list.append(requests.post(f"{url}auth/register/v2",
-                                   json = 
-                                       {'email': 'z5374601@unsw.com',
-                                        'password': '123456',
-                                        'name_first': 'Bojin',
-                                        'name_last': 'Li'}).json())
-    user_list.append(requests.post(f"{url}auth/register/v2",
-                                   json = 
-                                       {'email': 'z5374600@unsw.com',
-                                        'password': '123456',
-                                        'name_first':'Cicy',
-                                        'name_last': 'Zhou'}).json())
+    requests.delete(f"{url}clear/v1", json = {})    # clear all info in server
+    requests.post(f"{url}auth/register/v2",
+                                   json = { 'email': 'z5374603@unsw.com',
+                                            'password': '123456',
+                                            'name_first': 'Steve',
+                                            'name_last': 'Yang'})
+    requests.post(f"{url}auth/register/v2",
+                                   json = { 'email': 'z5374602@unsw.com',
+                                            'password': '123456',
+                                            'name_first': 'Brian',
+                                            'name_last': 'Lee'})
+    requests.post(f"{url}auth/register/v2",
+                                   json = { 'email': 'z5374601@unsw.com',
+                                            'password': '123456',
+                                            'name_first': 'Bojin',
+                                            'name_last': 'Li'})
+    requests.post(f"{url}auth/register/v2",
+                                   json = {  'email': 'z5374600@unsw.com',
+                                            'password': '123456',
+                                            'name_first':'Cicy',
+                                            'name_last': 'Zhou'})
+    user_list.append(requests.post(url + "auth/login/v2",
+                                    json = {"email": "z5374603@unsw.com",
+                                            "password": "123456"}).json())
+    user_list.append(requests.post(url + "auth/login/v2",
+                                    json = {"email": "z5374602@unsw.com",
+                                            "password": "123456"}).json())
+    user_list.append(requests.post(url + "auth/login/v2",
+                                    json = {"email": "z5374601@unsw.com",
+                                            "password": "123456"}).json())
+    user_list.append(requests.post(url + "auth/login/v2",
+                                    json = {"email": "z5374600@unsw.com",
+                                            "password": "123456"}).json())
     return user_list
 
 
@@ -57,28 +65,32 @@ def users(user_list):
             'email': 'z5374603@unsw.com',
             'name_first': 'Steve',
             'name_last': 'Yang',
-            'handle_str': 'steveyang'
+            'handle_str': 'steveyang',
+            'profile_img_url': ''
         },
         {
             'u_id': user_list[1]['auth_user_id'],
             'email': 'z5374602@unsw.com',
             'name_first': 'Brian',
             'name_last': 'Lee',
-            'handle_str': 'brianlee'
+            'handle_str': 'brianlee',
+            'profile_img_url': ''
         },
         {
             'u_id': user_list[2]['auth_user_id'],
             'email': 'z5374601@unsw.com',
             'name_first': 'Bojin',
             'name_last': 'Li',
-            'handle_str': 'bojinli'
+            'handle_str': 'bojinli',
+            'profile_img_url': ''
         },
         {
             'u_id': user_list[3]['auth_user_id'],
             'email': 'z5374600@unsw.com',
             'name_first':'Cicy',
             'name_last': 'Zhou',
-            'handle_str': 'cicyzhou'
+            'handle_str': 'cicyzhou',
+            'profile_img_url': ''
         }
     ]
     return users
@@ -99,13 +111,17 @@ def test_users_all_valid_token(user_list, users):
     '''
     respon = requests.get(url + "users/all/v1", params = {
         'token': user_list[0]['token']
-    })
+    }).json()
 
     # assert all users in the response return
     for i in range(4):
-        assert users[i] in respon.json()['users']
+        assert users[i]['u_id'] == respon['users'][i]['u_id']
+        assert users[i]['email'] == respon['users'][i]['email']
+        assert users[i]['name_first'] == respon['users'][i]['name_first']
+        assert users[i]['name_last'] == respon['users'][i]['name_last']
+        assert users[i]['handle_str'] == respon['users'][i]['handle_str']
 
-def test_users_all_invalid_token(user_list):
+def test_users_all_invalid_token():
     '''
     Test users/all/v1 takes in an invalid token
     
@@ -133,15 +149,23 @@ def test_user_profile_valid_token_and_uid(user_list, users):
                               params = {
                                   'token': user_list[0]['token'],
                                   'u_id': user_list[0]['auth_user_id']
-                              })
+                              }).json()
     response_2 = requests.get(url + "user/profile/v1", 
                               params = {
                                   'token': user_list[1]['token'],
                                   'u_id': user_list[1]['auth_user_id']
-                              })
+                              }).json()
     
-    assert response_1.json()['user'] == users[0]
-    assert response_2.json()['user'] == users[1]
+    assert users[0]['u_id'] == response_1['user']['u_id']
+    assert users[0]['email'] == response_1['user']['email']
+    assert users[0]['name_first'] == response_1['user']['name_first']
+    assert users[0]['name_last'] == response_1['user']['name_last']
+    assert users[0]['handle_str'] == response_1['user']['handle_str']
+    assert users[1]['u_id'] == response_2['user']['u_id']
+    assert users[1]['email'] == response_2['user']['email']
+    assert users[1]['name_first'] == response_2['user']['name_first']
+    assert users[1]['name_last'] == response_2['user']['name_last']
+    assert users[1]['handle_str'] == response_2['user']['handle_str']
     
 def test_users_profile_invalid_uid(user_list):
     '''
