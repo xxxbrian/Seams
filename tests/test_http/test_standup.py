@@ -116,7 +116,6 @@ def test_standup_start(login_list, channel_list):
                                       json={'token': login_list[2]['token'],
                                             'channel_id': channel_list[2]['channel_id'],
                                             'length': 1}).json())
-    standup_list.append( )
     for standup in standup_list:
         assert type(standup).__name__ == 'dict'
         assert type(standup['time_finish']).__name__ == 'int'
@@ -260,7 +259,7 @@ def test_standup_active_normal(login_list, channel_list):
                        params={'token': login_list[0]['token'],
                                'channel_id': channel_list[0]['channel_id']}).json()
     assert res['is_active'] is True
-    assert res['time_finish'] == time.time() + 2
+    assert res['time_finish'] == int(time.time()) + 2
     time.sleep(2.1)
     res = requests.get(url + 'standup/active/v1',
                        params={'token': login_list[0]['token'],
@@ -348,7 +347,7 @@ def test_standup_send_normal(login_list, channel_list):
     # send a message with @
     res = requests.post(url + 'standup/send/v1',
                   json = {'token': login_list[0]['token'],
-                          'channel_id': channel_list[0]['channel-id'],
+                          'channel_id': channel_list[0]['channel_id'],
                           'message': "Hello guys @steveyang"})
     assert res.status_code == 200
     time.sleep(2.1)
@@ -409,7 +408,7 @@ def test_standup_send_too_long_message(login_list, channel_list):
     # send a message with @
     res = requests.post(url + 'standup/send/v1',
                   json = {'token': login_list[0]['token'],
-                          'channel_id': channel_list[0]['channel-id'],
+                          'channel_id': channel_list[0]['channel_id'],
                           'message': too_long_message})
     assert res.status_code == InputError.code
     
@@ -429,7 +428,7 @@ def test_standup_send_before_standup(login_list, channel_list):
     '''
     res = requests.post(url + 'standup/send/v1',
                   json = {'token': login_list[0]['token'],
-                          'channel_id': channel_list[0]['channel-id'],
+                          'channel_id': channel_list[0]['channel_id'],
                           'message': "Hi"})
     assert res.status_code == InputError.code
     
@@ -453,7 +452,7 @@ def test_standup_send_user_didnot_join_channel(login_list, channel_list):
                         'length': 2})
     res = requests.post(url + 'standup/send/v1',
                   json = {'token': login_list[1]['token'],
-                          'channel_id': channel_list[0]['channel-id'],
+                          'channel_id': channel_list[0]['channel_id'],
                           'message': "Hi"})
     assert res.status_code == AccessError.code
     
@@ -476,7 +475,7 @@ def test_standup_send_invalid_token(login_list, channel_list):
                         'length': 2})
     res = requests.post(url + 'standup/send/v1',
                   json = {'token': -1,
-                          'channel_id': channel_list[0]['channel-id'],
+                          'channel_id': channel_list[0]['channel_id'],
                           'message': "Hi"})
     assert res.status_code == AccessError.code
  
