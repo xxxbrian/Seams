@@ -4,7 +4,6 @@ import requests
 import json
 from src.config import url
 from src.error import InputError, AccessError
-import time
 
 @pytest.fixture(name = 'user_list')
 def create_user_list():
