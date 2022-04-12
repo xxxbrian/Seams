@@ -18,8 +18,8 @@ def standup_start_v1(token: str, channel_id: int, length: int):
         raise AccessError(description='Permission denied: Not member')
     if channel.standup['is_active']:
         raise InputError(description='Already active standup')
-    finish_time = Message.utc_timestamp() + length
-    channel.standup_set(user, int(finish_time))
+    finish_time = int(Message.utc_timestamp() + length)
+    channel.standup_set(user, finish_time)
     standup_do = pickelsave(channel.standup_do)
     standup = threading.Timer(length, standup_do)
     standup.start()

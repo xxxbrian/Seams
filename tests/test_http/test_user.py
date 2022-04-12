@@ -251,8 +251,8 @@ def test_users_stats_normal(user_list, channel_list, dm_list):
                        params = {'token': user_list[0]['token']}).json()
     assert res['workspace_stats']['channels_exist'][-1]['num_channels_exist'] == 4
     assert res['workspace_stats']['dms_exist'][-1]['num_dms_exist'] == 2
-    assert res['workspace_stats']['messages_exist'][-1]['num_messages_sent'] == 3
-    assert res['workspace_stats']['involvement_rate'] == 1
+    assert res['workspace_stats']['messages_exist'][-1]['num_messages_exist'] == 3
+    assert res['workspace_stats']['utilization_rate'] == 1
     requests.post(f"{url}auth/register/v2",
                   json = { 'email': 'z537@unsw.com',
                            'password': '123456',
@@ -260,7 +260,7 @@ def test_users_stats_normal(user_list, channel_list, dm_list):
                            'name_last': 'Curry'})
     res = requests.get(url + 'users/stats/v1',
                        params = {'token': user_list[0]['token']}).json()
-    assert res['workspace_stats']['involvement_rate'] == 4/5
+    assert res['workspace_stats']['utilization_rate'] == 4/5
     
 def test_users_stats_invalid_token(user_list, channel_list, dm_list):
     '''
