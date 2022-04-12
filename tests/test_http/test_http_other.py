@@ -1,4 +1,3 @@
-from os import access
 import pytest
 import requests
 from src.config import url
