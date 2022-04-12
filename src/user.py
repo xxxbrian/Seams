@@ -78,7 +78,7 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end,
     try:
         res = requests.get(img_url)
     except Exception as e:
-        raise InputError(description=f'{e}')
+        raise InputError(description=f'{e}') from InputError
     if res.status_code != 200:
         raise InputError(description='Invalid img_url')
     if not res.headers['Content-Type'] in ('image/jpeg', 'image/jpg'):
