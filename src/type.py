@@ -45,7 +45,7 @@ class Seams():
 
     @staticmethod
     def analytics_filter(data, key, time):
-        return [i for i in data[key] if i['time_stamp'] < time]
+        return [i for i in data[key] if i['time_stamp'] <= time]
 
     @staticmethod
     def get_workspace_stats() -> dict:
