@@ -973,7 +973,7 @@ def test_user_profile_uploadphoto_invalid_URL(user_list):
     """
     resp = requests.post(url + 'user/profile/uploadphoto/v1', json={
         "token": user_list[0]["token"],
-        "img_url": 'http://unswcs.alwaysdata.net/profile_img/vc1LgHIMq4DHV1UIfMCHdGOC7lrW0JKi2xliwRthcIc.jpg',
+        "img_url": 'unswcs.alwaysdata.net/profile_img/vc1LgHIMq4DHV1UIfMCHdGOC7lrW0JKi2xliwRth',
         "x_start": 0,
         "y_start": 0,
         "x_end": 200,
