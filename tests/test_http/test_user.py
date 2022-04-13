@@ -1042,11 +1042,11 @@ def test_user_profile_uploadphoto_not_JPG(user_list):
     """
     resp = requests.post(url + 'user/profile/uploadphoto/v1', json={
         "token": user_list[0]["token"],
-        "img_url": 'https://avatars.githubusercontent.com/u/86137559?v=4',
+        "img_url": 'https://www.bing.com/images/search?q=Png图片&FORM=IQFRBA&id=6E60E94DB8C2D2BA8B9036F95011FD3504117596',
         "x_start": 0,
         "y_start": 0,
-        "x_end": 20,
-        "y_end": 20,
+        "x_end": 2,
+        "y_end": 2,
     })
     assert resp.status_code == InputError.code
     
