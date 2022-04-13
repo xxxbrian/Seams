@@ -1,8 +1,5 @@
-from ast import In
-from json import tool
 import pytest
 import requests
-import json
 import random
 from src.config import url
 from src.error import InputError, AccessError
@@ -479,3 +476,33 @@ def test_standup_send_invalid_token(login_list, channel_list):
                           'message': "Hi"})
     assert res.status_code == AccessError.code
  
+def test_standup_user_cant_leave_channel(login_list, channel_list):
+    '''
+    
+    This test is to test when user who starts a standup can't leave 
+    the channel
+    
+    Raises:
+        InputError
+        
+    '''
+    # user[0] add user[1] to channel[0]
+    requests.post(f"{url}channel/invite/v2",
+                  json= {'token': login_list[0]['token'],
+                         'channel_id': channel_list[0]['channel_id'],
+                         'u_id': login_list[1]['auth_user_id']})
+    # user[1] asked a 10 seconds standup
+    requests.post(url + 'standup/start/v1',
+                  json={'token': login_list[1]['token'],
+                        'channel_id': channel_list[0]['channel_id'],
+                        'length': 10})
+    # During standup, user[1] wanna leave the channel[0]
+    res = requests.post(url + 'channel/leave/v1',
+                        json = {'token': login_list[1]['token'],
+                                'channel_id': channel_list[0]['channel_id']})
+    assert res.status_code == InputError.code
+    time.sleep(10.1)
+    res = requests.post(url + 'channel/leave/v1',
+                        json = {'token': login_list[1]['token'],
+                                'channel_id': channel_list[0]['channel_id']})
+    assert res.status_code == 200

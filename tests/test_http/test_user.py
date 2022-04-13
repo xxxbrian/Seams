@@ -963,6 +963,26 @@ def test_user_profile_uploadphoto_normal(user_list):
 def test_user_profile_uploadphoto_invalid_URL(user_list):
     """
 
+    Test user_profile_uploadphoto when img_url is invalid
+    
+    Raises:
+        InputError
+    
+    """
+    resp = requests.post(url + 'user/profile/uploadphoto/v1', json={
+        "token": user_list[0]["token"],
+        "img_url": 'unswcs.alwaysdata.net/profile_img/vc1LgHIMq4DHV1UIfMCHdGOC7lrW0JKi2xliwRth',
+        "x_start": 0,
+        "y_start": 0,
+        "x_end": 200,
+        "y_end": 200,
+    })
+    
+    assert resp.status_code == InputError.code
+
+def test_user_profile_uploadphoto_invalid_status_code(user_list):
+    """
+
     Test user_profile_uploadphoto when img_url returns an
     HTTP status other than 200, or any other errors occur 
     when attempting to retrieve the image
@@ -973,7 +993,7 @@ def test_user_profile_uploadphoto_invalid_URL(user_list):
     """
     resp = requests.post(url + 'user/profile/uploadphoto/v1', json={
         "token": user_list[0]["token"],
-        "img_url": 'http://unswcs.alwaysdata.net/profile_img/vc1LgHIMq4DHV1UIfMCHdGOC7lrW0JKi2xliwRthcIc.jpg',
+        "img_url": 'http://unswcse.alwaysdata.net/abc.jpg',
         "x_start": 0,
         "y_start": 0,
         "x_end": 200,
@@ -1042,11 +1062,11 @@ def test_user_profile_uploadphoto_not_JPG(user_list):
     """
     resp = requests.post(url + 'user/profile/uploadphoto/v1', json={
         "token": user_list[0]["token"],
-        "img_url": 'https://avatars.githubusercontent.com/u/86137559?v=4',
+        "img_url": 'https://www.bing.com/images/search?q=Png图片&FORM=IQFRBA&id=6E60E94DB8C2D2BA8B9036F95011FD3504117596',
         "x_start": 0,
         "y_start": 0,
-        "x_end": 20,
-        "y_end": 20,
+        "x_end": 2,
+        "y_end": 2,
     })
     assert resp.status_code == InputError.code
     
