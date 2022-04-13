@@ -1,8 +1,5 @@
-from ast import In
-from json import tool
 import pytest
 import requests
-import json
 import random
 from src.config import url
 from src.error import InputError, AccessError
