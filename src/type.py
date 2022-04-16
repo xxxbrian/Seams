@@ -151,7 +151,7 @@ class User():
         return info
 
     def __hash__(self) -> int:
-        return hash(self.handle_str)
+        return hash(self.u_id)
 
     def todict(
         self,
