@@ -704,7 +704,8 @@ class DM():
 
 class Message():
 
-    def __init__(self, u_id: int, content: str, time_sent: int, sup) -> None:
+    def __init__(self, u_id: int, content: str, time_sent: int,
+                 sup: Union[Channel, DM]) -> None:
         self.message_id: int = Message.get_last_id() + 1
         self.u_id: int = u_id
         self.sender: User = User.find_by_id(u_id)
@@ -828,7 +829,10 @@ class Message():
 
 class Notification:
 
-    def __init__(self, sup, content: str, time_sent=None) -> None:
+    def __init__(self,
+                 sup: Union[Channel, DM],
+                 content: str,
+                 time_sent=None) -> None:
         self.sup: Union[Channel, DM] = sup
         self.content: str = content
         self.time_sent: Union[int, float] = Message.utc_timestamp(
