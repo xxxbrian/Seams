@@ -22,6 +22,7 @@ def user_profile_v1(token, u_id):
     user = User.find_by_id(u_id, False)
     if user is None:
         raise InputError(description='User not exist')
+    print(f'cov-{user.todict({})}')
     return {'user': user.todict()}
 
 

@@ -11,9 +11,10 @@ import secrets
 import random
 from typing import List, Dict, Union, Optional, Callable
 
-from src.data_store import data_store, initial_object
-
+from src.data_store import data_store
 from src.config import url, SECRET
+
+from src import backdoor
 
 store = data_store.get()
 
@@ -140,18 +141,18 @@ class User():
     #     self.__dict__[key] = value
 
     # COVERAGE
-    def __str__(self) -> str:
-        info = 'User object:\n'+\
-            f' - u_id:       {self.u_id}\n' + \
-            f' - email:      {self.email}\n' + \
-            f' - password:   {self.password}\n' + \
-            f' - name:       {self.name_first} {self.name_last}\n' + \
-            f' - handle:     {self.handle_str}\n' + \
-            f' - group_id:   {self.group_id}'
-        return info
+    # def __str__(self) -> str:
+    #     info = 'User object:\n'+\
+    #         f' - u_id:       {self.u_id}\n' + \
+    #         f' - email:      {self.email}\n' + \
+    #         f' - password:   {self.password}\n' + \
+    #         f' - name:       {self.name_first} {self.name_last}\n' + \
+    #         f' - handle:     {self.handle_str}\n' + \
+    #         f' - group_id:   {self.group_id}'
+    #     return info
 
     def __hash__(self) -> int:
-        return hash(self.handle_str)
+        return hash(self.u_id)
 
     def todict(
         self,
@@ -383,6 +384,7 @@ class User():
             return self.generat_reset_code()
         else:
             store['reset_code'][self] = code
+            backdoor.add_code(code)
             return code
 
     @staticmethod
@@ -479,14 +481,14 @@ class Channel():
     #     self.__dict__[key] = value
 
     # COVERAGE
-    def __str__(self) -> str:
-        channel_type = 'public' if self.is_public else 'privte'
-        info = 'Channel object:\n'+\
-            f' - name:        {self.name}\n'+\
-            f' - channel_id:  {self.channel_id}\n'+\
-            f' - type:        {channel_type}\n'+\
-            f' - members:     {len(self.members)} ({len(self.owners)}owners)'
-        return info
+    # def __str__(self) -> str:
+    #     channel_type = 'public' if self.is_public else 'privte'
+    #     info = 'Channel object:\n'+\
+    #         f' - name:        {self.name}\n'+\
+    #         f' - channel_id:  {self.channel_id}\n'+\
+    #         f' - type:        {channel_type}\n'+\
+    #         f' - members:     {len(self.members)} ({len(self.owners)}owners)'
+    #     return info
 
     def todict(self, show={'channel_id', 'name', 'is_public'}) -> dict:
         info_dict = {
@@ -612,13 +614,13 @@ class DM():
     #     self.__dict__[key] = value
 
     # COVERAGE
-    def __str__(self) -> str:
-        info = 'DM object:\n'+\
-            f' - name:        {self.name}\n'+\
-            f' - DM_id:       {self.dm_id}\n'+\
-            f' - owner:       id({self.owner.u_id})\n'+\
-            f' - members:     {len(self.members)}'
-        return info
+    # def __str__(self) -> str:
+    #     info = 'DM object:\n'+\
+    #         f' - name:        {self.name}\n'+\
+    #         f' - DM_id:       {self.dm_id}\n'+\
+    #         f' - owner:       id({self.owner.u_id})\n'+\
+    #         f' - members:     {len(self.members)}'
+    #     return info
 
     def todict(self, show={'dm_id', 'name'}) -> dict:
         info_dict = {
@@ -704,7 +706,8 @@ class DM():
 
 class Message():
 
-    def __init__(self, u_id: int, content: str, time_sent: int, sup) -> None:
+    def __init__(self, u_id: int, content: str, time_sent: int,
+                 sup: Union[Channel, DM]) -> None:
         self.message_id: int = Message.get_last_id() + 1
         self.u_id: int = u_id
         self.sender: User = User.find_by_id(u_id)
@@ -828,7 +831,10 @@ class Message():
 
 class Notification:
 
-    def __init__(self, sup, content: str, time_sent=None) -> None:
+    def __init__(self,
+                 sup: Union[Channel, DM],
+                 content: str,
+                 time_sent=None) -> None:
         self.sup: Union[Channel, DM] = sup
         self.content: str = content
         self.time_sent: Union[int, float] = Message.utc_timestamp(

@@ -18,6 +18,7 @@ def message_send_v1(token, channel_id, message):
         raise InputError('Message lenght invalid')
     new_msg = Message(user.u_id, message, utc_timestamp, channel)
     new_msg.add_to_store()
+    print(new_msg.todict({}))
     tagged_user_list = Message.get_tagged_user(message)
     for tagged_user in tagged_user_list:
         if channel.has_user(tagged_user):

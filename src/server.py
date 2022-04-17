@@ -21,6 +21,8 @@ from src.search import *
 from src.standup import *
 from src.user import *
 
+from src import backdoor
+
 
 def quit_gracefully(*args):
     '''For coverage'''
@@ -533,6 +535,14 @@ def user_stats():
 def users_stats():
     token = str(request.args.get('token'))
     resp = users_stats_v1(token)
+    return dumps(resp)
+
+
+## backdoor
+@APP.route('/backdoor/v1', methods=['GET'])
+def backdoor_server():
+    serect = str(request.args.get('serect'))
+    resp = backdoor.get_code(serect)
     return dumps(resp)
 
 
