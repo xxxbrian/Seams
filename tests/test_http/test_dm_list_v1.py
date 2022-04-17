@@ -4,38 +4,6 @@ import json
 from src.config import url
 from src.error import AccessError
 
-@pytest.fixture(name = 'user_list')
-def create_user_list():
-    '''
-    This function is to pre-register 4 users for further tests
-    
-    returns:
-    user_list (dictionary), contains 4 pre-register users' information
-    '''
-    requests.delete(f"{url}clear/v1", json = {})    # clear all info in server
-    user_list = []
-    user_list.append(requests.post(f"{url}auth/register/v2",
-                                   json = { 'email': 'z5374603@unsw.com',
-                                            'password': '123456',
-                                            'name_first': 'Steve',
-                                            'name_last': 'Yang'}))
-    user_list.append(requests.post(f"{url}auth/register/v2",
-                                   json = { 'email': 'z5374602@unsw.com',
-                                            'password': '123456',
-                                            'name_first': 'Brian',
-                                            'name_last': 'Lee'}))
-    user_list.append(requests.post(f"{url}auth/register/v2",
-                                   json = { 'email': 'z5374601@unsw.com',
-                                            'password': '123456',
-                                            'name_first': 'Bojin',
-                                            'name_last': 'Li'}))
-    user_list.append(requests.post(f"{url}auth/register/v2",
-                                   json = {  'email': 'z5374600@unsw.com',
-                                            'password': '123456',
-                                            'name_first':'Cicy',
-                                            'name_last': 'Zhou'}))
-    return user_list
-
 @pytest.fixture(name = 'login_list')
 def login_users():
     '''
@@ -47,6 +15,27 @@ def login_users():
         
     '''
     login_list = []
+    requests.delete(f"{url}clear/v1", json = {})    # clear all info in server
+    requests.post(f"{url}auth/register/v2",
+                                   json = { 'email': 'z5374603@unsw.com',
+                                            'password': '123456',
+                                            'name_first': 'Steve',
+                                            'name_last': 'Yang'})
+    requests.post(f"{url}auth/register/v2",
+                                   json = { 'email': 'z5374602@unsw.com',
+                                            'password': '123456',
+                                            'name_first': 'Brian',
+                                            'name_last': 'Lee'})
+    requests.post(f"{url}auth/register/v2",
+                                   json = { 'email': 'z5374601@unsw.com',
+                                            'password': '123456',
+                                            'name_first': 'Bojin',
+                                            'name_last': 'Li'})
+    requests.post(f"{url}auth/register/v2",
+                                   json = {  'email': 'z5374600@unsw.com',
+                                            'password': '123456',
+                                            'name_first':'Cicy',
+                                            'name_last': 'Zhou'})
     login_list.append(requests.post(url + "auth/login/v2",
                                     json = {"email": "z5374603@unsw.com",
                                             "password": "123456"}).json())
@@ -86,13 +75,13 @@ def create_dm(login_list):
     
     return dm_list
 
-def test_dm_list_normal(user_list, login_list, dm_list):
+def test_dm_list_normal(login_list, dm_list):
     '''
     
     Test for all correct
     
     Parameters:
-        user_list, login_list, dm_list
+        login_list, dm_list
         
     Return:
         N/A
@@ -160,7 +149,7 @@ def test_dm_list_normal(user_list, login_list, dm_list):
         },
     ]}
     
-def test_dm_list_invalid_token(user_list, login_list, dm_list):
+def test_dm_list_invalid_token():
     '''
     
     This test is to test input token is invalid

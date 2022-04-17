@@ -99,8 +99,8 @@ def test_standup_start(login_list, channel_list):
     standup_list.append(requests.post(url + 'standup/start/v1',
                                       json={'token': login_list[0]['token'],
                                             'channel_id': channel_list[0]['channel_id'],
-                                            'length': 1}).json())
-    time.sleep(1.1)
+                                            'length': 10}).json())
+    time.sleep(10.1)
     standup_list.append(requests.post(url + 'standup/start/v1',
                                       json={'token': login_list[0]['token'],
                                             'channel_id': channel_list[0]['channel_id'],

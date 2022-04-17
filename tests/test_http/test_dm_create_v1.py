@@ -8,38 +8,6 @@ import json
 from src.config import url
 from src.error import AccessError, InputError
 
-@pytest.fixture(name = 'user_list')
-def create_user_list():
-    '''
-    This function is to pre-register 4 users for further tests
-    
-    returns:
-    user_list (dictionary), contains 4 pre-register users' information
-    '''
-    requests.delete(f"{url}clear/v1", json = {})    # clear all info in server
-    user_list = []
-    user_list.append(requests.post(f"{url}auth/register/v2",
-                                   json = { 'email': 'z5374603@unsw.com',
-                                            'password': '123456',
-                                            'name_first': 'Steve',
-                                            'name_last': 'Yang'}))
-    user_list.append(requests.post(f"{url}auth/register/v2",
-                                   json = { 'email': 'z5374602@unsw.com',
-                                            'password': '123456',
-                                            'name_first': 'Brian',
-                                            'name_last': 'Lee'}))
-    user_list.append(requests.post(f"{url}auth/register/v2",
-                                   json = { 'email': 'z5374601@unsw.com',
-                                            'password': '123456',
-                                            'name_first': 'Bojin',
-                                            'name_last': 'Li'}))
-    user_list.append(requests.post(f"{url}auth/register/v2",
-                                   json = {  'email': 'z5374600@unsw.com',
-                                            'password': '123456',
-                                            'name_first':'Cicy',
-                                            'name_last': 'Zhou'}))
-    return user_list
-
 @pytest.fixture(name = 'login_list')
 def login_users():
     '''
@@ -51,6 +19,27 @@ def login_users():
         
     '''
     login_list = []
+    requests.delete(f"{url}clear/v1", json = {})    # clear all info in server
+    requests.post(f"{url}auth/register/v2",
+                                   json = { 'email': 'z5374603@unsw.com',
+                                            'password': '123456',
+                                            'name_first': 'Steve',
+                                            'name_last': 'Yang'})
+    requests.post(f"{url}auth/register/v2",
+                                   json = { 'email': 'z5374602@unsw.com',
+                                            'password': '123456',
+                                            'name_first': 'Brian',
+                                            'name_last': 'Lee'})
+    requests.post(f"{url}auth/register/v2",
+                                   json = { 'email': 'z5374601@unsw.com',
+                                            'password': '123456',
+                                            'name_first': 'Bojin',
+                                            'name_last': 'Li'})
+    requests.post(f"{url}auth/register/v2",
+                                   json = {  'email': 'z5374600@unsw.com',
+                                            'password': '123456',
+                                            'name_first':'Cicy',
+                                            'name_last': 'Zhou'})
     login_list.append(requests.post(url + "auth/login/v2",
                                     json = {"email": "z5374603@unsw.com",
                                             "password": "123456"}).json())
@@ -65,13 +54,13 @@ def login_users():
                                             "password": "123456"}).json())
     return login_list
 
-def test_dm_create_successfully(user_list, login_list):
+def test_dm_create_successfully(login_list):
     '''
     
     This test is for testing create a dm successfully
     
     Parameters:
-        user_list, login_list
+        login_list
         
     Return:
         N/A
@@ -86,7 +75,7 @@ def test_dm_create_successfully(user_list, login_list):
     assert response_1.status_code == 200
     assert response_2.status_code == 200
 
-def test_dm_create_invalid_uid(user_list, login_list):
+def test_dm_create_invalid_uid(login_list):
     """
         Test invalid user id
         
@@ -107,7 +96,7 @@ def test_dm_create_invalid_uid(user_list, login_list):
     assert response_1.status_code == InputError.code
     assert response_2.status_code == InputError.code
 
-def test_dm_create_duplicated_uid(user_list, login_list):
+def test_dm_create_duplicated_uid(login_list):
     """
     
         Test duplicated user id
@@ -121,7 +110,7 @@ def test_dm_create_duplicated_uid(user_list, login_list):
                                        'u_ids': [login_list[1]['auth_user_id'], login_list[1]['auth_user_id']]})
     assert response_1.status_code == InputError.code
     
-def test_dm_create_wrong_uid(user_list, login_list):
+def test_dm_create_wrong_uid(login_list):
     """
     
         Test wrong user id
@@ -135,7 +124,7 @@ def test_dm_create_wrong_uid(user_list, login_list):
                                        'u_ids': [-1, -2]})
     assert response_1.status_code == InputError.code
     
-def test_dm_create_invalid_token(user_list, login_list):
+def test_dm_create_invalid_token(login_list):
     """
     
         Test invalid token

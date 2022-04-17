@@ -2,7 +2,6 @@ from cgitb import reset
 from pickle import TRUE
 import pytest
 import requests
-import json
 from src.config import url
 from src.error import InputError, AccessError
 from src.server import channels_list

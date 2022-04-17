@@ -1,8 +1,7 @@
 import pytest
 import requests
-import json
 from src.config import url
-from src.error import AccessError, InputError
+from src.error import AccessError
 
 @pytest.fixture(name = 'user_list')
 def create_user_list():

@@ -6,51 +6,38 @@ from src.config import url
 from src.error import InputError, AccessError
 from src.server import channels_list
 
-@pytest.fixture(name = 'user_list')
-def create_user_list():
-    '''
-    This function is to pre-register 4 users for further tests
-    
-    returns:
-        user_list, contains 4 pre-register users' response
-    '''
-    requests.delete(f"{url}clear/v1", json = {})    # clear all info in server
-    user_list = []
-    user_list.append(requests.post(f"{url}auth/register/v2",
-                                   json = 
-                                       {'email': 'z5374603@unsw.com',
-                                        'password': '123456',
-                                        'name_first': 'Steve',
-                                        'name_last': 'Yang'}))
-    user_list.append(requests.post(f"{url}auth/register/v2",
-                                   json = 
-                                       {'email': 'z5374602@unsw.com',
-                                        'password': '123456',
-                                        'name_first': 'Brian',
-                                        'name_last': 'Lee'}))
-    user_list.append(requests.post(f"{url}auth/register/v2",
-                                   json = 
-                                       {'email': 'z5374601@unsw.com',
-                                        'password': '123456',
-                                        'name_first': 'Bojin',
-                                        'name_last': 'Li'}))
-    user_list.append(requests.post(f"{url}auth/register/v2",
-                                   json = 
-                                       {'email': 'z5374600@unsw.com',
-                                        'password': '123456',
-                                        'name_first':'Cicy',
-                                        'name_last': 'Zhou'}))
-    return user_list
-
 @pytest.fixture(name = 'login_list')
 def login_users():
     '''
+    
     This function is to pre-login 4 users for further tests
     
     returns:
         login_list, contains 4 pre-register users' information
+        
     '''
     login_list = []
+    requests.delete(f"{url}clear/v1", json = {})    # clear all info in server
+    requests.post(f"{url}auth/register/v2",
+                                   json = { 'email': 'z5374603@unsw.com',
+                                            'password': '123456',
+                                            'name_first': 'Steve',
+                                            'name_last': 'Yang'})
+    requests.post(f"{url}auth/register/v2",
+                                   json = { 'email': 'z5374602@unsw.com',
+                                            'password': '123456',
+                                            'name_first': 'Brian',
+                                            'name_last': 'Lee'})
+    requests.post(f"{url}auth/register/v2",
+                                   json = { 'email': 'z5374601@unsw.com',
+                                            'password': '123456',
+                                            'name_first': 'Bojin',
+                                            'name_last': 'Li'})
+    requests.post(f"{url}auth/register/v2",
+                                   json = {  'email': 'z5374600@unsw.com',
+                                            'password': '123456',
+                                            'name_first':'Cicy',
+                                            'name_last': 'Zhou'})
     login_list.append(requests.post(url + "auth/login/v2",
                                     json = {"email": "z5374603@unsw.com",
                                             "password": "123456"}).json())
@@ -94,14 +81,14 @@ def channel_create(login_list):
                                               'is_public': False}).json())
     return channel_list
 
-def test_normal_channel_messages(user_list, login_list, channel_list):
+def test_normal_channel_messages(login_list, channel_list):
     '''
     
     This tests is testing the normal situation of sending messages in 
     public/private channels
     
     Parameters:
-        user_list, login_list, channel_list
+        login_list, channel_list
         
     Return:
         N/A
@@ -164,13 +151,13 @@ def test_normal_channel_messages(user_list, login_list, channel_list):
     assert response_1['end'] == -1
     assert response_2['end'] == -1
     
-def test_channel_message_more_messages(user_list, login_list, channel_list):
+def test_channel_message_more_messages(login_list, channel_list):
     '''
     
     This tests is to test when sending more than 50 messages, the end value is start +50
     
     Parameters:
-        user_list, login_list, channel_list
+        login_list, channel_list
         
     Return:
         N/A
@@ -196,13 +183,13 @@ def test_channel_message_more_messages(user_list, login_list, channel_list):
     assert response_1['start'] == 0
     assert response_1['end'] == 50
 
-def test_channel_messages_invalid_start(user_list, login_list, channel_list):
+def test_channel_messages_invalid_start(login_list, channel_list):
     '''
     
     Test channel messages with invalid start
     
     Parameters:
-        user_list, login_list, channel_list
+        login_list, channel_list
         
     Raises:
         InputError
@@ -238,13 +225,13 @@ def test_channel_messages_invalid_start(user_list, login_list, channel_list):
                                         'start': 10})
     assert response_2.status_code == InputError.code
     
-def test_channel_messages_invalid_channel_id(user_list, login_list, channel_list):
+def test_channel_messages_invalid_channel_id(login_list, channel_list):
     '''
     
     This test is for testing input invalid channel_id
     
     Parameters:
-        user_list, login_list, channel_list
+        login_list, channel_list
         
     Raises:
         InputError
@@ -277,13 +264,13 @@ def test_channel_messages_invalid_channel_id(user_list, login_list, channel_list
                                         'start': 0})
     assert response_1.status_code == InputError.code
     
-def test_channel_messages_user_not_in_channel(user_list, login_list, channel_list):
+def test_channel_messages_user_not_in_channel(login_list, channel_list):
     '''
     
     This test is for testing input user isn't in channel
     
     Parameters:
-        user_list, login_list, channel_list
+        login_list, channel_list
         
     Raises:
         AccessError
@@ -312,14 +299,14 @@ def test_channel_messages_user_not_in_channel(user_list, login_list, channel_lis
                                         'start': 0})
     assert response_1.status_code == AccessError.code
     
-def test_channel_messages_invalid_user_token(user_list, login_list, channel_list):
+def test_channel_messages_invalid_user_token(login_list, channel_list):
     '''
     
     This test is for testing raises AccessError for invalid token
     Even if there are some InputError, raises AccessError at first
     
     Parameters:
-        user_list, login_list, channel_list
+        login_list, channel_list
         
     Raises:
         AccessError

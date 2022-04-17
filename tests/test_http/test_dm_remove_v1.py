@@ -1,41 +1,8 @@
 import pytest
 import requests
-import json
 import random
 from src.config import url
 from src.error import InputError, AccessError
-
-@pytest.fixture(name = 'user_list')
-def create_user_list():
-    '''
-    This function is to pre-register 4 users for further tests
-    
-    returns:
-    user_list (dictionary), contains 4 pre-register users' information
-    '''
-    requests.delete(f"{url}clear/v1", json = {})    # clear all info in server
-    user_list = []
-    user_list.append(requests.post(f"{url}auth/register/v2",
-                                   json = { 'email': 'z5374603@unsw.com',
-                                            'password': '123456',
-                                            'name_first': 'Steve',
-                                            'name_last': 'Yang'}))
-    user_list.append(requests.post(f"{url}auth/register/v2",
-                                   json = { 'email': 'z5374602@unsw.com',
-                                            'password': '123456',
-                                            'name_first': 'Brian',
-                                            'name_last': 'Lee'}))
-    user_list.append(requests.post(f"{url}auth/register/v2",
-                                   json = { 'email': 'z5374601@unsw.com',
-                                            'password': '123456',
-                                            'name_first': 'Bojin',
-                                            'name_last': 'Li'}))
-    user_list.append(requests.post(f"{url}auth/register/v2",
-                                   json = {  'email': 'z5374600@unsw.com',
-                                            'password': '123456',
-                                            'name_first':'Cicy',
-                                            'name_last': 'Zhou'}))
-    return user_list
 
 @pytest.fixture(name = 'login_list')
 def login_users():
@@ -48,6 +15,27 @@ def login_users():
         
     '''
     login_list = []
+    requests.delete(f"{url}clear/v1", json = {})    # clear all info in server
+    requests.post(f"{url}auth/register/v2",
+                                   json = { 'email': 'z5374603@unsw.com',
+                                            'password': '123456',
+                                            'name_first': 'Steve',
+                                            'name_last': 'Yang'})
+    requests.post(f"{url}auth/register/v2",
+                                   json = { 'email': 'z5374602@unsw.com',
+                                            'password': '123456',
+                                            'name_first': 'Brian',
+                                            'name_last': 'Lee'})
+    requests.post(f"{url}auth/register/v2",
+                                   json = { 'email': 'z5374601@unsw.com',
+                                            'password': '123456',
+                                            'name_first': 'Bojin',
+                                            'name_last': 'Li'})
+    requests.post(f"{url}auth/register/v2",
+                                   json = {  'email': 'z5374600@unsw.com',
+                                            'password': '123456',
+                                            'name_first':'Cicy',
+                                            'name_last': 'Zhou'})
     login_list.append(requests.post(url + "auth/login/v2",
                                     json = {"email": "z5374603@unsw.com",
                                             "password": "123456"}).json())
@@ -88,13 +76,13 @@ def create_dm(login_list):
     return dm_list
 
 
-def test_dm_remove_normal(user_list, login_list, dm_list):
+def test_dm_remove_normal(login_list, dm_list):
     '''
     
     Test remove successfully
     
     Parameters:
-        user_list, login_list, dm_list
+        login_list, dm_list
         
     Assumption:
         dm/list/v1 is working well
@@ -111,13 +99,13 @@ def test_dm_remove_normal(user_list, login_list, dm_list):
     # remove dm[0]
     assert response_1['dms'] == []
 
-def test_dm_remove_invalid_dm_id(user_list, login_list, dm_list):
+def test_dm_remove_invalid_dm_id(login_list, dm_list):
     """
     
     Test dm_remove_v1 input a invalid dm ID.
     
     Parameters:
-        user_list, login_list, dm_list
+        login_list, dm_list
     
     Raises:
         InputError
@@ -141,7 +129,7 @@ def test_dm_remove_invalid_dm_id(user_list, login_list, dm_list):
     assert response_1.status_code == InputError.code
     assert response_2.status_code == InputError.code
 
-def test_dm_remove_author_not_creator(user_list, login_list, dm_list):
+def test_dm_remove_author_not_creator(login_list, dm_list):
     """
     
     Test dm/remove/v1 when the user is not the original DM creator 
@@ -156,7 +144,7 @@ def test_dm_remove_author_not_creator(user_list, login_list, dm_list):
                                          "dm_id": dm_list[1]["dm_id"]})
     assert response_1.status_code == AccessError.code
 
-def test_dm_remove_creater_no_longer_in_dm(user_list, login_list, dm_list):
+def test_dm_remove_creater_no_longer_in_dm(login_list, dm_list):
     '''
     
     Test when creater leave the dm
@@ -177,7 +165,7 @@ def test_dm_remove_creater_no_longer_in_dm(user_list, login_list, dm_list):
                                          "dm_id": dm_list[2]["dm_id"]})
     assert response_1.status_code == AccessError.code
     
-def test_dm_remove_creater_invalid_token(user_list, login_list, dm_list):
+def test_dm_remove_creater_invalid_token(login_list, dm_list):
     '''
     
     This test is to test when token is invalid 
