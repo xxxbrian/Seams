@@ -1,8 +1,7 @@
-import json
 import pytest
 import requests
 from src.config import url
-from src.error import InputError, AccessError
+from src.error import InputError
 
 def test_auth_passwordreset_request_normal():
     '''

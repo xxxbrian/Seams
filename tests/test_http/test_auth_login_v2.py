@@ -1,6 +1,5 @@
 import pytest
 import requests
-import json
 from src.config import url
 from src.error import InputError, AccessError
 
