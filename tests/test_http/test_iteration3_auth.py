@@ -40,7 +40,7 @@ def test_auth_passwordreset_reset_correct_reset_code():
     requests.post(url + "auth/passwordreset/request/v1",
                         json = {'email': '1981686549@qq.com'})
     bd = requests.get(url + 'backdoor/v1',
-                 params = SECRET).json()
+                      params = {'secret': SECRET}).json()
     re_code = bd['rcode'][-1]
     res = requests.post(url + 'auth/passwordreset/reset/v1',
                         json = {'reset_code': re_code,
@@ -59,7 +59,7 @@ def test_auth_passwordreset_reset_invalid_new_password():
     requests.post(url + "auth/passwordreset/request/v1",
                         json = {'email': '1981686549@qq.com'})
     bd = requests.get(url + 'backdoor/v1',
-                 params = SECRET).json()
+                      params = {'secret': SECRET}).json()
     re_code = bd['rcode'][-1]
     res = requests.post(url + 'auth/passwordreset/reset/v1',
                         json = {'reset_code': re_code,
