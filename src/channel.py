@@ -67,7 +67,7 @@ def channel_details_v2(token, channel_id):
         raise InputError(description='Channel not found')
     if not channel.has_user(user):
         raise AccessError(description='Permission denied: Join channel first')
-
+    print(f'cov-{channel.todict({})}')
     channel_info = channel.todict(
         {'name', 'is_public', 'owner_members', 'all_members'})
     return channel_info

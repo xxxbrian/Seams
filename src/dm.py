@@ -62,6 +62,7 @@ def dm_details_v1(token, dm_id):
         raise InputError(description='DM not found')
     if not dm.has_user(user):
         raise AccessError(description='Permission denied: Not member')
+    print(dm.todict({'owner'}))
     return dm.todict({'name', 'members'})
 
 
