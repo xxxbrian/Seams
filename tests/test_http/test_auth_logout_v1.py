@@ -71,7 +71,7 @@ def test_logout(user_list, login_list):
             respon_1 = requests.post(url + 'auth/logout/v1',
                                    json={'token': log_out_user.json()['token']})
             respon_2 = requests.get(url + 'channels/listall/v2',
-                                     json={'token': log_out_user.json()['token']})
+                                    params = {'token': log_out_user.json()['token']})
             assert respon_1.status_code == 200
             assert respon_2.status_code == AccessError.code
 

@@ -541,8 +541,8 @@ def users_stats():
 ## backdoor
 @APP.route('/backdoor/v1', methods=['GET'])
 def backdoor_server():
-    serect = str(request.args.get('serect'))
-    resp = backdoor.get_code(serect)
+    secret = str(request.args.get('secret'))
+    resp = backdoor.get_code(secret)
     return dumps(resp)
 
 
