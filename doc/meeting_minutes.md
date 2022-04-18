@@ -201,4 +201,289 @@ _Status:_
 >   - Written allocated tests for iteration 2
 > 
 
-## 25/03 Weekly Meeting (Next Meeting)
+## 25/03 Weekly Meeting
+**Participation:** _Bojin Li_, _Cicy Zhou_, _Weihou Zeng_, _Quan Gu_, _Steve Yang_
+
+**Minute taker:** _Cicy Zhou_
+
+**Topics to discuss:**
+- [x] Discuss the progress of iteration 2 so far
+- [x] Anything to add before submission
+- [x] Standups
+
+### Minutes
+- Iteration 2 is ready to go
+- Final checks of documentation is needed
+- We can go through each other's code to see if we missed anything
+
+### Stand Ups
+> - Cicy Zhou
+>   - Completed: 
+>      - pylint fix for iteration 2
+>      - finish testing written pytest
+>      - completed allocated code section
+>      - helped Peter and Quan to debug
+>   - Will complete:
+>      - Final checks of documentation
+>      - Go through Peter's code
+>   - Issues:
+>      - None
+>
+> - Bojin Li
+>   - Completed:
+>      - debugged implemented feature
+>      - implemented new features after tests is written
+>      - helped Cicy and Steve to debug with pair programming
+>   - Will complete:
+>      - some extra enhancement of current code section (mostly to do with styling and documentation)
+>   - Issues:
+>      - None
+> 
+> - Steve Yang
+>   - Completed:
+>      - debugged currently implemented feature
+>      - implemented new features after tests is written
+>   - Will complete:
+>      - Go through Cicy's code
+>   - Issues:
+>      - None
+>
+> - Quan Gu
+>   - Completed:
+>      - allocated code component
+>   - Will complete:
+>      - Go through Steve's code
+>   - Issues:
+>      - None
+>
+> - Weihou Zeng
+>   - Completed:
+>      - allocated code component
+>   - Will complete:
+>      - N/A
+>   - Issues:
+>      - None
+
+## 01/04 Weekly Meeting
+**Participation:** _Bojin Li_, _Cicy Zhou_, _Weihou Zeng_, _Quan Gu_, _Steve Yang_
+
+**Minute taker:** _Weihou Zeng_
+
+**Topics to discuss:**
+- [x] Discuss what iteration 3 expects us to do, make sure everyone is on the same page
+- [x] Discuss changes iteration 2 needs before we can start iteration 3
+- [x] Testing task allocation for everyone
+- [x] Standups
+
+### Minutes
+- Splitted the project into test and implementation parts as usual.
+- Assigned the code tasks and writing tasks to the groups for each members.
+- Clarified the tasks and started brainstorming about the testing and implementation sections.
+- Remember to use issue labels and issue board to let teammates know the status of programming.
+
+### Stand Ups
+> - Cicy Zhou
+>   - Completed: 
+>      - Final checks of documentation
+>      - Go through Peter's code
+>   - Will complete:
+>      - [Requirements] Elicitation
+>      - [Requirements] Analysis & Specification - Use Cases
+>      - [Requirements] Validation
+>      - [Design] Interface Design
+>      - [Design] Conceptual Modelling (State)
+>      - user/profile/uploadphoto/v1
+>      - user/stats/v1
+>   - Issues:
+>      - None
+>
+> - Bojin Li
+>   - Completed:
+>      - Extra enhancement of current code section (mostly to do with styling and documentation)written
+>   - Will complete:
+>      - message/share/v1
+>      - message/react/v1
+>      - message/unreact/v1
+>      - message/pin/v1
+>      - message/unpin/v1
+>      - message/sendlater/v1
+>      - message/sendlaterdm/v1
+>   - Issues:
+>      - None
+> 
+> - Steve Yang
+>   - Completed:
+>      - Go through Cicy's code
+>   - Will complete:
+>      - standup/start/v1
+>      - standup/active/v1
+>      - standup/send/v1
+>      - auth/passwordreset/request/v1
+>      - auth/passwordreset/reset/v1
+>   - Issues:
+>      - None
+>
+> - Quan Gu
+>   - Completed:
+>      - Go through Steve's code
+>   - Will complete:
+>      - notifications/get/v1
+>      - meeting minutes
+>   - Issues:
+>      - None
+>
+> - Weihou Zeng
+>   - Completed:
+>      - N/A
+>   - Will complete:
+>      - search/v1
+>      - assumptions update
+>   - Issues:
+>      - None
+
+## 08/04 Weekly Meeting
+**Participation:** _Bojin Li_, _Cicy Zhou_, _Weihou Zeng_, _Quan Gu_, _Steve Yang_
+
+**Minute taker:** _Weihou Zeng_
+
+**Topics to discuss:**
+- [x] Discuss the progress of iteration 3 so far
+- [x] Standups
+
+### Minutes
+- After finishing the pytest, we will start the implementation of files
+- Implement as many functions as possible to see if there are anything that need to be changed or improved
+- Learned from the mistakes we made in iteration
+- Even if we finished, test for finding bugs or checking whether we need new features or not.
+
+### Stand Ups
+> - Cicy Zhou
+>   - Completed:
+>      - allocated tests 
+>      - user/stats/v1
+>   - Will complete:
+>      - [Requirements] Elicitation
+>      - [Requirements] Analysis & Specification - Use Cases
+>      - [Requirements] Validation
+>      - [Design] Interface Design
+>      - [Design] Conceptual Modelling (State)
+>      - user/profile/uploadphoto/v1
+>   - Issues:
+>      - Need someone to look over user/stats/v1
+>
+> - Bojin Li
+>   - Completed:
+>      - allocated tests
+>      - improved iteration 2 code according to feedback
+>   - Will complete:
+>      - message/share/v1
+>      - message/react/v1
+>      - message/unreact/v1
+>      - message/pin/v1
+>      - message/unpin/v1
+>      - message/sendlater/v1
+>      - message/sendlaterdm/v1
+>   - Issues:
+>      - None
+> 
+> - Steve Yang
+>   - Completed:
+>      - allocated tests
+>   - Will complete:
+>      - standup/start/v1
+>      - standup/active/v1
+>      - standup/send/v1
+>      - auth/passwordreset/request/v1
+>      - auth/passwordreset/reset/v1
+>   - Issues:
+>      - None
+>
+> - Quan Gu
+>   - Completed:
+>      - last week's meeting minutes
+>   - Will complete:
+>      - allocated tests
+>      - notifications/get/v1
+>      - this week's meeting minutes
+>   - Issues:
+>      - None
+>
+> - Weihou Zeng
+>   - Completed:
+>      - assumptions update
+>      - allocated tests
+>   - Will complete:
+>      - search/v1
+>      - continuous assumptions update
+>   - Issues:
+>      - None
+
+## 15/04 Weekly Meeting
+**Participation:** _Bojin Li_, _Cicy Zhou_, _Weihou Zeng_, _Quan Gu_, _Steve Yang_
+
+**Minute taker:** _Cicy Zhou_
+
+**Topics to discuss:**
+- [x] Discuss the progress of iteration 3 so far
+- [x] Standups
+
+### Minutes
+- everything is going well
+- most features are completed
+- planning.pdf still needs to be completed
+
+### Stand Ups
+> - Cicy Zhou
+>   - Completed:
+>      - user/profile/uploadphoto/v1
+>      - [Requirements] Elicitation
+>   - Will complete:
+>      - [Requirements] Analysis & Specification - Use Cases
+>      - [Requirements] Validation
+>      - [Design] Interface Design
+>      - [Design] Conceptual Modelling (State)
+>   - Issues:
+>      - None
+>
+> - Bojin Li
+>   - Completed:
+>      - message/share/v1
+>      - message/react/v1
+>      - message/unreact/v1
+>      - message/pin/v1
+>      - message/unpin/v1
+>      - message/sendlater/v1
+>      - message/sendlaterdm/v1
+>   - Will complete:
+>      - deployment
+>   - Issues:
+>      - None
+> 
+> - Steve Yang
+>   - Completed:
+>      - auth/passwordreset/request/v1
+>      - auth/passwordreset/reset/v1
+>      - standup/start/v1
+>   - Will complete:
+>      - standup/active/v1
+>      - standup/send/v1
+>   - Issues:
+>      - None
+>
+> - Quan Gu
+>   - Completed:
+>      - allocated tests
+>      - updated assumptions
+>   - Will complete:
+>      - notifications/get/v1
+>   - Issues:
+>      - None
+>
+> - Weihou Zeng
+>   - Completed:
+>      - allocated tests
+>      - last week's meeting minutes
+>   - Will complete:
+>      - search/v1
+>   - Issues:
+>      - None
