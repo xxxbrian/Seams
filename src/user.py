@@ -9,6 +9,7 @@ import secrets
 
 
 def users_all_v1(token):
+    """Return all active users in the Seams."""
     auth_user = User.find_by_token(token)
     if auth_user is None:
         raise AccessError(description='Permission denied')
@@ -16,6 +17,7 @@ def users_all_v1(token):
 
 
 def user_profile_v1(token, u_id):
+    """Return the user's profile."""
     auth_user = User.find_by_token(token)
     if auth_user is None:
         raise AccessError(description='Permission denied')
@@ -28,6 +30,7 @@ def user_profile_v1(token, u_id):
 
 @pickelsave
 def user_profile_setname_v1(token, name_first, name_last):
+    """Set the user's name."""
     user = User.find_by_token(token)
     if user is None:
         raise AccessError(description='Permission denied')
@@ -42,6 +45,7 @@ def user_profile_setname_v1(token, name_first, name_last):
 
 @pickelsave
 def user_profile_setemail_v1(token, email):
+    """Set the user's email."""
     user = User.find_by_token(token)
     if user is None:
         raise AccessError(description='Permission denied')
@@ -55,6 +59,7 @@ def user_profile_setemail_v1(token, email):
 
 @pickelsave
 def user_profile_sethandle_v1(token, handle_str):
+    """Set the user's handle."""
     user = User.find_by_token(token)
     if user is None:
         raise AccessError(description='Permission denied')
@@ -71,6 +76,7 @@ def user_profile_sethandle_v1(token, handle_str):
 @pickelsave
 def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end,
                                 y_end):
+    """Set the user's profile photo."""
     user = User.find_by_token(token)
     if user is None:
         raise AccessError(description='Permission denied')
@@ -96,6 +102,7 @@ def user_profile_uploadphoto_v1(token, img_url, x_start, y_start, x_end,
 
 
 def user_stats_v1(token):
+    """Return the user's stats."""
     user = User.find_by_token(token)
     if user is None:
         raise AccessError(description='Permission denied')
@@ -103,6 +110,7 @@ def user_stats_v1(token):
 
 
 def users_stats_v1(token):
+    """Return the stats of all workspace."""
     user = User.find_by_token(token)
     if user is None:
         raise AccessError(description='Permission denied')

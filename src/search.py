@@ -4,6 +4,22 @@ from functools import reduce
 
 
 def search_v1(token, query_str: str):
+    """Given a query string, return a collection of messages 
+    in all of the channels/DMs that the user has joined that 
+    contain the query (case-insensitive). There is no expected 
+    order for these messages.
+
+    Args:
+        token (str): user's token
+        query_str (str): query string
+
+    Raises:
+        AccessError: if token is invalid
+        InputError: if query_str is empty
+
+    Returns:
+        dict: dictionary of messages
+    """
     user = User.find_by_token(token)
     if user is None:
         raise AccessError(description='Permission denied')

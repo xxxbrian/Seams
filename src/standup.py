@@ -6,6 +6,30 @@ from src.type import pickelsave
 
 @pickelsave
 def standup_start_v1(token: str, channel_id: int, length: int):
+    """For a given channel, start the standup period whereby for the 
+    next "length" seconds if someone calls "standup/send" with a message, 
+    it is buffered during the X second window then at the end of the X 
+    second window a message will be added to the message queue in the 
+    channel from the user who started the standup. "length" is an integer 
+    that denotes the number of seconds that the standup occurs for. If no 
+    standup messages were sent during the duration of the standup, no message 
+    should be sent at the end.
+
+    Args:
+        token (str): user's token
+        channel_id (int): channel's id
+        length (int): length of standup
+
+    Raises:
+        AccessError: token invalid
+        InputError: channel_id does not refer to a valid channel
+        InputError: length is a negative integer
+        AccessError: channel_id is valid and the authorised user is not a member of the channel
+        InputError: an active standup is currently running in the channel
+
+    Returns:
+        dict: dictionary of time_finish
+    """
     user = User.find_by_token(token)
     channel = Channel.find_by_id(channel_id)
     if user is None:
@@ -27,6 +51,23 @@ def standup_start_v1(token: str, channel_id: int, length: int):
 
 
 def standup_active_v1(token, channel_id):
+    """For a given channel, return whether a standup is active in it, 
+    and what time the standup finishes. If no standup is active, then 
+    time_finish returns None.
+
+    Args:
+        token (str): user's token
+        channel_id (int): channel's id
+
+    Raises:
+        AccessError: token invalid
+        InputError: channel_id does not refer to a valid channel
+        AccessError: channel_id is valid and the authorised user 
+                    is not a member of the channel
+
+    Returns:
+        _type_: _description_
+    """
     user = User.find_by_token(token)
     channel = Channel.find_by_id(channel_id)
     if user is None:
@@ -44,6 +85,25 @@ def standup_active_v1(token, channel_id):
 
 @pickelsave
 def standup_send_v1(token, channel_id, message):
+    """Sending a message to get buffered in the standup queue, assuming a 
+    standup is currently active. Note: @ tags should not be parsed as proper 
+    tags when sending to standup/send
+
+    Args:
+        token (str): _description_
+        channel_id (int): _description_
+        message (str): _description_
+
+    Raises:
+        AccessError: token invalid
+        InputError: channel_id does not refer to a valid channel
+        InputError: length of message is over 1000 characters
+        AccessError: channel_id is valid and the authorised user is not a member of the channel
+        InputError: an active standup is not currently running in the channel
+
+    Returns:
+        dict: empty dictionary
+    """
     user = User.find_by_token(token)
     channel = Channel.find_by_id(channel_id)
     if user is None:

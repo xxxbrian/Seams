@@ -93,6 +93,21 @@ def auth_logout_v1(token):
 
 @pickelsave
 def auth_passwordreset_request_v1(email, mailobj):
+    """Given an email address, if the user is a registered user, 
+    sends them an email containing a specific secret code, that 
+    when entered in auth/passwordreset/reset, shows that the user 
+    trying to reset the password is the one who got sent this email. 
+    No error should be raised when passed an invalid email, as that 
+    would pose a security/privacy concern. When a user requests a 
+    password reset, they should be logged out of all current sessions.
+
+    Args:
+        email (str): user's email
+        mailobj (flask-mail): Flask's mail object
+
+    Returns:
+        dict: empy dict
+    """
     user = User.find_by_email(email)
     if user is None:
         return {}
@@ -107,6 +122,21 @@ def auth_passwordreset_request_v1(email, mailobj):
 
 @pickelsave
 def auth_passwordreset_reset_v1(reset_code: str, new_password: str):
+    """Given a reset code for a user, set that user's new password 
+    to the password provided. Once a reset code has been used, it 
+    is then invalidated.
+
+    Args:
+        reset_code (str): reset code of user
+        new_password (str): new password of user
+
+    Raises:
+        InputError: reset code is invalid
+        InputError: new password is invalid
+
+    Returns:
+        dict: empty dict
+    """
     user = User.find_by_reset_code(reset_code)
     if user is None:
         raise InputError(description='Reset_code invalid')

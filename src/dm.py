@@ -5,6 +5,7 @@ from src.type import pickelsave
 
 @pickelsave
 def dm_create_v1(token, u_ids):
+    """Create a new DM with the given user ids."""
     auth_user = User.find_by_token(token)
     users_list = [User.find_by_id(u_id) for u_id in u_ids]
     users_list.append(auth_user)
@@ -24,6 +25,7 @@ def dm_create_v1(token, u_ids):
 
 
 def dm_list_v1(token):
+    """List all DMs the authorised user is a member of."""
     user = User.find_by_token(token)
     if user is None:
         raise AccessError(description='Permission denied')
@@ -39,6 +41,7 @@ def dm_list_v1(token):
 
 @pickelsave
 def dm_remove_v1(token, dm_id):
+    """Remove a DM."""
     user = User.find_by_token(token)
     dm = DM.find_by_id(dm_id)
     if user is None:
@@ -54,6 +57,7 @@ def dm_remove_v1(token, dm_id):
 
 
 def dm_details_v1(token, dm_id):
+    """Get details of a DM."""
     user = User.find_by_token(token)
     dm = DM.find_by_id(dm_id)
     if user is None:
@@ -68,6 +72,7 @@ def dm_details_v1(token, dm_id):
 
 @pickelsave
 def dm_leave_v1(token, dm_id):
+    """Leave a DM."""
     user = User.find_by_token(token)
     dm = DM.find_by_id(dm_id)
     if user is None:
@@ -81,6 +86,7 @@ def dm_leave_v1(token, dm_id):
 
 
 def dm_messages_v1(token, dm_id, start):
+    """Get messages in a DM."""
     user = User.find_by_token(token)
     dm = DM.find_by_id(dm_id)
     if user is None:
